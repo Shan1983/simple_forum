@@ -1,23 +1,23 @@
 {
   "development": {
-    "username": "root",
+    "username": "shan",
     "password": null,
     "database": "simple_forum_dev",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "postgress"
   },
   "test": {
-    "username": "root",
+    "username": "shan",
     "password": null,
     "database": "simple_forum_test",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "postgres"
   },
   "production": {
-    "username": "root",
+    "username": "shan",
     "password": null,
     "database": "simple_forum",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "postgres"
   }
 }
