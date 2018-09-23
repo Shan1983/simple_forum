@@ -51,6 +51,10 @@ module.exports = {
         IpId: {
           type: Sequelize.INTEGER
         },
+        allowAdvertising: {
+          type: Sequelize.BOOLEAN,
+          defautValue: false
+        },
         createdAt: {
           allowNull: false,
           type: Sequelize.DATE
