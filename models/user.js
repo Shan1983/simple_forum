@@ -27,11 +27,10 @@
 // };
 
 const Sequelize = require("sequelize");
-const bcrypt = require("bcryptjs");
 const randomColor = require("randomcolor");
 
-class User extends Sequelize.Model {
-  static init(sequelize, DataTypes) {
+module.exports = class User extends Sequelize.Model {
+  static init(sequelize) {
     return super.init(
       {
         username: {
@@ -158,63 +157,14 @@ class User extends Sequelize.Model {
         // IpId: { type: DataTypes.INTEGER }
       },
       {
-        sequelize,
-        async updatePassword(sentPassword, newPassword) {
-          // check to make sure the user isnt using the previous password
-          if (sentPassword === newPassword) {
-            throw error.passwordsAreTheSame;
-          }
-
-          // authenticate the password before updating
-          const checkPassword = await bcrypt.compare(
-            sentPassword,
-            this.password
-          );
-
-          // if everything checks out do the update
-          if (checkPassword) {
-            await this.update({ password: newPassword });
-          } else {
-            throw error.didNotAuthenticate;
-          }
-        },
-        // compare passwords for use with logging in etc
-        async comparePasswords(sentPassword) {
-          return await bcrypt.compare(sentPassword, this.password);
-        },
-        async getUsersMetaData(limit) {
-          const Post = sequelize.Models.Post;
-          let metaData = {};
-
-          // get the id of the next post
-          const nextPostId = await pagination.getNextIdOrderedByDesc(
-            Post,
-            { UserId: this.id },
-            this.Post
-          );
-
-          // build the required url
-          if (nextPostId === null) {
-            metaData.URL = null;
-            metaData.PostCount = 0;
-          } else {
-            metaData.URL = trim(
-              `/api/v1/${
-                this.username
-              }?posts=true&limit=${limit}&from=${nextPostId - 1}`
-            );
-            metaData.PostCount = await pagination.getTotalPostCount(
-              Post,
-              this.Post,
-              limit,
-              { UserId: this.id },
-              true
-            );
-          }
-
-          return metaData;
-        }
+        sequelize
       }
     );
   }
-}
+
+  static associate(models) {
+    this.hasMany(models.Post);
+    this.hasMany(models.Thread);
+    this.belongsToMany(models.Ip, { through: "UserIp" });
+  }
+};

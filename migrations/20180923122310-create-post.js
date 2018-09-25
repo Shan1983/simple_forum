@@ -31,7 +31,8 @@ module.exports = {
           type: Sequelize.INTEGER
         },
         bestPost: {
-          type: Sequelize.INTEGER
+          type: Sequelize.BOOLEAN,
+          defaultValue: false
         },
         LikeId: {
           type: Sequelize.INTEGER
