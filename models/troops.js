@@ -1,12 +1,16 @@
-'use strict';
+"use strict";
 module.exports = (sequelize, DataTypes) => {
-  const troops = sequelize.define('troops', {
-    name: DataTypes.STRING,
-    level: DataTypes.INTEGER,
-    maxLevel: DataTypes.INTEGER
-  }, {});
-  troops.associate = function(models) {
-    // associations can be defined here
+  const Troop = sequelize.define(
+    "Troop",
+    {
+      name: DataTypes.STRING,
+      level: DataTypes.INTEGER,
+      maxLevel: DataTypes.INTEGER
+    },
+    {}
+  );
+  Troop.associate = function(models) {
+    Troop.belongsTo(models.Village);
   };
-  return troops;
+  return Troop;
 };
