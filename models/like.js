@@ -1,12 +1,18 @@
-'use strict';
+"use strict";
 module.exports = (sequelize, DataTypes) => {
-  const like = sequelize.define('like', {
-    UserId: DataTypes.INTEGER,
-    ThreadId: DataTypes.INTEGER,
-    PostId: DataTypes.INTEGER
-  }, {});
-  like.associate = function(models) {
-    // associations can be defined here
+  const Like = sequelize.define(
+    "Like",
+    {
+      UserId: DataTypes.INTEGER,
+      ThreadId: DataTypes.INTEGER,
+      PostId: DataTypes.INTEGER
+    },
+    {}
+  );
+  Like.associate = function(models) {
+    Like.belongsTo(models.User);
+    Like.belongsTo(models.Thread);
+    Like.belongsTo(models.Post);
   };
-  return like;
+  return Like;
 };
