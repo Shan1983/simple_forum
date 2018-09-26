@@ -1,11 +1,25 @@
-'use strict';
+"use strict";
 module.exports = (sequelize, DataTypes) => {
-  const friend = sequelize.define('friend', {
-    username: DataTypes.STRING,
-    UserId: DataTypes.INTEGER
-  }, {});
-  friend.associate = function(models) {
-    // associations can be defined here
+  const Friend = sequelize.define(
+    "Friend",
+    {
+      username: DataTypes.STRING,
+      UserId: DataTypes.INTEGER
+    },
+    {}
+  );
+
+  // class methods
+
+  Friend.associate = function(models) {
+    Friend.belongsToMany(models.User, { throught: "frienduser" });
   };
-  return friend;
+
+  // instance methods
+
+  Friend.prototype.getFriendCount = function() {
+    return Friend.count();
+  };
+
+  return Friend;
 };
