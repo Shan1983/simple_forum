@@ -55,6 +55,10 @@ module.exports = {
           type: Sequelize.BOOLEAN,
           defautValue: false
         },
+        emailSubscriptions: {
+          type: Sequelize.BOOLEAN,
+          defaultValue: true
+        },
         createdAt: {
           allowNull: false,
           type: Sequelize.DATE
