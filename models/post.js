@@ -1,85 +1,112 @@
 "use strict";
-const marked = require("marked");
-const Sequelize = require("sequelize");
 const errors = require("../helpers/mainErrors");
+const marked = require("../helpers/markedSetup");
 
-// initialize basic marked options
-marked.setOptions({
-  highligh(hl) {
-    return require("highlight.js").highlightAuto(hl).value;
-  },
-  sanitize: true
-});
-
-// module.exports = (sequelize, DataTypes) => {
-//   const post = sequelize.define(
-//     "post",
-//     {
-//       discussion: DataTypes.TEXT,
-//       postPosition: DataTypes.INTEGER,
-//       removed: DataTypes.BOOLEAN,
-//       UserId: DataTypes.INTEGER,
-//       ThreadId: DataTypes.INTEGER,
-//       bestPost: DataTypes.INTEGER
-//     },
-//     {}
-//   );
-//   post.associate = function(models) {
-//     // associations can be defined here
-//   };
-//   return post;
-// };
-
-module.exports = class Post extends Sequelize.Model {
-  static init(sequelize) {
-    return super.init(
-      {
-        discussion: {
-          type: DataTypes.TEXT,
-          set(val) {
-            if (!val) {
-              throw new sequelize.ValidationError(sequelize, {
-                error: "discussion must be a string",
-                field: "discussion"
-              });
-            }
-            this.setDataValue("discussion", marked(val)); // set up with editor options later
-          },
-          allowNull: false
+module.exports = (sequelize, DataTypes) => {
+  const Post = sequelize.define(
+    "Post",
+    {
+      discussion: {
+        type: DataTypes.TEXT,
+        set(val) {
+          if (!val) {
+            throw new sequelize.ValidationError(sequelize, {
+              error: "discussion must be a string",
+              field: "discussion"
+            });
+          }
+          this.setDataValue("discussion", marked(val)); // set up with editor options later
         },
-        postPosition: {
-          type: DataTypes.INTEGER
-        },
-        removed: {
-          type: DataTypes.BOOLEAN,
-          defaultValue: false
-        },
-        UserId: {
-          type: DataTypes.INTEGER
-        },
-        ThreadId: {
-          type: DataTypes.INTEGER
-        },
-        bestPost: {
-          type: DataTypes.BOOLEAN,
-          defaultValue: false
-        }
+        allowNull: false
       },
-      {
-        sequelize
-      }
-    );
-  }
+      postPosition: { type: DataTypes.INTEGER },
+      removed: { type: DataTypes.BOOLEAN, defaultValue: false },
+      UserId: { type: DataTypes.INTEGER },
+      ThreadId: { type: DataTypes.INTEGER },
+      bestPost: { type: DataTypes.BOOLEAN, defaultValue: false },
+      replyToUser: {
+        type: DataTypes.STRING
+      },
+      ReplyId: { type: DataTypes.INTEGER }
+    },
+    {}
+  );
 
-  static associate(models) {
-    this.belongsTo(models.User);
-    this.belongsTo(models.Thread);
-    this.hasMany(models.Post, { as: "Replies", foreignKey: "ReplyId" });
-    this.belongsTo(models.Like);
-    this.hasMany(models.Report, {
+  // class methods
+
+  Post.associate = function(models) {
+    Post.belongsTo(models.User);
+    Post.belongsTo(models.Thread);
+    Post.hasMany(models.Post, { as: "Replies", foreignKey: "ReplyId" });
+    Post.hasMany(models.Like, { foreignKeyConstraint: true });
+    Post.hasMany(models.Report, {
       foreignKeyConstraint: true,
       onDelete: "CASCADE",
       hooks: true
     });
-  }
+  };
+
+  // return data from required models
+  Post.postOptions = function() {
+    const { User, Like, Thread, Post, Category, Village } = sequelize.models;
+
+    return [
+      { model: User, attributes: ["username", "id", "color", "avatar"] },
+      {
+        model: Like,
+        where: { PostId: Post.id },
+        attributes: ["username", "color", "avatar", "id"]
+      },
+      { model: Thread, include: [Category] },
+      {
+        model: Post,
+        as: "Replies",
+        include: [
+          {
+            model: User,
+            attributes: ["id", "username", "color", "avatar"]
+          }
+        ]
+      },
+      Village
+    ];
+  };
+
+  Post.prototype.getPostReplies = async function(id, thread) {
+    const { Thread, User } = sequelize.models;
+
+    const postReplies = await Post.findById(id, {
+      include: [Thread, { model: User, attributes: ["username"] }]
+    });
+
+    if (!postReplies) {
+      throw errors.parameterError("replyingToUser", "The post does not exist.");
+    } else if (postReplies.Thread.id !== thread.id) {
+      throw errors.parameterError(
+        "replyingToUser",
+        "You cannot reply cross site. i.e. you must be in the same thread."
+      );
+    } else if (postReplies.removed) {
+      throw errors.postRemoved;
+    } else {
+      return postReplies;
+    }
+  };
+
+  // instance methods
+
+  Post.prototype.getReplyToUser = function() {
+    return Post.findByPrimary(this.replyId);
+  };
+
+  Post.prototype.setReplyToUser = function() {
+    return post.getUser().then(user => {
+      return this.update({
+        replyToUser: user.username,
+        ReplyId: post.id
+      });
+    });
+  };
+
+  return Post;
 };
