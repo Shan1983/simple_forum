@@ -37,6 +37,10 @@ module.exports = {
         LikeId: {
           type: Sequelize.INTEGER
         },
+        replyToUser: {
+          type: Sequelize.STRING
+        },
+        ReplyId: { type: Sequelize.INTEGER },
         createdAt: {
           allowNull: false,
           type: Sequelize.DATE

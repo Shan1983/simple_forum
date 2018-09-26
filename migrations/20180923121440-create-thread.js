@@ -70,6 +70,9 @@ module.exports = {
         LikeId: {
           type: Sequelize.INTEGER
         },
+        threadPosition: {
+          type: Sequelize.INTEGER
+        },
         createdAt: {
           allowNull: false,
           type: Sequelize.DATE
