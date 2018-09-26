@@ -1,11 +1,15 @@
-'use strict';
+"use strict";
 module.exports = (sequelize, DataTypes) => {
-  const search = sequelize.define('search', {
-    query: DataTypes.STRING,
-    UserId: DataTypes.INTEGER
-  }, {});
-  search.associate = function(models) {
-    // associations can be defined here
-  };
-  return search;
+  const Search = sequelize.define(
+    "Search",
+    {
+      query: DataTypes.STRING,
+      UserId: DataTypes.INTEGER
+    },
+    {}
+  );
+  // Search.associate = function(models) {
+  //   // associations can be defined here
+  // };
+  return Search;
 };
