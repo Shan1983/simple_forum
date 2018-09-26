@@ -1,11 +1,40 @@
-'use strict';
+"use strict";
 module.exports = (sequelize, DataTypes) => {
-  const ipaddress = sequelize.define('ipaddress', {
-    ipAddress: DataTypes.STRING,
-    UserId: DataTypes.INTEGER
-  }, {});
-  ipaddress.associate = function(models) {
-    // associations can be defined here
+  const IpAddress = sequelize.define(
+    "IpAddress",
+    {
+      ipaddress: {
+        type: DataTypes.STRING,
+        validate: {
+          isIP: true
+        }
+      },
+      UserId: DataTypes.INTEGER
+    },
+    {}
+  );
+
+  // class methods
+
+  IpAddress.associate = function(models) {
+    IpAddress.belongsToMany(models.User, { throught: "UserIp" });
   };
-  return ipaddress;
+
+  IpAddress.createIpIfEmpty = async function(ip, user) {
+    const { User } = sequelize.models;
+    // get ip if user had one already
+    const ip = await IpAddress.findOne({
+      where: { ipaddress: ip },
+      include: [{ model: User, where: { id: user.id } }]
+    });
+
+    if (!ip) {
+      const newIp = await IpAddress.create({
+        ipaddress: ip
+      });
+      await newIp.addUser(user);
+    }
+  };
+
+  return IpAddress;
 };
