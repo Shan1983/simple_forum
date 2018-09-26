@@ -1,12 +1,16 @@
-'use strict';
+"use strict";
 module.exports = (sequelize, DataTypes) => {
-  const spells = sequelize.define('spells', {
-    name: DataTypes.STRING,
-    level: DataTypes.INTEGER,
-    maxLevel: DataTypes.INTEGER
-  }, {});
-  spells.associate = function(models) {
-    // associations can be defined here
+  const Spell = sequelize.define(
+    "Spell",
+    {
+      name: DataTypes.STRING,
+      level: DataTypes.INTEGER,
+      maxLevel: DataTypes.INTEGER
+    },
+    {}
+  );
+  Spell.associate = function(models) {
+    Spell.belongsTo(models.Village);
   };
-  return spells;
+  return Spell;
 };
