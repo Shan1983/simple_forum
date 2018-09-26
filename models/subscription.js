@@ -1,11 +1,25 @@
-'use strict';
+"use strict";
 module.exports = (sequelize, DataTypes) => {
-  const subscription = sequelize.define('subscription', {
-    ThreadId: DataTypes.INTEGER,
-    UserId: DataTypes.INTEGER
-  }, {});
-  subscription.associate = function(models) {
-    // associations can be defined here
+  const Subscription = sequelize.define(
+    "Subscription",
+    {
+      ThreadId: DataTypes.INTEGER,
+      UserId: DataTypes.INTEGER
+    },
+    {}
+  );
+
+  // class methods
+
+  Subscription.associate = function(models) {
+    Subscription.belongsTo(models.Thread);
   };
-  return subscription;
+
+  // setup email for subs
+
+  // setup stop emails
+
+  // setup functionality for canceling subscriptions
+
+  return Subscription;
 };
