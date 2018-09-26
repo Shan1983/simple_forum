@@ -1,10 +1,31 @@
-'use strict';
+"use strict";
 module.exports = (sequelize, DataTypes) => {
-  const role = sequelize.define('role', {
-    role: DataTypes.ENUM
-  }, {});
-  role.associate = function(models) {
-    // associations can be defined here
+  constRole = sequelize.define(
+    "Role",
+    {
+      role: {
+        type: DataTypes.ENUM,
+        values: ["System", "Administrator", "Moderator", "Member"]
+      }
+    },
+    {}
+  );
+
+  // class Methods
+
+  Role.associate = function(models) {
+    Role.belongsToMany(models.User, { throught: "userrole" });
   };
-  return role;
+
+  // instance methods
+
+  // check if user can do admin stuff
+
+  // check if user can do mod stuff
+
+  // check if user can do system system stuff
+
+  // create special role for recruitment
+
+  return Role;
 };
