@@ -4,7 +4,8 @@ module.exports = (sequelize, DataTypes) => {
     "Subscription",
     {
       ThreadId: DataTypes.INTEGER,
-      UserId: DataTypes.INTEGER
+      UserId: DataTypes.INTEGER,
+      sendEmails: { type: DataTypes.BOOLEAN, defaultValue: true }
     },
     {}
   );
@@ -13,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Subscription.associate = function(models) {
     Subscription.belongsTo(models.Thread);
+    Subscription.belongsTo(models.User);
   };
 
   // setup email for subs

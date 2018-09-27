@@ -16,6 +16,10 @@ module.exports = {
         UserId: {
           type: Sequelize.INTEGER
         },
+        sendEmails: {
+          type: Sequelize.BOOLEAN,
+          defaultValue: true
+        },
         createdAt: {
           allowNull: false,
           type: Sequelize.DATE
