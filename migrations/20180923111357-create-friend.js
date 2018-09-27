@@ -16,6 +16,16 @@ module.exports = {
         UserId: {
           type: Sequelize.INTEGER
         },
+        requestTo: {
+          type: Sequelize.INTEGER
+        },
+        requestFrom: {
+          type: Sequelize.INTEGER
+        },
+        accepted: {
+          type: Sequelize.BOOLEAN,
+          defaultValue: false
+        },
         createdAt: {
           allowNull: false,
           type: Sequelize.DATE
