@@ -18,7 +18,14 @@ module.exports = {
           defaultValue: false
         },
         type: {
-          type: Sequelize.STRING
+          type: Sequelize.ENUM,
+          values: [
+            "mention",
+            "thread update",
+            "reply",
+            "friend request",
+            "punishment"
+          ]
         },
         createdAt: {
           allowNull: false,
