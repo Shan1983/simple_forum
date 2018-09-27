@@ -4,11 +4,11 @@ const errors = {
     400
   ],
   accountNotExists: ["You need to create an account to continue.", 400],
+  banError: ["You cannot ban this user.", 400],
   categoryExists: ["This category already exists.", 400],
   categoryError: ["This category does not exist.", 400],
   invalidLike: ["You cannot like your own thread/post.", 400],
   lockedError: ["This thread is locked, posting is not allowed.", 400],
-  loginError: ["The username or password provided was incorrect.", 401],
   loginError: ["The username or password provided was incorrect.", 401],
   notAuthorized: ["You are not authorized to continue.", 401],
   passwordsAreTheSame: ["You cannot use your old password.", 400],
