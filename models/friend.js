@@ -1,10 +1,23 @@
 "use strict";
+
+const errors = require("../helpers/mainErrors");
+
 module.exports = (sequelize, DataTypes) => {
   const Friend = sequelize.define(
     "Friend",
     {
       username: DataTypes.STRING,
-      UserId: DataTypes.INTEGER
+      UserId: DataTypes.INTEGER,
+      requestTo: {
+        type: Sequelize.INTEGER
+      },
+      requestFrom: {
+        type: Sequelize.INTEGER
+      },
+      accepted: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+      }
     },
     {}
   );
