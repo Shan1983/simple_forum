@@ -32,12 +32,18 @@ module.exports = (sequelize, DataTypes) => {
     const user = await User.findById(id);
 
     // check if their in the box
-    const penalty = await PenaltyBox.findById(id, {
+    const penalty = await PenaltyBox.findOne({
+      where: { UserId: id },
       include: [
-        "duration",
-        "userCanCreatePost",
-        "userCanCreateThread",
-        "severity"
+        {
+          model: PenaltyBox,
+          attributes: [
+            "duration",
+            "userCanCreatePost",
+            "userCanCreateThread",
+            "severity"
+          ]
+        }
       ]
     });
 
