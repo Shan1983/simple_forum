@@ -1,13 +1,43 @@
-'use strict';
+"use strict";
 module.exports = (sequelize, DataTypes) => {
-  const blacklist = sequelize.define('blacklist', {
-    playerTag: DataTypes.STRING,
-    currentName: DataTypes.STRING,
-    previousName: DataTypes.STRING,
-    reason: DataTypes.TEXT
-  }, {});
-  blacklist.associate = function(models) {
-    // associations can be defined here
+  const Blacklist = sequelize.define(
+    "Blacklist",
+    {
+      playerTag: DataTypes.STRING,
+      currentName: DataTypes.STRING,
+      previousName: DataTypes.STRING,
+      reason: DataTypes.TEXT
+    },
+    {}
+  );
+
+  // class methods
+
+  Blacklist.associate = function(models) {
+    Blacklist.belongsTo(models.User);
   };
-  return blacklist;
+
+  Blacklist.addUser = function(tag, name, reason) {
+    Blacklist.create({
+      tag,
+      currentName: name,
+      reason,
+      previousName: name
+    });
+  };
+
+  // instance methods
+  Blacklist.prototype.removeUser = async function(name) {
+    const { Blacklist } = sequelize.models;
+
+    const bl = await Blacklist.findOne({
+      where: { currentName: name }
+    });
+
+    bl.destroy();
+
+    return true;
+  };
+
+  return Blacklist;
 };
