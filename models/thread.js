@@ -211,9 +211,11 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   Thread.prototype.checkStickyDuration = async function() {
-    const expires = this.stickyDuration;
+    const expires = await Thread.findOne({
+      where: { duration: moment() }
+    });
 
-    if (moment().isAfter(expires)) {
+    if (moment().isAfter(expires.duration)) {
       this.update({
         isSticky: false
       });
