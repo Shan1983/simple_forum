@@ -1,4 +1,7 @@
 "use strict";
+
+const errors = require("../helpers/mainErrors");
+
 module.exports = (sequelize, DataTypes) => {
   constRole = sequelize.define(
     "Role",
@@ -20,6 +23,22 @@ module.exports = (sequelize, DataTypes) => {
   // instance methods
 
   // check if user can do admin stuff
+  Role.prototype.isAdmin = async function() {
+    const { User } = sequelize.models;
+
+    const userRole = await Role.findOne({
+      where: { UserId: User.id }
+    });
+
+    //loop?
+
+    // check if admin
+    if (!userRole.role === "Administrator") {
+      throw errors.notAuthorized;
+    } else {
+      return true;
+    }
+  };
 
   // check if user can do mod stuff
 
