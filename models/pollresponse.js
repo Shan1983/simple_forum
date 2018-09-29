@@ -1,11 +1,29 @@
-'use strict';
+"use strict";
 module.exports = (sequelize, DataTypes) => {
-  const pollResponse = sequelize.define('pollResponse', {
-    response: DataTypes.STRING,
-    PollQueryId: DataTypes.INTEGER
-  }, {});
-  pollResponse.associate = function(models) {
-    // associations can be defined here
+  const PollResponse = sequelize.define(
+    "PollResponse",
+    {
+      response: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          len: {
+            args: [1, 240],
+            msg: "The poll's response must be between 1 and 240 characters."
+          },
+          isString(val) {
+            if (typeof val !== "string") {
+              throw sequelize.ValidationError("The response must be a string.");
+            }
+          }
+        }
+      },
+      PollQueryId: DataTypes.INTEGER
+    },
+    {}
+  );
+  PollResponse.associate = function(models) {
+    PollResponse.hasMany(mdoels.PollBallot);
   };
-  return pollResponse;
+  return PollResponse;
 };
