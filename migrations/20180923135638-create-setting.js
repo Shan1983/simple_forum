@@ -63,7 +63,7 @@ module.exports = {
         },
         editor: {
           type: Sequelize.ENUM,
-          values: ["Plain Editor", "Markdown Editor", "Tiny Editor"]
+          values: ["Plain Editor", "Markdown Editor"]
         },
         setAdminUser: {
           type: Sequelize.INTEGER
