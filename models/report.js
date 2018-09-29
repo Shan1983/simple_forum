@@ -1,14 +1,103 @@
-'use strict';
+"use strict";
+const errors = require("../helpers/mainErrors");
+
 module.exports = (sequelize, DataTypes) => {
-  const report = sequelize.define('report', {
-    ThreadId: DataTypes.INTEGER,
-    PostId: DataTypes.INTEGER,
-    reason: DataTypes.ENUM,
-    complaint: DataTypes.TEXT,
-    submittedBy: DataTypes.INTEGER
-  }, {});
-  report.associate = function(models) {
-    // associations can be defined here
+  const Report = sequelize.define(
+    "Report",
+    {
+      ThreadId: {
+        type: DataTypes.INTEGER
+      },
+      PostId: {
+        type: DataTypes.INTEGER
+      },
+      reason: {
+        type: DataTypes.ENUM,
+        values: [
+          "Spam",
+          "Inappropriate",
+          "Harrassment",
+          "Poster Requested",
+          "Duplicate"
+        ],
+        validate: {
+          isIn: {
+            args: [
+              [
+                "Spam",
+                "Inappropriate",
+                "Harrassment",
+                "Poster Requested",
+                "Duplicate"
+              ]
+            ],
+            msg: "Please only use one of the predefined options."
+          }
+        }
+      },
+      complaint: {
+        type: DataTypes.TEXT,
+        validate: {
+          allowNull: false,
+          isString(val) {
+            if (typeof val !== "string") {
+              throw sequelize.ValidationError(
+                "The complaint must be a string."
+              );
+            }
+          }
+        }
+      },
+      submittedBy: {
+        type: DataTypes.INTEGER
+      }
+    },
+    {}
+  );
+
+  // class methods
+
+  Report.associate = function(models) {
+    Report.belongsTo(models.User);
+    Report.belongsTo(models.Thread);
+    Report.belongsTo(models.Post);
   };
-  return report;
+
+  // instance methods
+
+  // check if the post or thread exists
+  Report.prototype.checkIfValid = async function(type, id) {
+    const { Post, Thread } = sequelize.models;
+
+    if (type === "thread") {
+      const thread = await Thread.findOne({
+        where: { id }
+      });
+
+      if (!thread) {
+        throw errors.parameterError("id", "That thread does not exist.");
+      }
+    } else if (type === "post") {
+      const post = await Post.findOne({
+        where: { id }
+      });
+
+      if (!post) {
+        throw errors.parameterError("id", "That post does not exist.");
+      }
+    } else {
+      return true;
+    }
+  };
+
+  // data should be an object
+  Report.prototype.submitNewReport = async function(data) {
+    return await Report.create({
+      ThreadId: data.threadId,
+      PostId: data.PostId,
+      reason: data.reason,
+      submittedBy: data.userId
+    });
+  };
+  return Report;
 };
