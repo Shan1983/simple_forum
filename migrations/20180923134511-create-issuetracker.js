@@ -16,7 +16,7 @@ module.exports = {
           values: ["LOW", "MODERATE", "HIGH", "URGENT"]
         },
         notes: { type: Sequelize.TEXT },
-        PriorityId: { type: Sequelize.INTEGER },
+
         UserId: { type: Sequelize.INTEGER },
         createdAt: { allowNull: false, type: Sequelize.DATE },
         updatedAt: { allowNull: false, type: Sequelize.DATE }

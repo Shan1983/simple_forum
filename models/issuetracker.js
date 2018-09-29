@@ -35,7 +35,6 @@ module.exports = (sequelize, DataTypes) => {
           }
         }
       },
-      PriorityId: { type: DataTypes.INTEGER },
       UserId: { type: DataTypes.INTEGER },
       points: { type: DataTypes.INTEGER, defaultValue: 0 }
     },
