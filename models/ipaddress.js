@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
       ipaddress: {
         type: DataTypes.STRING,
         validate: {
-          isIP: true
+          isIp: true
         }
       },
       UserId: DataTypes.INTEGER
