@@ -14,7 +14,10 @@ const errors = {
   passwordsAreTheSame: ["You cannot use your old password.", 400],
   postRemoved: ["This post has been removed, replying is not allowed.", 400],
   settingError: ["There was an error with the settings options.", 400],
-  unknown: ["An unknown error occured, reload and try again.", 500],
+  unknown: [
+    "Whoops! something on our end screwed up :( reload and try again.",
+    500
+  ],
 
   parameterError(param, message) {
     return [`Error: ${param} is invalid. Message: ${message}.`, 400];
