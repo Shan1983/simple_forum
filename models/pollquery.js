@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
       completionDate: {
         type: DataTypes.DATE
       },
-      isDone: { type: DataTypes.Boolean, defaultValue: false }
+      isDone: { type: DataTypes.BOOLEAN, defaultValue: false }
     },
     {}
   );
@@ -59,7 +59,7 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   // start a new poll
-  PollQuery.prorotype.startNewPoll = async function(
+  PollQuery.prototype.startNewPoll = async function(
     userId,
     question,
     completionDate
@@ -76,9 +76,9 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     // work out the completionDate
-    const completionDate = moment().add(duration, "days");
+    const finished = moment().add(duration, "days");
 
-    await PollQuery.create({ UserId, question, completionDate });
+    await PollQuery.create({ UserId, question, completionDate: finished });
 
     return true;
   };
