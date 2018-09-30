@@ -9,6 +9,6 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropColumn("settings", "setMaxDuscussionWordLimit");
+    return queryInterface.removeColumn("settings", "setMaxDiscussionWordLimit");
   }
 };
