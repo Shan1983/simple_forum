@@ -2,8 +2,8 @@
 
 const randomColor = require("randomcolor");
 const bcrypt = require("bcryptjs");
-const pagination = require("../../helpers/pagination");
-const errors = require("../../helpers/mainErrors");
+const pagination = require("../helpers/pagination");
+const errors = require("../helpers/mainErrors");
 
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
@@ -132,13 +132,12 @@ module.exports = (sequelize, DataTypes) => {
   User.associate = function(models) {
     User.hasMany(models.Post);
     User.hasMany(models.Thread);
-    User.belongsToMany(models.Ip, { through: "UserIp" });
-    User.hasOne(models.Village)
-    User.belongsTo(models.Role, { through: 'userrole'})
+    User.belongsToMany(models.IpAddress, { through: "UserIp" });
+    User.hasOne(models.Village);
+    User.belongsTo(models.Role, { through: "userrole" });
   };
 
-
-  User.prototype.updatePassword = function(sentPassword, newPassword) {
+  User.prototype.updatePassword = async function(sentPassword, newPassword) {
     // check to make sure the user isnt using the previous password
     if (sentPassword === newPassword) {
       throw errors.passwordsAreTheSame;
@@ -153,14 +152,14 @@ module.exports = (sequelize, DataTypes) => {
     } else {
       throw errors.notAuthenticated;
     }
-  }
+  };
 
   // compare passwords for use with logging in etc
   User.prototype.validPassword = async function(sentPassword) {
     return await bcrypt.compare(sentPassword, this.password);
-  }
+  };
 
-  User.prototype.getUsersMetaData = function (limit) {
+  User.prototype.getUsersMetaData = async function(limit) {
     const Post = sequelize.Models.Post;
     let metaData = {};
 
@@ -178,7 +177,7 @@ module.exports = (sequelize, DataTypes) => {
     } else {
       metaData.URL = trim(
         `/api/v1/${this.username}?posts=true&limit=${limit}&from=${nextPostId -
-        1}`
+          1}`
       );
       metaData.PostCount = await pagination.getTotalPostCount(
         Post,
@@ -190,11 +189,11 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     return metaData;
-  }
+  };
 
   // return users posts
   User.userOptions = function(from, limit) {
-    const {Post, Village} = sequelize.models;
+    const { Post, Village } = sequelize.models;
 
     return [
       {
@@ -206,8 +205,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       Village
     ];
-  }
-
+  };
 
   return User;
 };
