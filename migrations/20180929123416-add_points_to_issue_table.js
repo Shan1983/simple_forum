@@ -8,6 +8,6 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropColumn("issuetrackers", "points");
+    return queryInterface.removeColumn("issuetrackers", "points");
   }
 };
