@@ -8,16 +8,9 @@ module.exports = (sequelize, DataTypes) => {
     {
       username: DataTypes.STRING,
       UserId: DataTypes.INTEGER,
-      requestTo: {
-        type: Sequelize.INTEGER
-      },
-      requestFrom: {
-        type: Sequelize.INTEGER
-      },
-      accepted: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false
-      }
+      requestTo: { type: DataTypes.INTEGER },
+      requestFrom: { type: DataTypes.INTEGER },
+      accepted: { type: DataTypes.BOOLEAN, defaultValue: false }
     },
     {}
   );
