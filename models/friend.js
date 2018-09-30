@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
   // class methods
 
   Friend.associate = function(models) {
-    Friend.belongsToMany(models.User, { throught: "FriendUser" });
+    Friend.belongsToMany(models.User, { through: "FriendUser" });
   };
 
   // instance methods
