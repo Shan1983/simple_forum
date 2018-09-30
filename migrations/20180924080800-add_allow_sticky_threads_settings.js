@@ -9,6 +9,6 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropColumn("settings", "allowStickyThreads");
+    return queryInterface.removeColumn("settings", "allowStickyThreads");
   }
 };
