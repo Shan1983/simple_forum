@@ -27,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
   );
   Village.associate = function(models) {
     Village.hasOne(models.Troop);
-    Village.hasOne(models.Heroes);
+    Village.hasOne(models.Hero);
     Village.hasOne(models.Spell);
   };
   return Village;
