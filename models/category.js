@@ -39,7 +39,7 @@ module.exports = (sequelize, DataTypes) => {
   // class methods
 
   Category.associate = function(models) {
-    Category.hasMany(models.Threads);
+    Category.hasMany(models.Thread);
   };
 
   Category.hook("beforeCreate", category => {
