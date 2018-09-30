@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     {}
   );
   PollResponse.associate = function(models) {
-    PollResponse.hasMany(mdoels.PollBallot);
+    PollResponse.hasMany(models.PollBallot);
   };
   return PollResponse;
 };
