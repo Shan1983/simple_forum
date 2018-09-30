@@ -2,12 +2,12 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.addColumn("pollQuery", "completionDate", {
+    return queryInterface.addColumn("pollQueries", "completionDate", {
       type: Sequelize.DATE
     });
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropColumn("pollQuery", "completionDate");
+    return queryInterface.removeColumn("pollQueries", "completionDate");
   }
 };

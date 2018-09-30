@@ -2,12 +2,12 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.addColumn("pollQuery", "isDone", {
+    return queryInterface.addColumn("pollQueries", "isDone", {
       type: Sequelize.BOOLEAN
     });
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropColumn("pollQuery", "isDone");
+    return queryInterface.removeColumn("pollQueries", "isDone");
   }
 };
