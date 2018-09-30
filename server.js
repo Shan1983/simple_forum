@@ -1,7 +1,9 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const expressSession = require("express-session");
-const SequelizeStore = require("connect-session-sequelize")(expressSession);
+const SequelizeStore = require("connect-session-sequelize")(
+  expressSession.Store
+);
 const path = require("path");
 const helmet = require("helmet");
 const compression = require("compression");
@@ -17,8 +19,8 @@ const port = process.env.PORT || 3000;
 const sessionSecret = process.env.SESSION_SECRET;
 
 // setup express middleware
-app.use(helmet);
-app.use(compression);
+app.use(helmet());
+app.use(compression());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -34,8 +36,8 @@ const session = expressSession({
 // sync the initial db connection
 sessionStore
   .sync()
-  .then(response => console.log("Database status: Started!"))
-  .catch(err => console.log(err));
+  .then(response => console.log("Database status: ✅"))
+  .catch(err => console.log(`Database status: ❌ ${err}`));
 
 // setup proxy if in production
 if (process.env.NODE_ENV === "production") {
@@ -46,7 +48,7 @@ if (process.env.NODE_ENV === "production") {
 app.use(session);
 
 // the api routes
-app.use("api/v1/test", require("./routes/test"));
+app.use("/api/v1/test", require("./routes/test"));
 
 // setup general error handler
 app.use(require("./helpers/generalErrors"));
@@ -56,7 +58,7 @@ app.use(require("./helpers/generalErrors"));
 
 const start = () => {
   const server = app.listen(port, () => {
-    console.log("🦄  Server has started!");
+    console.log(`🖥  Server has started! on port: ${port}`);
 
     // setup global vars
     app.locals.started = true; // used for testing
