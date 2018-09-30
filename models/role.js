@@ -3,7 +3,7 @@
 const errors = require("../helpers/mainErrors");
 
 module.exports = (sequelize, DataTypes) => {
-  constRole = sequelize.define(
+  const Role = sequelize.define(
     "Role",
     {
       role: {
@@ -17,8 +17,8 @@ module.exports = (sequelize, DataTypes) => {
   // class Methods
 
   Role.associate = function(models) {
-    Role.belongsTo(models.User)
-    Role.belongsToMany(models.User, { throught: "userrole" });
+    Role.belongsTo(models.User);
+    Role.belongsToMany(models.User, { through: "userrole" });
   };
 
   // instance methods
@@ -42,7 +42,7 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   // check if user can do mod stuff
-  Role.prototype.isModerator = async function (id) {
+  Role.prototype.isModerator = async function(id) {
     const { Role } = sequelize.models;
 
     const userRole = await Role.findOne({
@@ -60,7 +60,7 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   // check if user can do system system stuff
-  Role.prototype.isAdmin = async function (id) {
+  Role.prototype.isAdmin = async function(id) {
     const { Role } = sequelize.models;
 
     const userRole = await Role.findOne({
