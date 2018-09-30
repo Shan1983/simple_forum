@@ -68,7 +68,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       setAdminUser: { type: DataTypes.INTEGER },
       numberOfAdmins: { type: DataTypes.INTEGER },
-      setMaxDiscussionWordLimit: { type: DatatTypes.INTEGER },
+      setMaxDiscussionWordLimit: { type: DataTypes.INTEGER },
       allowSubscriptions: { type: DataTypes.BOOLEAN, defaultValue: true },
       allowStickyThreads: { type: DataTypes.BOOLEAN, defaultValue: true }
     },
