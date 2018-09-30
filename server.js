@@ -48,7 +48,6 @@ if (process.env.NODE_ENV === "production") {
 app.use(session);
 
 // the api routes
-// app.use("/api/v1/test", require("./routes/test"));
 app.use("/api/v1/user", require("./routes/user"));
 
 // setup general error handler
