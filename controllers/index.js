@@ -123,3 +123,40 @@ exports.getUserMeta = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.userProfile = async (req, res, next) => {
+  try {
+  } catch (error) {
+    next(error);
+  }
+};
+exports.login = async (req, res, next) => {
+  try {
+  } catch (error) {
+    next(error);
+  }
+};
+exports.register = async (req, res, next) => {
+  try {
+  } catch (error) {
+    next(error);
+  }
+};
+exports.logout = async (req, res, next) => {
+  try {
+  } catch (error) {
+    next(error);
+  }
+};
+exports.updateProfile = async (req, res, next) => {
+  try {
+  } catch (error) {
+    next(error);
+  }
+};
+exports.deleteUser = async (req, res, next) => {
+  try {
+  } catch (error) {
+    next(error);
+  }
+};
