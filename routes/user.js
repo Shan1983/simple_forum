@@ -25,7 +25,7 @@ router.put(
 router.delete(
   "/profile/:username",
   passport.authenticate("jwt"),
-  controller.updateProfile
+  controller.deleteUser
 );
 
 module.exports = router;
