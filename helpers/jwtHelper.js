@@ -5,9 +5,16 @@ const moment = require("moment");
 const errors = require("./mainErrors");
 
 module.exports = {
+  /**
+   * Returns the JWT secret
+   */
   getJwtSecret() {
     return process.env.JWT_SECRET;
   },
+  /**
+   * Creates a new token
+   * @param {Model} user
+   */
   generateNewToken(user) {
     const now = moment();
     const tomorrow = moment().add(1, "days");
