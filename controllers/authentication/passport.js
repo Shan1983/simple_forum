@@ -33,7 +33,7 @@ module.exports = app => {
     new JwtStrategy(jwtOptions, async (payload, done) => {
       try {
         const user = await User.findOne({ where: { id: payload.id } });
-        console.log(user);
+        console.log("user", user);
         if (!user) {
           done(null, false);
         } else {
