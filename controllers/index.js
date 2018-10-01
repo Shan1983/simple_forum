@@ -61,7 +61,8 @@ exports.getUserMeta = async (req, res, next) => {
     // the user attributes
     const queryObj = {
       attributes: { exclude: ["password"] },
-      where: { username: req.params.username }
+      where: { username: req.params.username },
+      include: [{ model: Role, attributes: ["role"] }]
     };
 
     // if the params contains 'posts'
