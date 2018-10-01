@@ -30,17 +30,18 @@ module.exports = {
       iat: now
     });
   },
-  getUserRole(req, token) {
-    if (req.session.admin) {
-      const decoded = jwt.verify(token, this.getJwtSecret);
-      if (!decoded) {
-        throw errors.parameterError("token", "We could not decode the token.");
-      } else {
-        console.log("passed the token");
-        return decoded.sub.role;
-      }
+  /**
+   * Returns a users role
+   * @param {Server} req
+   * @param {String} token
+   */
+  getUserRole(token) {
+    const decoded = jwt.verify(token, this.getJwtSecret());
+    if (!decoded) {
+      throw errors.parameterError("token", "We could not decode the token.");
     } else {
-      throw errors.notAuthorized;
+      console.log("passed the token");
+      return decoded.sub.role;
     }
   }
 };
