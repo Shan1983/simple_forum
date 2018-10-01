@@ -4,7 +4,8 @@ const router = express.Router();
 
 const controller = require("../controllers");
 
-router.get("/", controller.getAllUsers);
+router.get("/", passport.authenticate("jwt"), controller.getAllUsers);
+router.get("/:username", passport.authenticate("jwt"), controller.getUserMeta);
 
 // router.get("/login", passport.authenticate("jwt"), controller.login);
 
