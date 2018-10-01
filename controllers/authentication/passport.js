@@ -13,13 +13,13 @@ module.exports = app => {
 
   // setup auth via JWT
 
-  const cookieExtractor = req => {
-    if (req && req.cookies && req.cookies.jwt_token) {
-      return req.cookies.jwt_token;
-    }
+  //   const cookieExtractor = req => {
+  //     if (req && req.cookies && req.cookies.jwt_token) {
+  //       return req.cookies.jwt_token;
+  //     }
 
-    return errors.notAuthorized;
-  };
+  //     return errors.notAuthorized;
+  //   };
 
   const jwtOptions = {
     // where does passport get the auth headers?
