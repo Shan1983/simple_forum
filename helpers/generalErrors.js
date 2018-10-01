@@ -9,7 +9,7 @@ module.exports = (err, req, res, next) => {
     res.status(err.status);
     res.json({ errors: [err] });
   } else {
-    console.log(`//!\ ${err} /!\\`);
+    console.log(`/!\\ ${err} /!\\`);
     res.status(500);
     res.json({ errors: [errors.unknown] });
   }
