@@ -7,6 +7,7 @@ const SequelizeStore = require("connect-session-sequelize")(
 const path = require("path");
 const helmet = require("helmet");
 const compression = require("compression");
+const passport = require("passport");
 const app = express();
 
 // import the models
@@ -46,6 +47,9 @@ if (process.env.NODE_ENV === "production") {
 
 // allow express to start the db sessions
 app.use(session);
+
+// passport strategy setup
+require("./controllers/authentication/passport")(app);
 
 // the api routes
 app.use("/api/v1/user", require("./routes/user"));
