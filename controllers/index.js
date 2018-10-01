@@ -65,7 +65,7 @@ exports.getUserMeta = async (req, res, next) => {
     };
 
     // if the params contains 'posts'
-    if (req.params.posts) {
+    if (req.params.posts || req.params.threads) {
       // req.query => the complete query string
       const { from, limit } = pagination.getPaginationProps(req.query, true);
 
@@ -90,21 +90,24 @@ exports.getUserMeta = async (req, res, next) => {
         throw errors.accountNotExists;
       }
 
+      const includedThreads = {
+        model: Thread,
+        include: Thread.threadOptions(),
+        limit,
+        order: [["id", "DESC"]]
+      };
+
+      // check if id is <= from
+      if (from !== null) {
+        includedThreads.where = { id: { $lte: from } };
+      }
+
+      queryObj.include = [includedThreads];
+
       // get the users meta data
       const meta = await user.getUsersMetaData(limit);
 
       res.json(Object.assign(user.toJSON(limit), { meta }));
-    } else if (req.query.threads) {
-      let queryStr = "";
-
-      Object.keys(req.query).forEach(query => {
-        queryStr += `&${query}=${req.query[query]}`;
-      });
-
-      // send them to ALL category route
-      res.redirect(
-        `api/v1/category/ALL?username=${req.params.username}${queryStr}`
-      );
     } else {
       // otherwise just dump what we have
       const user = await User.findOne(queryObj);
