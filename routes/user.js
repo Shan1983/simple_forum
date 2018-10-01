@@ -4,7 +4,7 @@ const router = express.Router();
 
 const controller = require("../controllers");
 
-router.get("/", controller.index);
+router.get("/", controller.getAllUsers);
 
 // router.get("/login", passport.authenticate("jwt"), controller.login);
 

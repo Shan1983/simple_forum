@@ -29,7 +29,7 @@ sharp(profilePicture.file)
  * Returns a list of all users, this route is only for
  * Administrators
  */
-exports.index = async (req, res, next) => {
+exports.getAllUsers = async (req, res, next) => {
   try {
     const token = req.headers.authorization;
     if (jwtHelper.getUserRole(token) === req.session.admin) {
