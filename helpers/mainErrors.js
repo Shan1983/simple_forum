@@ -11,6 +11,7 @@ const errors = {
   lockedError: ["This thread is locked, posting is not allowed.", 400],
   loginError: ["The username or password provided was incorrect.", 401],
   notAuthorized: ["You are not authorized to continue.", 401],
+  noUsers: ["Currently there are no users.", 400],
   passwordsAreTheSame: ["You cannot use your old password.", 400],
   postRemoved: ["This post has been removed, replying is not allowed.", 400],
   settingError: ["There was an error with the settings options.", 400],
