@@ -9,6 +9,7 @@ const {
   Category,
   Sequelize,
   IpAdress,
+  Log,
   Ban
 } = require("../models");
 const pagination = require("../helpers/pagination");
@@ -45,6 +46,74 @@ exports.getAllUsers = async (req, res, next) => {
       res.json({ users });
     } else {
       res.json({});
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Returns a user and any threads, posts a user has made,
+ * otherwise it returns just the users model minus their password
+ */
+exports.getUserMeta = async (req, res, next) => {
+  try {
+    // the user attributes
+    const queryObj = {
+      attributes: { exclude: ["password"] },
+      where: { username: req.params.username }
+    };
+
+    // if the params contains 'posts'
+    if (req.params.posts) {
+      // req.query => the complete query string
+      const { from, limit } = pagination.getPaginationProps(req.query, true);
+
+      const includedPosts = {
+        model: Post,
+        include: Post.postOptions(),
+        limit,
+        order: [["id", "DESC"]]
+      };
+
+      // check if id is <= from
+      if (from !== null) {
+        includedPosts.where = { id: { $lte: from } };
+      }
+
+      queryObj.include = [includedPosts];
+
+      // get the user
+      const user = await User.findOne(queryObj);
+
+      if (!user) {
+        throw errors.accountNotExists;
+      }
+
+      // get the users meta data
+      const meta = await user.getUsersMetaData(limit);
+
+      res.json(Object.assign(user.toJSON(limit), { meta }));
+    } else if (req.query.threads) {
+      let queryStr = "";
+
+      Object.keys(req.query).forEach(query => {
+        queryStr += `&${query}=${req.query[query]}`;
+      });
+
+      // send them to ALL category route
+      res.redirect(
+        `api/v1/category/ALL?username=${req.params.username}${queryStr}`
+      );
+    } else {
+      // otherwise just dump what we have
+      const user = await User.findOne(queryObj);
+
+      if (!user) {
+        errors.userNotExist;
+      }
+
+      res.json(user.toJSON());
     }
   } catch (error) {
     next(error);
