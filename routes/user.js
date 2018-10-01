@@ -6,6 +6,6 @@ const controller = require("../controllers");
 
 router.get("/", controller.index);
 
-router.get("/login", passport.authenticate("jwt"), controller.login);
+// router.get("/login", passport.authenticate("jwt"), controller.login);
 
 module.exports = router;
