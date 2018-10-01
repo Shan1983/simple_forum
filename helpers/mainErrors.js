@@ -19,6 +19,7 @@ const errors = {
     "Whoops! something on our end screwed up :( reload and try again.",
     500
   ],
+  userNotExist: ["Sorry this user does not exist.", 400],
 
   parameterError(param, message) {
     return [`Error: ${param} is invalid. Message: ${message}.`, 400];
