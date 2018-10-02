@@ -1,6 +1,14 @@
 const { Sequelize } = require("../models");
 const errors = require("./mainErrors");
 
+/**
+ * Handles any errors that are passed to next, and those
+ * that are not caught elsewhere.
+ * @param {String} err
+ * @param {Request} req
+ * @param {Response} res
+ * @param {Middleware} next
+ */
 module.exports = (err, req, res, next) => {
   if (err instanceof Sequelize.ValidationError) {
     res.status(400);
