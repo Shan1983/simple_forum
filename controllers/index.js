@@ -10,7 +10,11 @@ const {
   Sequelize,
   IpAdress,
   Log,
-  Ban
+  Ban,
+  Village,
+  Troop,
+  Spell,
+  Hero
 } = require("../models/index");
 const pagination = require("../helpers/pagination");
 const errors = require("../helpers/mainErrors");
@@ -126,6 +130,17 @@ exports.getUserMeta = async (req, res, next) => {
 
 exports.userProfile = async (req, res, next) => {
   try {
+    const user = await User.findOne({
+      where: { username: req.params.username },
+      include: [Role, Village, Troop, Spell, Hero]
+    });
+
+    if (!user) {
+      res.status(400);
+      res.json({ error: [errors.userNotExist] });
+    }
+
+    res.json(user.toJSON());
   } catch (error) {
     next(error);
   }
