@@ -1,22 +1,39 @@
-// this sets up the internal session for the user. This session will be checked
-// against incoming traffic to test is the incoming request is actually valid.
+/**
+ * this sets up the internal session for the user.
+ * This session will be checked
+ * against incoming traffic to test is the incoming request
+ * is actually valid.
+ * @param {Object} req
+ * @param {Object} res
+ * @param {String} username
+ * @param {Integer} userId
+ * @param {Object} role
+ */
 exports.setupUserSession = (req, res, username, userId, role) => {
-  // set the sessions
+  /**
+   * set the sessions
+   */
   req.session.loggedIn = true;
   req.session.username = username;
   req.session.userId = userId;
 
-  // set a cookie for the username
+  /**
+   * set a cookie for the username
+   */
   res.cookie("username", username);
 
-  // set a cookie for displaying certain UI elments
-  // this is NOT a security measure! ALL request
-  // with a users role will be server side validated.
-  // Therefore even if a user sees a Admin UI element,
-  // they will not be able to access that route.
+  /**
+   * set a cookie for displaying certain UI elments
+   * this is NOT a security measure! ALL request
+   * with a users role will be server side validated.
+   * Therefore even if a user sees a Admin UI element,
+   * they will not be able to access that route.
+   */
   res.cookie("admin", !!role.admin); // !! coerces to boolean
 
-  // set the session depending on a users role
+  /**
+   * Sets the session depending on user role.
+   */
   switch (role) {
     case "System":
       req.session.System;
