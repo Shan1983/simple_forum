@@ -4,7 +4,6 @@ const jwtHelper = require("../../helpers/jwtHelper.js");
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
 
-// grab the user model
 const { User } = require("../../models");
 const errors = require("../../helpers/mainErrors");
 
@@ -21,14 +20,18 @@ module.exports = app => {
   //     return errors.notAuthorized;
   //   };
 
+  /**
+   * Options for setting where passport access a token, and
+   * where the secret for the tokens is kept
+   */
   const jwtOptions = {
-    // where does passport get the auth headers?
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    // wherte does passport get the jwt secret/key ?
     secretOrKey: jwtHelper.getJwtSecret()
   };
 
-  // setup the jwt strategy
+  /**
+   * Using the JWT Strategy
+   */
   passport.use(
     new JwtStrategy(jwtOptions, async (payload, done) => {
       try {
