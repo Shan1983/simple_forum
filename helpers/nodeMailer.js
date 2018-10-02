@@ -1,6 +1,10 @@
 const nodemailer = require("nodemailer");
 
 module.exports = {
+  /**
+   * Setup the initial ports, host, and email auth
+   * @returns {Object}
+   */
   transporter() {
     return nodemailer.createTransport({
       host: "",
@@ -12,6 +16,12 @@ module.exports = {
       }
     });
   },
+  /**
+   * Nodemailer options
+   * Set the to, from, and message
+   * @param {Request} req
+   * @returns {Object}
+   */
   options(req) {
     return (mailOptions = {
       from: `"site-name" <xx@gmail.com>`,
@@ -21,7 +31,10 @@ module.exports = {
       html: ""
     });
   },
-
+  /**
+   * Sends the email
+   * @param {Request} req
+   */
   send(req) {
     this.transporter()
       .sendMail(options(req))
