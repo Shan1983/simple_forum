@@ -11,7 +11,7 @@ const {
   IpAdress,
   Log,
   Ban
-} = require("../models");
+} = require("../models/index");
 const pagination = require("../helpers/pagination");
 const errors = require("../helpers/mainErrors");
 const jwtHelper = require("../helpers/jwtHelper");
