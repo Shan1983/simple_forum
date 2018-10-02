@@ -1,3 +1,6 @@
+/**
+ * A list of general errors and their messages/status
+ */
 const errors = {
   accountExists: [
     "This account already exists, please try logging in instead.",
@@ -21,11 +24,23 @@ const errors = {
   ],
   userNotExist: ["Sorry this user does not exist.", 400],
 
+  /**
+   * If none of the above errors are a good fit,
+   * use this to generate a custom error
+   * @param {String} param
+   * @param {String} message
+   * @returns {Array}
+   */
   parameterError(param, message) {
     return [`Error: ${param} is invalid. Message: ${message}.`, 400];
   }
 };
-
+/**
+ * processes the above errors, and returns the
+ * appropriate error response
+ * @param {String} errName
+ * @returns {Object}
+ */
 const processErrors = errName => {
   let temp;
   if (typeof errors[errName] === "function") {
@@ -53,10 +68,18 @@ const processErrors = errName => {
 
 processedErrorsObj = {};
 
+/**
+ * Add any errors and their values to the prrocessErrorsObj
+ */
 for (let errName in errors) {
   processedErrorsObj[errName] = processErrors(errName);
 }
-
+/**
+ * Send the errors to sequelize, so that sequelize can throw,
+ * Validation errors
+ * @param {Object} sequelize
+ * @param {Object} obj
+ */
 processedErrorsObj.sequelizeValidation = (sequelize, obj) => {
   return new sequelize.ValidationError(obj.error, [
     new sequelize.ValidationErrorItem(
