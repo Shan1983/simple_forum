@@ -1,6 +1,11 @@
 const marked = require("marked");
 
-// set up marked with code highlighting
+/**
+ * Setup auto highlighting for markdown editor.
+ * Sanitizers the input
+ * @param {String} val
+ * @returns {Object}
+ */
 module.exports = val => {
   marked.setOptions({
     highlight: function() {
