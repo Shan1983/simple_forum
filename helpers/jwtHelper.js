@@ -32,8 +32,9 @@ module.exports = {
   },
   /**
    * Returns a users role
-   * @param {Server} req
+   * @param {Request} req
    * @param {String} token
+   * @returns {string}
    */
   getUserRole(token) {
     const decoded = jwt.verify(token, this.getJwtSecret());
