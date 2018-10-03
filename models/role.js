@@ -7,8 +7,7 @@ module.exports = (sequelize, DataTypes) => {
     "Role",
     {
       role: {
-        type: DataTypes.ENUM,
-        values: ["System", "Administrator", "Moderator", "Member"]
+        type: DataTypes.STRING
       }
     },
     {}
@@ -17,8 +16,9 @@ module.exports = (sequelize, DataTypes) => {
   // class Methods
 
   Role.associate = function(models) {
-    Role.belongsTo(models.User);
-    Role.belongsToMany(models.User, { through: "userrole" });
+    // Role.belongsTo(models.User);
+    // Role.belongsToMany(models.User, { through: "userrole" });
+    Role.belongsToMany(models.User, { through: "userroles" });
   };
 
   // instance methods
