@@ -29,20 +29,25 @@ exports.setupUserSession = (req, res, username, userId, role) => {
    * Therefore even if a user sees a Admin UI element,
    * they will not be able to access that route.
    */
-  res.cookie("admin", !!role.admin); // !! coerces to boolean
+  if (role !== "Member") {
+    res.cookie("UIadmin", !!role.admin); // !! coerces to boolean
+  }
 
   /**
    * Sets the session depending on user role.
    */
   switch (role) {
     case "System":
-      req.session.System;
+      req.session.role = "System";
       break;
     case "Administrator":
-      req.session.Admin;
+      req.session.role = "Admininstrator";
       break;
     case "Moderator":
-      req.session.Moderator;
+      req.session.role = "Moderator";
+      break;
+    case "Member":
+      req.session.role = "Member";
       break;
     default:
       return null;
