@@ -255,6 +255,15 @@ exports.register = async (req, res, next) => {
 };
 exports.logout = async (req, res, next) => {
   try {
+    // destroy any sessions that we have on the user
+    req.session.destroy(() => {
+      res.clearCookie("username");
+      res.clearCookie("UIadmin");
+      res.json({
+        success: true,
+        message: "You have been logged out."
+      });
+    });
   } catch (error) {
     next(error);
   }
