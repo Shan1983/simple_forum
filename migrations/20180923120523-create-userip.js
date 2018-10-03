@@ -2,7 +2,7 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable(
-      "userips",
+      "userip",
       {
         id: {
           allowNull: false,
@@ -10,7 +10,7 @@ module.exports = {
           primaryKey: true,
           type: Sequelize.INTEGER
         },
-        IpId: {
+        IpAddressId: {
           type: Sequelize.INTEGER
         },
         UserId: {
@@ -29,6 +29,6 @@ module.exports = {
     );
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable("userips");
+    return queryInterface.dropTable("userip");
   }
 };
