@@ -1,6 +1,8 @@
 const multer = require("multer");
 const bcrypt = require("bcryptjs");
 const sharp = require("sharp");
+const color = require("color");
+const uuidv5 = require("uuid/v5");
 const session = require("../controllers/userSession/userSession");
 const {
   User,
