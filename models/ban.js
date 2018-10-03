@@ -13,10 +13,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         defaultValue: false
       },
-      ipAddress: {
-        type: DataTypes.STRING
-      },
-      bannedEmail: { type: DataTypes.STRING },
       reason: {
         type: DataTypes.TEXT,
         validate: {
@@ -88,19 +84,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
 
-  Ban.associate = function(models) {
-    Ban.belongsTo(models.User);
-  };
-
-  // instance methods
-
-  Ban.prototype.checkIfBanned = async function(username) {
-    const { User } = sequelize.models;
-
-    const user = await User.findOne({
-      where: { username }
-    });
-
+  Ban.checkIfBanned = async function(user) {
     if (!user) {
       errors.parameterError(
         "username",
