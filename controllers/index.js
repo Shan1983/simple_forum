@@ -151,12 +151,104 @@ exports.userProfile = async (req, res, next) => {
 };
 exports.login = async (req, res, next) => {
   try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({
+      where: { email }
+    });
+
+    if (!user) {
+      res.status(400);
+      res.json({ error: [errors.loginError] });
+    } else {
+      /**
+       * Check if the user is banned
+       */
+      await Ban.checkIfBanned(user);
+
+      /**
+       * Check the users password check out
+       */
+      if (await user.validPassword(password)) {
+        // create a new token
+        if (user.accountVerified(user)) {
+          const token = await jwtHelper.generateNewToken(user);
+
+          /**
+           * Set the users ipaddress
+           */
+          await IpAddress.createIpIfEmpty(req.ip, user);
+
+          /**
+           * Set the user internal session data
+           */
+
+          const roleMeta = await user.getRoles();
+          const role = roleMeta[0].role;
+
+          session.setupUserSession(
+            req,
+            res,
+            user.username,
+            user.id,
+            role,
+            token
+          );
+
+          res.json({ success: true, username: user.username, role, token });
+        } else {
+          res.status(400);
+          res.json({ error: [errors.verifyAccountError] });
+        }
+      } else {
+        res.status(401);
+        res.json({ error: [errors.loginError] });
+      }
+    }
   } catch (error) {
     next(error);
   }
 };
 exports.register = async (req, res, next) => {
+  const bcrypt = require("bcryptjs");
   try {
+    /**
+     * Check if user does not exist
+     */
+    const checkUser = await User.findOne({ where: { email: req.body.email } });
+
+    if (checkUser) {
+      res.status(400);
+      res.json({ error: [errors.accountExists] });
+    } else {
+      const bcrypt = require("bcryptjs");
+
+      const params = {
+        username: req.body.username,
+        email: req.body.email,
+        password: bcrypt.hashSync(req.body.password, 10),
+        emailVerificationToken: uuidv5(req.body.email, uuidv5.DNS),
+        emailVerified: false
+      };
+
+      /**
+       * Create the user
+       */
+      const user = await User.create(params);
+
+      /**
+       * Set the users ipaddress
+       */
+      await IpAddress.createIpIfEmpty(req.ip, user);
+
+      /**
+       * assign user a role - all users start off as members
+       */
+
+      await UserRole.assignUserRole(user);
+
+      res.json({ message: "Ok", path: `api/v1/user/login` });
+    }
   } catch (error) {
     next(error);
   }
