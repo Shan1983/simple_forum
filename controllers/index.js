@@ -8,6 +8,7 @@ const {
   User,
   Post,
   Thread,
+  Blacklist,
   Category,
   Sequelize,
   IpAddress,
@@ -325,8 +326,78 @@ exports.updateProfile = async (req, res, next) => {
     next(error);
   }
 };
+// soft deletes a users account
+exports.closeAccount = async (req, res, next) => {
+  try {
+    const { username } = req.params;
+
+    const user = await User.findOne({ where: { id: req.session.userId } });
+
+    if (!user) {
+      res.status(401);
+      res.json({ error: [errors.accountNotExists] });
+    } else if (username === user.username) {
+      // close their account
+      await user.destroy();
+      req.session.destroy(() => {
+        res.clearCookie("username");
+        res.clearCookie("UIadmin");
+        res.json({
+          success: true,
+          message:
+            "Oh No! Your leaving us. We hope that you come back and join us again soon."
+        });
+      });
+    } else {
+      res.status(401);
+      res.josn({ error: [errors.notAuthorized] });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+// perminatly deletes a users account
 exports.deleteUser = async (req, res, next) => {
   try {
+    if (req.session.role === "Administrator") {
+      // remove a user's account perminatly -
+      // this will add the user to the blacklist
+
+      const user = await User.findOne({ where: { email: req.body.email } });
+
+      if (!user) {
+        res.status(400);
+        res.json({
+          error: [errors.accountNotExists]
+        });
+      } else if (user.getRoles() === "Administrator") {
+        res.status(401);
+        res.json({
+          message:
+            "This user is a Administrator, they must be demoted first. This action can only be completed by the sites owner.",
+          error: [errors.notAuthorized]
+        });
+      } else {
+        const { tag, name, reason } = req.body;
+
+        await user.destroy({ force: true });
+
+        await Blacklist.addUser(tag, name, reason);
+
+        req.session.destroy(() => {
+          res.clearCookie("username");
+          res.clearCookie("UIadmin");
+          res.json({
+            success: true
+          });
+        });
+      }
+    } else {
+      res.status(401);
+      res.josn({
+        error: [errors.notAuthorized]
+      });
+    }
   } catch (error) {
     next(error);
   }
