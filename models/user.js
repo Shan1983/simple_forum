@@ -80,40 +80,11 @@ module.exports = (sequelize, DataTypes) => {
           }
         }
       },
-      // RoleId: { type: DataTypes.INTEGER },
-      // VillageId: { type: DataTypes.INTEGER },
+      RoleId: { type: DataTypes.INTEGER }, // VillageId: { type: DataTypes.INTEGER },
       // PlayerId: { type: DataTypes.INTEGER },
-      points: {
-        type: DataTypes.INTEGER,
-        validation: {
-          isInt: true
-        }
-      },
-      facebookToken: {
-        type: DataTypes.STRING,
-        validate: {
-          isString(val) {
-            if (typeof val !== "string") {
-              throw new sequelize.ValidationError(
-                "Facebook token must be a string."
-              );
-            }
-          }
-        }
-      },
-      googleToken: {
-        type: DataTypes.STRING,
-        validate: {
-          isString(val) {
-            if (typeof val !== "string") {
-              throw new sequelize.ValidationError(
-                "Google token must be a string."
-              );
-            }
-          }
-        }
-      },
-      // FriendId: { type: DataTypes.INTEGER },
+      points: { type: DataTypes.INTEGER, validation: { isInt: true } },
+      emailVerificationToken: { type: DataTypes.STRING },
+      emailVerified: { type: DataTypes.BOOLEAN, defaultValue: false }, // FriendId: { type: DataTypes.INTEGER },
       avatar: {
         type: DataTypes.STRING,
         validate: {
@@ -124,7 +95,6 @@ module.exports = (sequelize, DataTypes) => {
           }
         }
       }
-      // IpId: { type: DataTypes.INTEGER }
     },
     {}
   );
@@ -132,9 +102,11 @@ module.exports = (sequelize, DataTypes) => {
   User.associate = function(models) {
     User.hasMany(models.Post);
     User.hasMany(models.Thread);
-    User.belongsToMany(models.IpAddress, { through: "UserIp" });
+    User.belongsToMany(models.IpAddress, { through: "userip" });
     User.hasOne(models.Village);
-    User.belongsTo(models.Role, { through: "userrole" });
+    User.belongsToMany(models.Role, { through: "userroles" });
+    // User.belongsToMany(models.UserRole, { through: "userroles" });
+    // User.hasOne(models.Role);
   };
 
   User.prototype.updatePassword = async function(sentPassword, newPassword) {
@@ -157,6 +129,14 @@ module.exports = (sequelize, DataTypes) => {
   // compare passwords for use with logging in etc
   User.prototype.validPassword = async function(sentPassword) {
     return await bcrypt.compare(sentPassword, this.password);
+  };
+
+  User.prototype.accountVerified = function(user) {
+    if (user.emailVerified) {
+      return true;
+    }
+
+    return false;
   };
 
   User.prototype.getUsersMetaData = async function(limit) {
