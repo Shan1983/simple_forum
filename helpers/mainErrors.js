@@ -23,6 +23,10 @@ const errors = {
     500
   ],
   userNotExist: ["Sorry this user does not exist.", 400],
+  verifyAccountError: [
+    "Please check your registered email and follow the link to verify your account.",
+    400
+  ],
 
   /**
    * If none of the above errors are a good fit,
