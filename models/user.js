@@ -96,7 +96,7 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
-    {}
+    { paranoid: true }
   );
 
   User.associate = function(models) {
