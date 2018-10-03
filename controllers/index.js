@@ -210,7 +210,6 @@ exports.login = async (req, res, next) => {
   }
 };
 exports.register = async (req, res, next) => {
-  const bcrypt = require("bcryptjs");
   try {
     /**
      * Check if user does not exist
@@ -221,8 +220,6 @@ exports.register = async (req, res, next) => {
       res.status(400);
       res.json({ error: [errors.accountExists] });
     } else {
-      const bcrypt = require("bcryptjs");
-
       const params = {
         username: req.body.username,
         email: req.body.email,
@@ -270,6 +267,60 @@ exports.logout = async (req, res, next) => {
 };
 exports.updateProfile = async (req, res, next) => {
   try {
+    const { username } = req.params;
+
+    const user = await User.findOne({
+      where: { id: req.session.userId }
+    });
+
+    if (!user) {
+      res.status(401);
+      res.json({ error: [errors.accountNotExists] });
+    } else if (username === user.username) {
+      // update the users profile
+      const {
+        description,
+        password,
+        email,
+        avatar,
+        allowAdvertising,
+        emailSubscriptions
+      } = req.body;
+
+      if (password) {
+        await user.updatePassword(oldPassword, password);
+      } else if (email) {
+        await user.update({
+          description,
+          email,
+          avatar,
+          allowAdvertising,
+          emailSubscriptions,
+          emailVerificationToken: uuidv5(req.body.email, uuidv5.DNS),
+          emailVerified: false
+        });
+
+        return res.json({
+          success: true,
+          message: "Your profile has been updated."
+        });
+      } else {
+        await user.update({
+          description,
+          avatar,
+          allowAdvertising,
+          emailSubscriptions
+        });
+
+        return res.json({
+          success: true,
+          message: "Your profile has been updated."
+        });
+      }
+    } else {
+      res.status(401);
+      res.json({ error: [errors.notAuthorized] });
+    }
   } catch (error) {
     next(error);
   }
