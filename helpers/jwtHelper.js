@@ -15,20 +15,21 @@ module.exports = {
    * Creates a new token
    * @param {Model} user
    */
-  generateNewToken(user) {
-    const now = moment();
-    const tomorrow = moment().add(1, "days");
+  async generateNewToken(user) {
+    const now = new Date().getTime() / 1000;
+    const tomorrow = 86400;
 
-    return jwt.sign({
-      iss: "localhost",
-      sub: {
-        id: user.id,
-        username: user.username,
-        role: user.Role.role
+    const role = await user.getRoles();
+
+    return jwt.sign(
+      {
+        iss: "localhost",
+        sub: { id: user.id, username: user.username, role },
+        exp: tomorrow,
+        iat: now
       },
-      exp: tomorrow,
-      iat: now
-    });
+      process.env.JWT_SECRET
+    );
   },
   /**
    * Returns a users role
