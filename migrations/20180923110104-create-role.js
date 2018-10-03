@@ -11,8 +11,7 @@ module.exports = {
           type: Sequelize.INTEGER
         },
         role: {
-          type: Sequelize.ENUM,
-          values: ["System", "Administrator", "Moderator", "Member"]
+          type: Sequelize.STRING
         },
         createdAt: {
           allowNull: false,
