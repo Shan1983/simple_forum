@@ -23,6 +23,14 @@ router.put(
   controller.updateProfile
 );
 
+// soft deletes account
+router.delete(
+  "/profile/:username/close",
+  passport.authenticate("jwt"),
+  controller.closeAccount
+);
+
+// perminately deletes a users account - requires admin
 router.delete(
   "/profile/:username",
   passport.authenticate("jwt"),
