@@ -10,11 +10,11 @@ module.exports = {
     operatorsAliases: false
   },
   test: {
-    username: process.env.DATABASE_USER,
-    password: process.env.DATABASE_PASSWORD,
-    database: "clash_forum_test",
-    host: process.env.DATABASE_PORT,
-    dialect: process.env.DATABASE_DIALECT,
+    username: "root",
+    password: null,
+    database: "test",
+    host: "127.0.0.1",
+    dialect: "mysql",
     operatorsAliases: false,
     logging: false
   },
