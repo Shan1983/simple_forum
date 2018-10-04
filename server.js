@@ -16,7 +16,6 @@ const { sequelize } = require("./models");
 // import the web socket functions
 
 // config the server port, and session secret
-const port = process.env.PORT || 3000;
 const sessionSecret = process.env.SESSION_SECRET;
 
 // setup express middleware
@@ -60,7 +59,7 @@ app.use(require("./helpers/generalErrors"));
 // setup the html side for the SPA
 // TODO complete this once the frontend is complete
 
-const start = () => {
+const start = port => {
   const server = app.listen(port, () => {
     console.log(`🖥  Server has started! on port: ${port}`);
 
@@ -72,18 +71,13 @@ const start = () => {
 };
 
 // server config
-// if (process.env.NODE_ENV === "test") {
-//   // sync the db
-
-//   sequelize
-//     .sync()
-//     .then(start)
-//     .catch(err => console.log(err));
-// } else {
-//   // lets get this party started
-//   start();
-// }
-
-start();
+if (process.env.NODE_ENV === "test") {
+  const port = 8888;
+  start(port);
+} else {
+  const port = process.env.PORT || 3000;
+  // lets get this party started
+  start(port);
+}
 
 module.exports = app;
