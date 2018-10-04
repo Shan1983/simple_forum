@@ -41,8 +41,7 @@ sharp(profilePicture.file)
  */
 exports.getAllUsers = async (req, res, next) => {
   try {
-    const token = req.headers.authorization;
-    if (jwtHelper.getUserRole(token) === req.session.admin) {
+    if (req.session.role === "Administrator") {
       const users = await User.findAll({
         attributes: { exclude: ["password"] }
       });
@@ -54,7 +53,8 @@ exports.getAllUsers = async (req, res, next) => {
       // send the users
       res.json({ users });
     } else {
-      res.json({});
+      res.status(401);
+      res.json({ error: [errors.notAuthorized] });
     }
   } catch (error) {
     next(error);
