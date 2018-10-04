@@ -14,7 +14,6 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   UserRole.assignRole = async function(user) {
-    console.log("id", user.id);
     await UserRole.create({
       UserId: user.id,
       RoleId: 1
