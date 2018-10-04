@@ -72,15 +72,18 @@ const start = () => {
 };
 
 // server config
-if (process.env.NODE_ENV === "test") {
-  // sync the db
-  sequelize
-    .sync({ force: true })
-    .then(start)
-    .catch(err => console.log(err));
-} else {
-  // lets get this party started
-  start();
-}
+// if (process.env.NODE_ENV === "test") {
+//   // sync the db
+
+//   sequelize
+//     .sync()
+//     .then(start)
+//     .catch(err => console.log(err));
+// } else {
+//   // lets get this party started
+//   start();
+// }
+
+start();
 
 module.exports = app;
