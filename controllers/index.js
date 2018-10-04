@@ -226,7 +226,8 @@ exports.register = async (req, res, next) => {
         email: req.body.email,
         password: bcrypt.hashSync(req.body.password, 10),
         emailVerificationToken: uuidv5(req.body.email, uuidv5.DNS),
-        emailVerified: false
+        emailVerified: false,
+        RoleId: 1
       };
 
       /**
@@ -234,16 +235,14 @@ exports.register = async (req, res, next) => {
        */
       const user = await User.create(params);
 
+      console.log("about to assign user role");
+      await UserRole.assignRole(user);
+      console.log("after");
+
       /**
        * Set the users ipaddress
        */
       await IpAddress.createIpIfEmpty(req.ip, user);
-
-      /**
-       * assign user a role - all users start off as members
-       */
-
-      await UserRole.assignUserRole(user);
 
       res.json({ message: "Ok", path: `api/v1/user/login` });
     }
