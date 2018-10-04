@@ -37,4 +37,7 @@ router.delete(
   controller.deleteUser
 );
 
+// TEMPORARY EMAIL VERIFICATION ROUTE
+router.get("/verify/email/:token", controller.verifyEmail);
+
 module.exports = router;
