@@ -235,9 +235,7 @@ exports.register = async (req, res, next) => {
        */
       const user = await User.create(params);
 
-      console.log("about to assign user role");
       await UserRole.assignRole(user);
-      console.log("after");
 
       /**
        * Set the users ipaddress
@@ -250,6 +248,7 @@ exports.register = async (req, res, next) => {
     next(error);
   }
 };
+
 exports.logout = async (req, res, next) => {
   try {
     // destroy any sessions that we have on the user
@@ -395,6 +394,32 @@ exports.deleteUser = async (req, res, next) => {
       res.status(401);
       res.josn({
         error: [errors.notAuthorized]
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+// TEMP FUNCTION!!
+exports.verifyEmail = async (req, res, next) => {
+  try {
+    const token = req.params.token;
+
+    const user = await User.findOne({
+      where: { emailVerificationToken: token }
+    });
+
+    if (user) {
+      await user.update({
+        emailVerified: 1
+      });
+
+      return res.json({ message: "Ok" });
+    } else {
+      res.status(401);
+      res.json({
+        error: errors.notAuthorized
       });
     }
   } catch (error) {
