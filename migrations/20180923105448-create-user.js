@@ -30,7 +30,8 @@ module.exports = {
         allowAdvertising: { type: Sequelize.BOOLEAN, defautValue: false },
         emailSubscriptions: { type: Sequelize.BOOLEAN, defaultValue: true },
         createdAt: { allowNull: false, type: Sequelize.DATE },
-        updatedAt: { allowNull: false, type: Sequelize.DATE }
+        updatedAt: { allowNull: false, type: Sequelize.DATE },
+        deletedAt: { type: Sequelize.DATE }
       },
       { charset: "utf8mb4" }
     );
