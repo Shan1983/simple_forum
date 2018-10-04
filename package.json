@@ -4,15 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=development npm run kill && npm run dev && npm run seed && mocha --harmony --timeout 10000 --exit ",
+    "test": "cross-env NODE_ENV=test npm run kill:test && npm run dev:test && npm run seed:test && mocha --harmony --timeout 10000 --exit ",
     "dev": "cross-env NODE_ENV=development && sequelize db:migrate",
-    "dev:test": "cross-env NODE_ENV=test && sequelize db:migrate",
+    "dev:test": "sequelize db:migrate --env test",
     "kill": "cross-env NODE_ENV=development && sequelize db:migrate:undo:all",
-    "kill:test": "cross-env NODE_ENV=test && sequelize db:migrate:undo:all",
+    "kill:test": "sequelize db:migrate:undo:all --env test",
     "seed": "cross-env NODE_ENV=development && sequelize db:seed:all",
-    "seed:test": "cross-env NODE_ENV=test && sequelize db:seed:all",
+    "seed:test": "sequelize db:seed:all  --env test",
     "start:dev": "cross-env NODE_ENV=development npm run kill && npm run dev && npm run seed && nodemon --harmony server.js",
-    "start": "nodemon --harmony server.js"
+    "start:test": "cross-env NODE_ENV=test npm run kill:test && npm run dev:test && npm run seed:test && npm test",
+    "clean": "NODE_ENV=test npm run kill:test && npm run dev:test && npm run seed:test"
   },
   "repository": {
     "type": "git",
