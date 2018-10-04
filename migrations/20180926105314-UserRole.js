@@ -12,9 +12,6 @@ module.exports = {
       UserId: {
         type: Sequelize.INTEGER
       },
-      UserRoleId: {
-        type: Sequelize.INTEGER
-      },
       RoleId: {
         type: Sequelize.INTEGER
       },
