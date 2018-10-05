@@ -22,8 +22,13 @@ const sessionSecret = process.env.SESSION_SECRET;
 // setup express middleware
 app.use(helmet());
 app.use(compression());
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// setup passport auth
+app.use(passport.initialize());
+require("./authentication/passport")(passport);
 
 // setup the sequelize session
 const sessionStore = new SequelizeStore({ db: sequelize });
@@ -47,9 +52,6 @@ if (process.env.NODE_ENV === "production") {
 
 // allow express to start the db sessions
 app.use(session);
-
-// passport strategy setup
-require("./controllers/authentication/passport")(app);
 
 // the api routes
 app.use("/api/v1/user", require("./routes/user"));
