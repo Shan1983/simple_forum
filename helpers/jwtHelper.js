@@ -2,6 +2,8 @@ const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const moment = require("moment");
 
+const { Role, UserRole } = require("../models");
+
 const errors = require("./mainErrors");
 
 module.exports = {
@@ -15,20 +17,28 @@ module.exports = {
    * Creates a new token
    * @param {Model} user
    */
-  async generateNewToken(user) {
-    const now = new Date().getTime() / 1000;
-    const tomorrow = 86400;
 
-    const role = await user.getRoles();
+  async generateNewToken(user) {
+    // get the users role
+
+    const roleRecord = await UserRole.findById(user.id);
+
+    const roleResult = await Role.findById(roleRecord.RoleId);
+
+    const role = roleResult.toJSON().role;
+
+    const exp = 3600;
 
     return jwt.sign(
       {
-        iss: "localhost",
-        sub: { id: user.id, username: user.username, role },
-        exp: tomorrow,
-        iat: now
+        id: user.id,
+        username: user.username,
+        role: role
       },
-      process.env.JWT_SECRET
+      process.env.JWT_SECRET,
+      {
+        expiresIn: exp
+      }
     );
   },
   /**
@@ -37,12 +47,21 @@ module.exports = {
    * @param {String} token
    * @returns {string}
    */
-  getUserRole(token) {
+  async getUserRole(user) {
+    const roleRecord = await UserRole.findById(user.id);
+
+    const roleResult = await Role.findById(roleRecord.RoleId);
+
+    const role = roleResult.toJSON().role;
+
+    return role;
+  },
+
+  decodeJwt(token) {
     const decoded = jwt.verify(token, this.getJwtSecret());
     if (!decoded) {
       throw errors.parameterError("token", "We could not decode the token.");
     } else {
-      console.log("passed the token");
       return decoded;
     }
   }
