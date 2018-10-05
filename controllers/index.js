@@ -4,6 +4,7 @@ const sharp = require("sharp");
 const color = require("color");
 const uuidv5 = require("uuid/v5");
 const session = require("../controllers/userSession/userSession");
+
 const {
   User,
   Post,
@@ -41,31 +42,37 @@ sharp(profilePicture.file)
  */
 exports.getAllUsers = async (req, res, next) => {
   try {
-    if (!req.headers.authorization) {
-      console.log("authorized");
-    }
-    console.log("authorized");
-    console.log("req:", req);
-    const role = jwtHelper.getUserRole(token);
+    // get the users token
 
-    if (req.session.role === "Administrator") {
-      const users = await User.findAll({
-        attributes: { exclude: ["password"] }
-      });
+    const token = req.cookies.token;
+    const decodedToken = jwtHelper.decodeJwt(token);
 
-      if (!users) {
-        throw errors.noUsers;
+    if (req.session.role === "Admin") {
+      if (decodedToken.role === req.session.role) {
+        const users = await User.findAll({
+          attributes: {
+            exclude: [
+              "password",
+              "emailVerificationToken",
+              "emailVerified",
+              "description",
+              "RoleId",
+              "updatedAt",
+              "deletedAt"
+            ]
+          },
+          include: [{ model: Role, attributes: ["role"] }]
+        });
+
+        res.json(users);
+      } else {
+        res.status(401);
+        res.json({ error: [errors.notAuthorized] });
       }
-
-      // send the users
-      res.json({ users });
     } else {
       res.status(401);
       res.json({ error: [errors.notAuthorized] });
     }
-    // } else {
-    //   res.status(500);
-    // }
   } catch (error) {
     next(error);
   }
