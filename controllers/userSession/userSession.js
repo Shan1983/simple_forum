@@ -9,7 +9,7 @@
  * @param {Integer} userId
  * @param {Object} role
  */
-exports.setupUserSession = (req, res, username, userId, role) => {
+exports.setupUserSession = (req, res, username, userId, role, token) => {
   /**
    * set the sessions
    */
@@ -40,8 +40,8 @@ exports.setupUserSession = (req, res, username, userId, role) => {
     case "System":
       req.session.role = "System";
       break;
-    case "Administrator":
-      req.session.role = "Admininstrator";
+    case "Admin":
+      req.session.role = "Admin";
       break;
     case "Moderator":
       req.session.role = "Moderator";
@@ -52,4 +52,10 @@ exports.setupUserSession = (req, res, username, userId, role) => {
     default:
       return null;
   }
+
+  // save the token to a cookie
+  // for testing..
+  // this should be saved to local storage on the client
+
+  res.cookie("token", token);
 };
