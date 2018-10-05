@@ -110,7 +110,7 @@ describe("USER", () => {
       });
 
       it('should assign the user a role of "member"', async () => {
-        const userToken = await User.findById(2);
+        const userToken = await User.findById(3);
 
         const tokenRes = await chai
           .request(server)
@@ -132,6 +132,52 @@ describe("USER", () => {
         memberRes.body.should.have.property("role", "Member");
       });
 
+      it('should assign the user a role of "moderator"', async () => {
+        const userToken = await User.findById(2);
+
+        const tokenRes = await chai
+          .request(server)
+          .get("/api/v1/user/verify/email/" + userToken.emailVerificationToken);
+
+        tokenRes.should.have.status(200);
+
+        const modRes = await chai
+          .request(server)
+          .post("/api/v1/user/login")
+          .set("content-type", "application/json")
+          .send({
+            email: "moderator@test.com",
+            password: "secret"
+          });
+
+        modRes.should.have.status(200);
+        modRes.body.should.have.property("success", true);
+        modRes.body.should.have.property("role", "Moderator");
+      });
+
+      it('should assign the user a role of "admin"', async () => {
+        const userToken = await User.findById(1);
+
+        const tokenRes = await chai
+          .request(server)
+          .get("/api/v1/user/verify/email/" + userToken.emailVerificationToken);
+
+        tokenRes.should.have.status(200);
+
+        const memberRes = await chai
+          .request(server)
+          .post("/api/v1/user/login")
+          .set("content-type", "application/json")
+          .send({
+            email: "shan@test.com",
+            password: "secret"
+          });
+
+        memberRes.should.have.status(200);
+        memberRes.body.should.have.property("success", true);
+        memberRes.body.should.have.property("role", "Admin");
+      });
+
       it("should allow a user to login", async () => {
         const res = await chai
           .request(server)
@@ -147,6 +193,22 @@ describe("USER", () => {
         res.body.should.have.property("username", username);
         res.body.should.have.property("role", "Member");
         res.body.should.have.property("token");
+      });
+
+      it("should prevent a user logging in if their login details are incorrect", async () => {
+        const res = await chai
+          .request(server)
+          .post("/api/v1/user/login")
+          .set("content-type", "application/json")
+          .send({
+            email,
+            password: "spiders"
+          });
+
+        res.should.have.status(401);
+        res.body.error.should.include.something.that.deep.equals(
+          errors.loginError
+        );
       });
     });
 
@@ -199,7 +261,8 @@ describe("USER", () => {
         res.should.have.status(200);
         res.body.should.have.property("length", res.body.length);
         res.body[0].should.have.deep.property("username", "Shan");
-        res.body[1].should.have.deep.property("username", username);
+        res.body[1].should.have.deep.property("username", "moderator");
+        res.body[2].should.have.deep.property("username", username);
       });
       it("should NOT return a list of users", async () => {
         const agent = chai.request.agent(server);
@@ -257,6 +320,22 @@ describe("USER", () => {
         res.body.should.have.deep.property("username", username);
         res.body.should.not.have.deep.property("password");
       });
+    });
+  });
+
+  describe("/PUT - USER ROUTES", () => {
+    describe("PUT /api/v1/user/profile/:username", () => {
+      it("should update a users profile", done => {});
+      it("should NOT update a users profile", done => {});
+    });
+  });
+
+  describe("/DELETE - USER ROUTES", () => {
+    describe("DELETE /profile/:username/close", () => {
+      it("should close a user account", done => {});
+    });
+    describe("DELETE /profile/:username/", () => {
+      it("should permanently delete a user", done => {});
     });
   });
 });
