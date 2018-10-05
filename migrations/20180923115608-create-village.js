@@ -10,6 +10,7 @@ module.exports = {
           primaryKey: true,
           type: Sequelize.INTEGER
         },
+        UserId: { type: Sequelize.INTEGER },
         townhallLevel: { type: Sequelize.INTEGER },
         TroopsId: { type: Sequelize.INTEGER },
         league: { type: Sequelize.INTEGER },

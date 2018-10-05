@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
   );
   Spell.associate = function(models) {
     Spell.belongsTo(models.Village);
+    Spell.belongsTo(models.User);
   };
   return Spell;
 };

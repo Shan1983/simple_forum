@@ -10,23 +10,13 @@ module.exports = {
           primaryKey: true,
           type: Sequelize.INTEGER
         },
-        name: {
-          type: Sequelize.STRING
-        },
-        level: {
-          type: Sequelize.INTEGER
-        },
-        maxLevel: {
-          type: Sequelize.INTEGER
-        },
-        createdAt: {
-          allowNull: false,
-          type: Sequelize.DATE
-        },
-        updatedAt: {
-          allowNull: false,
-          type: Sequelize.DATE
-        }
+        name: { type: Sequelize.STRING },
+        VillageId: { type: Sequelize.INTEGER },
+        UserId: { type: Sequelize.INTEGER },
+        level: { type: Sequelize.INTEGER },
+        maxLevel: { type: Sequelize.INTEGER },
+        createdAt: { allowNull: false, type: Sequelize.DATE },
+        updatedAt: { allowNull: false, type: Sequelize.DATE }
       },
       { charset: "utf8mb4" }
     );

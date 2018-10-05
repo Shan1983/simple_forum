@@ -105,6 +105,9 @@ module.exports = (sequelize, DataTypes) => {
     User.belongsToMany(models.IpAddress, { through: "userip" });
     User.hasOne(models.Village);
     User.belongsToMany(models.Role, { through: "userroles" });
+    User.hasMany(models.Troop);
+    User.hasMany(models.Spell);
+    User.hasMany(models.Hero);
     // User.belongsToMany(models.UserRole, { through: "userroles" });
     // User.hasOne(models.Role);
   };
