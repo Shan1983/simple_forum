@@ -4,11 +4,27 @@ const router = express.Router();
 
 const controller = require("../controllers");
 
-router.get("/all", passport.authenticate("jwt"), controller.getAllUsers);
-router.get("/:username", passport.authenticate("jwt"), controller.getUserMeta);
+router.get(
+  "/test",
+  passport.authenticate("jwt", { session: false }),
+  (req, res, next) => {
+    res.json({ success: 200 });
+  }
+);
+
+router.get(
+  "/all",
+  passport.authenticate("jwt", { session: false }),
+  controller.getAllUsers
+);
+router.get(
+  "/:username",
+  passport.authenticate("jwt", { session: false }),
+  controller.getUserMeta
+);
 router.get(
   "/profile/:username",
-  passport.authenticate("jwt"),
+  passport.authenticate("jwt", { session: false }),
   controller.userProfile
 );
 
@@ -19,21 +35,21 @@ router.post("/logout", controller.logout);
 
 router.put(
   "/profile/:username",
-  passport.authenticate("jwt"),
+  passport.authenticate("jwt", { session: false }),
   controller.updateProfile
 );
 
 // soft deletes account
 router.delete(
   "/profile/:username/close",
-  passport.authenticate("jwt"),
+  passport.authenticate("jwt", { session: false }),
   controller.closeAccount
 );
 
 // perminately deletes a users account - requires admin
 router.delete(
   "/profile/:username",
-  passport.authenticate("jwt"),
+  passport.authenticate("jwt", { session: false }),
   controller.deleteUser
 );
 
