@@ -200,6 +200,8 @@ exports.login = async (req, res, next) => {
       if (await user.validPassword(password)) {
         // create a new token
         if (user.accountVerified(user)) {
+          // get the role and token
+          const role = await jwtHelper.getUserRole(user);
           const token = await jwtHelper.generateNewToken(user);
 
           /**
@@ -210,9 +212,6 @@ exports.login = async (req, res, next) => {
           /**
            * Set the user internal session data
            */
-
-          const roleMeta = await user.getRoles();
-          const role = roleMeta[0].role;
 
           session.setupUserSession(
             req,
@@ -282,6 +281,7 @@ exports.logout = async (req, res, next) => {
     req.session.destroy(() => {
       res.clearCookie("username");
       res.clearCookie("UIadmin");
+      res.clearCookie("token");
       res.json({
         success: true,
         message: "You have been logged out."
@@ -367,6 +367,7 @@ exports.closeAccount = async (req, res, next) => {
       req.session.destroy(() => {
         res.clearCookie("username");
         res.clearCookie("UIadmin");
+        res.clearCookie("token");
         res.json({
           success: true,
           message:
@@ -395,7 +396,7 @@ exports.deleteUser = async (req, res, next) => {
         res.json({
           error: [errors.accountNotExists]
         });
-      } else if (user.getRoles() === "Administrator") {
+      } else if (user.getRoles() === "Admin") {
         res.status(401);
         res.json({
           message:
