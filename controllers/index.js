@@ -239,36 +239,46 @@ exports.login = async (req, res, next) => {
 exports.register = async (req, res, next) => {
   try {
     /**
-     * Check if user does not exist
+     * check if they supplied the required infor
      */
-    const checkUser = await User.findOne({ where: { email: req.body.email } });
+    const { username, email, password } = req.body;
 
-    if (checkUser) {
+    if (username === "" || email === "" || password === "") {
       res.status(400);
-      res.json({ error: [errors.accountExists] });
+      res.json({ error: [errors.invalidRegister] });
     } else {
-      const params = {
-        username: req.body.username,
-        email: req.body.email,
-        password: bcrypt.hashSync(req.body.password, 10),
-        emailVerificationToken: uuidv5(req.body.email, uuidv5.DNS),
-        emailVerified: false,
-        RoleId: 1
-      };
-
       /**
-       * Create the user
+       * Check if user does not exist
        */
-      const user = await User.create(params);
+      const checkUser = await User.findOne({ where: { email } });
 
-      await UserRole.assignRole(user);
+      if (checkUser) {
+        res.status(400);
+        res.json({ error: [errors.accountExists] });
+      } else {
+        const params = {
+          username: username,
+          email: email,
+          password: bcrypt.hashSync(password, 10),
+          emailVerificationToken: uuidv5(email, uuidv5.DNS),
+          emailVerified: false,
+          RoleId: 1
+        };
 
-      /**
-       * Set the users ipaddress
-       */
-      await IpAddress.createIpIfEmpty(req.ip, user);
+        /**
+         * Create the user
+         */
+        const user = await User.create(params);
 
-      res.json({ message: "Ok", path: `api/v1/user/login` });
+        await UserRole.assignRole(user);
+
+        /**
+         * Set the users ipaddress
+         */
+        await IpAddress.createIpIfEmpty(req.ip, user);
+
+        res.json({ message: "Ok", path: `api/v1/user/login` });
+      }
     }
   } catch (error) {
     next(error);
