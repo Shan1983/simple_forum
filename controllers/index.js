@@ -154,7 +154,17 @@ exports.userProfile = async (req, res, next) => {
   try {
     const user = await User.findOne({
       where: { username: req.params.username },
-      include: [Role, Village, Troop, Spell, Hero]
+      include: [Role, Village, Troop, Spell, Hero],
+      attributes: {
+        exclude: [
+          "password",
+          "emailVerificationToken",
+          "emailVerified",
+          "RoleId",
+          "updatedAt",
+          "deletedAt"
+        ]
+      }
     });
 
     if (!user) {
