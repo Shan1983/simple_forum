@@ -16,7 +16,6 @@ const faker = require("faker");
 
 const username = faker.internet.userName();
 const email = faker.internet.email();
-const adminEmail = "shan@test.com";
 const password = bcrypt.hashSync("secret", 10);
 
 describe("USER", () => {
@@ -52,6 +51,38 @@ describe("USER", () => {
             res.should.have.status(200);
             res.body.should.have.property("message");
             res.body.should.have.property("path");
+            done();
+          });
+      });
+
+      it("should prevent a user signing up if the email is taken", done => {
+        chai
+          .request(server)
+          .post("/api/v1/user/register")
+          .set("content-type", "application/json")
+          .send({ username, email, password, RoleId: 1 })
+          .end((err, res) => {
+            if (err) console.log(`${err}`);
+            res.should.have.status(400);
+            res.body.error.should.include.something.that.deep.equals(
+              errors.accountExists
+            );
+            done();
+          });
+      });
+
+      it("should prevent a user signing up if they don't supply the required information", done => {
+        chai
+          .request(server)
+          .post("/api/v1/user/register")
+          .set("content-type", "application/json")
+          .send({ username, email: "", password, RoleId: 1 })
+          .end((err, res) => {
+            if (err) console.log(`${err}`);
+            res.should.have.status(400);
+            res.body.error.should.include.something.that.deep.equals(
+              errors.invalidRegister
+            );
             done();
           });
       });
@@ -116,6 +147,25 @@ describe("USER", () => {
         res.body.should.have.property("username", username);
         res.body.should.have.property("role", "Member");
         res.body.should.have.property("token");
+      });
+    });
+
+    describe("POST /api/v1/user/logout", () => {
+      it("should allow a user to logout", done => {
+        chai
+          .request(server)
+          .post("/api/v1/user/logout")
+          .set("content-type", "application/json")
+          .end((err, res) => {
+            res.should.have.status(200);
+            res.body.should.have.property("success", true);
+            res.body.should.have.property(
+              "message",
+              "You have been logged out."
+            );
+
+            done();
+          });
       });
     });
   });
