@@ -43,7 +43,7 @@ module.exports = {
       throw errors.parameterError("token", "We could not decode the token.");
     } else {
       console.log("passed the token");
-      return decoded.sub.role;
+      return decoded;
     }
   }
 };
