@@ -11,6 +11,7 @@ const errors = {
   categoryExists: ["This category already exists.", 400],
   categoryError: ["This category does not exist.", 400],
   invalidLike: ["You cannot like your own thread/post.", 400],
+  invalidRegister: ["You need to supply all required fields.", 400],
   lockedError: ["This thread is locked, posting is not allowed.", 400],
   loginError: ["The username or password provided was incorrect.", 401],
   notAuthorized: ["You are not authorized to continue.", 401],
