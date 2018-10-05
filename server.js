@@ -42,7 +42,11 @@ const session = expressSession({
 // sync the initial db connection
 sessionStore
   .sync()
-  .then(response => console.log("Database status: ✅"))
+  .then(response => {
+    if (process.env.NODE_ENV !== "test") {
+      console.log("Database status: ✅");
+    }
+  })
   .catch(err => console.log(`Database status: ❌ ${err}`));
 
 // setup proxy if in production
