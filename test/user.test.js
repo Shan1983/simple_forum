@@ -3,6 +3,7 @@ process.env.NODE_ENV = "test";
 const server = require("../server");
 const chai = require("chai");
 const should = chai.should();
+const expect = chai.expect;
 const errors = require("../helpers/mainErrors");
 const jwtHelper = require("../helpers/jwtHelper");
 const { User } = require("../models");
@@ -15,17 +16,8 @@ const faker = require("faker");
 
 const username = faker.internet.userName();
 const email = faker.internet.email();
+const adminEmail = "shan@test.com";
 const password = bcrypt.hashSync("secret", 10);
-
-const login = async (email, password) =>
-  await chai
-    .request(server)
-    .post("/api/v1/user/login")
-    .set("content-type", "application/json")
-    .send({
-      email,
-      password
-    });
 
 describe("USER", () => {
   // lets get this party started!
@@ -43,79 +35,178 @@ describe("USER", () => {
   describe("/POST - USER ROUTES", () => {
     //let agent = chai.request.agent(server);
 
-    it("should register a new user", done => {
-      chai
-        .request(server)
-        .post("/api/v1/user/register")
-        .set("content-type", "application/json")
-        .send({
-          username,
-          email,
-          password,
-          RoleId: 1
-        })
-        .end((err, res) => {
-          if (err) console.log(`${err}`);
-          res.should.have.status(200);
-          res.body.should.have.property("message");
-          res.body.should.have.property("path");
-          done();
-        });
+    describe("POST /api/v1/user/register", () => {
+      it("should register a new user", done => {
+        chai
+          .request(server)
+          .post("/api/v1/user/register")
+          .set("content-type", "application/json")
+          .send({
+            username,
+            email,
+            password,
+            RoleId: 1
+          })
+          .end((err, res) => {
+            if (err) console.log(`${err}`);
+            res.should.have.status(200);
+            res.body.should.have.property("message");
+            res.body.should.have.property("path");
+            done();
+          });
+      });
     });
 
-    it("should fail while awaiting email verification", done => {
-      chai
-        .request(server)
-        .post("/api/v1/user/login")
-        .set("content-type", "application/json")
-        .send({
-          email,
-          password
-        })
-        .end((err, res) => {
-          res.should.have.status(400);
-          // console.log(res);
-          res.body.error.should.include.something.that.deep.equals(
-            errors.verifyAccountError
-          );
+    describe("POST /api/v1/user/login", () => {
+      it("should fail while awaiting email verification", done => {
+        chai
+          .request(server)
+          .post("/api/v1/user/login")
+          .set("content-type", "application/json")
+          .send({
+            email,
+            password
+          })
+          .end((err, res) => {
+            res.should.have.status(400);
+            // console.log(res);
+            res.body.error.should.include.something.that.deep.equals(
+              errors.verifyAccountError
+            );
 
-          done();
-        });
-    });
+            done();
+          });
+      });
 
-    it('should assign the user a role of "member"', async () => {
-      const userToken = await User.findById(2);
+      it('should assign the user a role of "member"', async () => {
+        const userToken = await User.findById(2);
 
-      const tokenRes = await chai
-        .request(server)
-        .get("/api/v1/user/verify/email/" + userToken.emailVerificationToken);
+        const tokenRes = await chai
+          .request(server)
+          .get("/api/v1/user/verify/email/" + userToken.emailVerificationToken);
 
-      tokenRes.should.have.status(200);
+        tokenRes.should.have.status(200);
 
-      const memberRes = await login(email, password);
+        const memberRes = await chai
+          .request(server)
+          .post("/api/v1/user/login")
+          .set("content-type", "application/json")
+          .send({
+            email,
+            password
+          });
 
-      memberRes.should.have.status(200);
-      memberRes.body.should.have.property("success", true);
-      memberRes.body.should.have.property("role", "Member");
-    });
+        memberRes.should.have.status(200);
+        memberRes.body.should.have.property("success", true);
+        memberRes.body.should.have.property("role", "Member");
+      });
 
-    it("should allow a user to login", async () => {
-      const res = await login(email, password);
+      it("should allow a user to login", async () => {
+        const res = await chai
+          .request(server)
+          .post("/api/v1/user/login")
+          .set("content-type", "application/json")
+          .send({
+            email,
+            password
+          });
 
-      res.should.have.status(200);
-      res.body.should.have.property("success", true);
-      res.body.should.have.property("username", username);
-      res.body.should.have.property("role", "Member");
-      res.body.should.have.property("token");
+        res.should.have.status(200);
+        res.body.should.have.property("success", true);
+        res.body.should.have.property("username", username);
+        res.body.should.have.property("role", "Member");
+        res.body.should.have.property("token");
+      });
     });
   });
 
   describe("/GET - USER ROUTES", () => {
-    it("should return a list of users - must be admin", done => {});
-    it("should NOT return a list of users", async () => {
-      // 1. log in
-      // 2. check the users role
-      // 3. return not authorized error
+    describe("GET /api/v1/user/all", () => {
+      it("ADMIN: should return a list of users", async () => {
+        const agent = chai.request.agent(server);
+
+        const user = await agent.post("/api/v1/user/login").send({
+          email: "shan@test.com",
+          password: "secret"
+        });
+
+        user.should.have.status(200);
+        user.body.should.have.property("success", true);
+        user.body.should.have.property("username", "Shan");
+        user.body.should.have.property("role", "Admin");
+        user.body.should.have.property("token");
+
+        const token = `Bearer ${user.body.token}`;
+        const cookie = `token=${user.body.token}`;
+
+        const res = await agent
+          .get("/api/v1/user/all")
+          .set("content-type", "application/json")
+          .set("Authorization", token)
+          .set("Cookie", cookie);
+
+        res.should.be.json;
+        res.should.have.status(200);
+        res.body.should.have.property("length", res.body.length);
+        res.body[0].should.have.deep.property("username", "Shan");
+        res.body[1].should.have.deep.property("username", username);
+      });
+      it("should NOT return a list of users", async () => {
+        const agent = chai.request.agent(server);
+
+        const user = await agent.post("/api/v1/user/login").send({
+          email,
+          password
+        });
+
+        user.should.have.status(200);
+        user.body.should.have.property("success", true);
+        user.body.should.have.property("username", username);
+        user.body.should.have.property("role", "Member");
+        user.body.should.have.property("token");
+
+        const token = `Bearer ${user.body.token}`;
+        const cookie = `token=${user.body.token}`;
+
+        const res = await agent
+          .get("/api/v1/user/all")
+          .set("content-type", "application/json")
+          .set("Authorization", token)
+          .set("Cookie", cookie);
+
+        res.should.be.json;
+        res.should.have.status(401);
+      });
+    });
+    describe("GET /api/v1/user/profile/:username", () => {
+      it("should show the users profile", async () => {
+        const agent = chai.request.agent(server);
+
+        const user = await agent.post("/api/v1/user/login").send({
+          email,
+          password
+        });
+
+        user.should.have.status(200);
+        user.body.should.have.property("success", true);
+        user.body.should.have.property("username", username);
+        user.body.should.have.property("role", "Member");
+        user.body.should.have.property("token");
+
+        const token = `Bearer ${user.body.token}`;
+        const cookie = `token=${user.body.token}`;
+
+        const res = await agent
+          .get(`/api/v1/user/profile/${username}`)
+          .set("content-type", "application/json")
+          .set("Authorization", token)
+          .set("Cookie", cookie);
+
+        res.should.be.json;
+        res.should.have.status(200);
+        res.body.should.have.deep.property("username", username);
+        res.body.should.not.have.deep.property("password");
+      });
     });
   });
 });
