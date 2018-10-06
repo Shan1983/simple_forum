@@ -25,6 +25,7 @@ const {
 const pagination = require("../../helpers/pagination");
 const errors = require("../../helpers/mainErrors");
 const jwtHelper = require("../../helpers/jwtHelper");
+const validateEmail = require("../../helpers/validateEmail");
 
 /*
 sharp(profilePicture.file)
@@ -167,11 +168,6 @@ exports.userProfile = async (req, res, next) => {
       }
     });
 
-    if (!user) {
-      res.status(400);
-      res.json({ error: [errors.userNotExist] });
-    }
-
     res.json(user.toJSON());
   } catch (error) {
     next(error);
@@ -308,47 +304,52 @@ exports.updateProfile = async (req, res, next) => {
     const decodedToken = jwtHelper.decodeJwt(token);
 
     if (decodedToken.username === req.session.username) {
-      const user = await User.findOne({
-        where: { id: req.session.userId }
-      });
+      const user = await User.findById(req.session.userId);
 
-      if (!user) {
-        res.status(401);
-        res.json({ error: [errors.accountNotExists] });
-      } else if (username === user.username) {
+      const foundUser = user.toJSON();
+
+      if (username === foundUser.username) {
         // update the users profile
-        const {
-          description,
-          password,
-          email,
-          avatar,
-          allowAdvertising,
-          emailSubscriptions
-        } = req.body;
 
-        if (password) {
-          await user.updatePassword(oldPassword, password);
-        } else if (email) {
-          await user.update({
-            description,
-            email,
-            avatar,
-            allowAdvertising,
-            emailSubscriptions,
-            emailVerificationToken: uuidv5(req.body.email, uuidv5.DNS),
-            emailVerified: false
-          });
+        if (
+          req.body.password !== undefined &&
+          req.body.oldPassword !== undefined
+        ) {
+          await user.updatePassword(req.body.password, req.body.oldPassword);
 
-          return res.json({
+          res.json({
             success: true,
-            message: "Your profile has been updated."
+            message: "Your password has been updated."
           });
-        } else {
+        }
+
+        if (req.body.email !== undefined) {
+          if (validateEmail(req.body.email)) {
+            await user.update({
+              email: req.body.email,
+              emailVerificationToken: uuidv5(req.body.email, uuidv5.DNS),
+              emailVerified: false
+            });
+            return res.json({
+              success: true,
+              message:
+                "Your email has been updated. Please validate your new email address."
+            });
+          } else {
+            res.status(400);
+            res.json({ error: [errors.emailError] });
+          }
+        }
+        if (
+          req.body.password === undefined &&
+          req.body.oldPassword === undefined &&
+          req.body.email === undefined
+        ) {
           await user.update({
-            description,
-            avatar,
-            allowAdvertising,
-            emailSubscriptions
+            description: req.body.description,
+            avatar: req.body.avatar,
+            allowAdvertising: !!req.body.allowAdvertising,
+            emailSubscriptions: !!req.body.emailSubscriptions
           });
 
           return res.json({
@@ -372,13 +373,15 @@ exports.updateProfile = async (req, res, next) => {
 exports.closeAccount = async (req, res, next) => {
   try {
     const { username } = req.params;
+    const token = req.cookies.token;
+    const decodedToken = jwtHelper.decodeJwt(token);
 
-    const user = await User.findOne({ where: { id: req.session.userId } });
+    if (
+      decodedToken.username === req.session.username &&
+      req.session.username === username
+    ) {
+      const user = await User.findById(req.session.userId);
 
-    if (!user) {
-      res.status(401);
-      res.json({ error: [errors.accountNotExists] });
-    } else if (username === user.username) {
       // close their account
       await user.destroy();
       req.session.destroy(() => {
@@ -393,7 +396,7 @@ exports.closeAccount = async (req, res, next) => {
       });
     } else {
       res.status(401);
-      res.josn({ error: [errors.notAuthorized] });
+      res.json({ error: [errors.notAuthorized] });
     }
   } catch (error) {
     next(error);
@@ -402,42 +405,61 @@ exports.closeAccount = async (req, res, next) => {
 // perminatly deletes a users account
 exports.deleteUser = async (req, res, next) => {
   try {
-    if (req.session.role === "Administrator") {
-      // remove a user's account perminatly -
-      // this will add the user to the blacklist
+    const token = req.cookies.token;
+    const decodedToken = jwtHelper.decodeJwt(token);
+    const username = req.params.username;
 
-      const user = await User.findOne({ where: { email: req.body.email } });
+    if (decodedToken.role === req.session.role) {
+      if (req.session.role === "Admin") {
+        // remove a user's account perminatly -
+        // this will add the user to the blacklist
 
-      if (!user) {
-        res.status(400);
-        res.json({
-          error: [errors.accountNotExists]
-        });
-      } else if (user.getRoles() === "Admin") {
+        const user = await User.findOne({ where: { email: req.body.email } });
+
+        if (!user) {
+          res.status(400);
+          return res.json({ error: [errors.accountNotExists] });
+        }
+
+        const deletedUserRole = await jwtHelper.getUserRole(user);
+
+        if (deletedUserRole === "Admin") {
+          res.status(400);
+          res.json({
+            message:
+              "This user is a Administrator, they must be demoted first. This action can only be completed by the sites owner.",
+            error: [errors.notAuthorized]
+          });
+        } else {
+          const { tag, name, reason } = req.body;
+
+          await Blacklist.create({
+            playerTag: tag,
+            currentName: name,
+            previousName: name,
+            reason
+          });
+
+          await user.destroy({ force: true });
+
+          req.session.destroy(() => {
+            res.clearCookie("username");
+            res.clearCookie("UIadmin");
+            res.clearCookie("token");
+            res.json({
+              success: true
+            });
+          });
+        }
+      } else {
         res.status(401);
         res.json({
-          message:
-            "This user is a Administrator, they must be demoted first. This action can only be completed by the sites owner.",
           error: [errors.notAuthorized]
-        });
-      } else {
-        const { tag, name, reason } = req.body;
-
-        await user.destroy({ force: true });
-
-        await Blacklist.addUser(tag, name, reason);
-
-        req.session.destroy(() => {
-          res.clearCookie("username");
-          res.clearCookie("UIadmin");
-          res.json({
-            success: true
-          });
         });
       }
     } else {
       res.status(401);
-      res.josn({
+      res.json({
         error: [errors.notAuthorized]
       });
     }
