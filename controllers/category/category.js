@@ -46,14 +46,30 @@ exports.newCategory = async (req, res, next) => {
     if (req.session.role === "Admin") {
       const { title, description } = req.body;
 
-      console.log(slug(req.body.title), description);
+      const allCategories = await Category.findAll();
 
-      Category.create({ title: slug(title), description });
+      let categoryError = false;
 
-      res.json({
-        success: true,
-        message: `Category: ${slug(title)}, has been created.`
+      allCategories.map(e => {
+        if (e.title === slug(title).toUpperCase()) {
+          categoryError = true;
+        }
       });
+
+      if (categoryError) {
+        res.status(400);
+        res.json({ error: [errors.categoryTitleError] });
+      } else {
+        const newCategory = await Category.create({
+          title: slug(title),
+          description
+        });
+
+        res.json({
+          success: true,
+          message: `Category: ${slug(title).toUpperCase()}, has been created.`
+        });
+      }
     } else {
       res.status(401);
       res.json({ error: [errors.notAuthorized] });
