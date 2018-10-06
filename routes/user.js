@@ -8,7 +8,7 @@ const multer = require("multer");
 const controller = require("../controllers/user/user");
 
 const storage = multer.diskStorage({
-  destination: __dirname + "/uploads/",
+  destination: "/uploads/",
   filename: (req, file, cb) => {
     const filename = file.originalname;
 
