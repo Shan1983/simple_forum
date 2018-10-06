@@ -6,7 +6,7 @@ const errors = {
     "This account already exists, please try logging in instead.",
     400
   ],
-  accountNotExists: ["You need to create an account to continue.", 400],
+  accountNotExists: ["This account does not exist.", 400],
   banError: ["You cannot ban this user.", 400],
   categoryExists: ["This category already exists.", 400],
   categoryError: ["This category does not exist.", 400],
