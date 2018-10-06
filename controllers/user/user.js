@@ -347,7 +347,6 @@ exports.updateProfile = async (req, res, next) => {
         ) {
           await user.update({
             description: req.body.description,
-            avatar: req.body.avatar,
             allowAdvertising: !!req.body.allowAdvertising,
             emailSubscriptions: !!req.body.emailSubscriptions
           });
