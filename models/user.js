@@ -80,6 +80,8 @@ module.exports = (sequelize, DataTypes) => {
           }
         }
       },
+      allowAdvertising: { type: DataTypes.BOOLEAN, defautValue: false },
+      emailSubscriptions: { type: DataTypes.BOOLEAN, defaultValue: true },
       RoleId: { type: DataTypes.INTEGER }, // VillageId: { type: DataTypes.INTEGER },
       // PlayerId: { type: DataTypes.INTEGER },
       points: { type: DataTypes.INTEGER, validation: { isInt: true } },
@@ -96,7 +98,15 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
-    { paranoid: true }
+    {
+      paranoid: true,
+      indexes: [
+        {
+          unique: true,
+          fields: ["id", "username", "email"]
+        }
+      ]
+    }
   );
 
   User.associate = function(models) {
@@ -112,26 +122,28 @@ module.exports = (sequelize, DataTypes) => {
     // User.hasOne(models.Role);
   };
 
-  User.prototype.updatePassword = async function(sentPassword, newPassword) {
+  User.prototype.updatePassword = async function(newPassword, oldPassword) {
     // check to make sure the user isnt using the previous password
-    if (sentPassword === newPassword) {
+    if (newPassword === oldPassword) {
       throw errors.passwordsAreTheSame;
     }
 
     // authenticate the password before updating
-    const checkPassword = await bcrypt.compare(sentPassword, this.password);
+    const checkPassword = await bcrypt.compare(oldPassword, this.password);
 
     // if everything checks out do the update
     if (checkPassword) {
-      await this.update({ password: newPassword });
+      const pendingNewPassword = bcrypt.hashSync(newPassword, 10);
+      await this.update({ password: pendingNewPassword });
+      return true;
     } else {
-      throw errors.notAuthenticated;
+      throw errors.passwordError;
     }
   };
 
   // compare passwords for use with logging in etc
-  User.prototype.validPassword = async function(sentPassword) {
-    return await bcrypt.compare(sentPassword, this.password);
+  User.prototype.validPassword = async function(newPassword) {
+    return await bcrypt.compare(newPassword, this.password);
   };
 
   User.prototype.accountVerified = function(user) {
