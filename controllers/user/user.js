@@ -368,6 +368,55 @@ exports.updateProfile = async (req, res, next) => {
     next(error);
   }
 };
+// upload a new avatar
+exports.upload = async (req, res, next) => {
+  try {
+    const { username } = req.params;
+    const token = req.cookies.token;
+    const decodedToken = jwtHelper.decodeJwt(token);
+
+    if (
+      decodedToken.username !== username &&
+      req.session.username !== username
+    ) {
+      res.status(401);
+      res.json({ error: [errors.notAuthorized] });
+    } else {
+      const user = await User.findOne({
+        where: { username: req.session.username }
+      });
+
+      const filename = req.file.originalname;
+
+      const finalFileName = `${uuidv5(filename, uuidv5.DNS)}${filename}`;
+
+      await user.update({
+        avatar: `uploads/${finalFileName}`
+      });
+
+      res.json({ success: true, message: "Avatar uploaded." });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+exports.getAvatar = async (req, res, next) => {
+  try {
+    if (!req.params.username) {
+      res.status(400);
+      res.json({ error: [errors.accountNotExists] });
+    } else {
+      const user = await User.findOne({
+        where: { username: req.params.username }
+      });
+
+      res.json(user.toJSON().avatar);
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 // soft deletes a users account
 exports.closeAccount = async (req, res, next) => {
   try {
