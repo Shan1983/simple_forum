@@ -8,12 +8,33 @@ const {
 } = require("../../models");
 const errors = require("../../helpers/mainErrors");
 
-exports.getCategory = async (req, res, next) => {
+exports.getAllCategory = async (req, res, next) => {
   try {
+    const categories = await Category.findAll();
+
+    res.json(categories);
   } catch (error) {
     next(error);
   }
 };
+exports.getAllThreadsInCategory = async (req, res, next) => {
+  try {
+    const category = await Category.findOne({
+      where: { id: req.params.id },
+      include: [Thread]
+    });
+
+    if (!category) {
+      res.status(400);
+      res.json({ error: [errors.categoryError] });
+    } else {
+      res.json(category.toJSON());
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.newCategory = async (req, res, next) => {
   try {
     if (req.session.role === "Admin") {
