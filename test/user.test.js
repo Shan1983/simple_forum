@@ -325,17 +325,464 @@ describe("USER", () => {
 
   describe("/PUT - USER ROUTES", () => {
     describe("PUT /api/v1/user/profile/:username", () => {
-      it("should update a users profile", done => {});
-      it("should NOT update a users profile", done => {});
+      it("should NOT authenticate", async () => {
+        const agent = chai.request.agent(server);
+
+        const user = await agent.post("/api/v1/user/login").send({
+          email,
+          password
+        });
+
+        user.should.have.status(200);
+
+        const cookie = `token=${user.body.token}`;
+
+        const res = await agent
+          .put(`/api/v1/user/profile/Shan`)
+
+          .set("Cookie", cookie);
+
+        res.should.have.status(401);
+      });
+
+      it("should NOT allow user to update someone elses profile", async () => {
+        const agent = chai.request.agent(server);
+
+        const user = await agent.post("/api/v1/user/login").send({
+          email,
+          password
+        });
+
+        user.should.have.status(200);
+
+        const token = `Bearer ${user.body.token}`;
+        const cookie = `token=${user.body.token}`;
+
+        const res = await agent
+          .put(`/api/v1/user/profile/Shan`)
+          .set("content-type", "application/json")
+          .set("Authorization", token)
+          .set("Cookie", cookie);
+
+        res.should.be.json;
+        res.should.have.status(401);
+        res.body.error.should.include.something.that.deep.equals(
+          errors.notAuthorized
+        );
+      });
+      it("should NOT update if we can't find the user", async () => {
+        const agent = chai.request.agent(server);
+
+        const user = await agent.post("/api/v1/user/login").send({
+          email,
+          password
+        });
+
+        user.should.have.status(200);
+
+        const token = `Bearer ${user.body.token}`;
+        const cookie = `token=${user.body.token}`;
+
+        const res = await agent
+          .put(`/api/v1/user/profile/qwertychickenduck`)
+          .set("content-type", "application/json")
+          .set("Authorization", token)
+          .set("Cookie", cookie);
+
+        res.should.be.json;
+        res.should.have.status(401);
+        res.body.error.should.include.something.that.deep.equals(
+          errors.notAuthorized
+        );
+      });
+
+      it("should not update password if they are the same", async () => {
+        const agent = chai.request.agent(server);
+
+        const user = await agent.post("/api/v1/user/login").send({
+          email: "shan@test.com",
+          password: "secret"
+        });
+
+        user.should.have.status(200);
+
+        const token = `Bearer ${user.body.token}`;
+        const cookie = `token=${user.body.token}`;
+
+        const oldPw = await agent
+          .put(`/api/v1/user/profile/Shan`)
+          .set("content-type", "application/json")
+          .set("Authorization", token)
+          .set("Cookie", cookie)
+          .send({ password: "secret", oldPassword: "secret" });
+
+        oldPw.should.have.status(400);
+        oldPw.body.errors.should.include.something.that.deep.equals(
+          errors.passwordsAreTheSame
+        );
+      });
+
+      it("should not update password if the supplied password does not check out", async () => {
+        const agent = chai.request.agent(server);
+
+        const user = await agent.post("/api/v1/user/login").send({
+          email: "shan@test.com",
+          password: "secret"
+        });
+
+        user.should.have.status(200);
+
+        const token = `Bearer ${user.body.token}`;
+        const cookie = `token=${user.body.token}`;
+
+        const oldPw = await agent
+          .put(`/api/v1/user/profile/Shan`)
+          .set("content-type", "application/json")
+          .set("Authorization", token)
+          .set("Cookie", cookie)
+          .send({ password: "secret", oldPassword: "secrets" });
+
+        oldPw.should.have.status(400);
+        oldPw.body.errors.should.include.something.that.deep.equals(
+          errors.passwordError
+        );
+      });
+
+      it("should update a users password", async () => {
+        const agent = chai.request.agent(server);
+
+        const user = await agent.post("/api/v1/user/login").send({
+          email: "shan@test.com",
+          password: "secret"
+        });
+
+        user.should.have.status(200);
+
+        const token = `Bearer ${user.body.token}`;
+        const cookie = `token=${user.body.token}`;
+
+        const res = await agent
+          .put(`/api/v1/user/profile/Shan`)
+          .set("content-type", "application/json")
+          .set("Authorization", token)
+          .set("Cookie", cookie)
+          .send({ password: "test123", oldPassword: "secret" });
+
+        res.should.be.json;
+        res.should.have.status(200);
+        res.body.should.have.property("success", true);
+        res.body.should.have.property(
+          "message",
+          "Your password has been updated."
+        );
+      });
+
+      it("should prevent a user updating their email if its invalid", async () => {
+        const agent = chai.request.agent(server);
+
+        const user = await agent.post("/api/v1/user/login").send({
+          email: "shan@test.com",
+          password: "test123"
+        });
+
+        user.should.have.status(200);
+
+        const token = `Bearer ${user.body.token}`;
+        const cookie = `token=${user.body.token}`;
+
+        const res = await agent
+          .put(`/api/v1/user/profile/Shan`)
+          .set("content-type", "application/json")
+          .set("Authorization", token)
+          .set("Cookie", cookie)
+          .send({ email: "turtle@" });
+
+        res.should.be.json;
+        res.should.have.status(400);
+        res.body.error.should.include.something.that.deep.equals(
+          errors.emailError
+        );
+      });
+
+      it("should update a users email, and require them to confirm the new email", async () => {
+        const agent = chai.request.agent(server);
+
+        const user = await agent.post("/api/v1/user/login").send({
+          email: "shan@test.com",
+          password: "test123"
+        });
+
+        user.should.have.status(200);
+
+        const token = `Bearer ${user.body.token}`;
+        const cookie = `token=${user.body.token}`;
+
+        const res = await agent
+          .put(`/api/v1/user/profile/Shan`)
+          .set("content-type", "application/json")
+          .set("Authorization", token)
+          .set("Cookie", cookie)
+          .send({ email: "turtle@test.com" });
+
+        res.should.be.json;
+        res.should.have.status(200);
+        res.body.should.have.property("success", true);
+        res.body.should.have.property("success", true);
+        res.body.should.have.property(
+          "message",
+          "Your email has been updated. Please validate your new email address."
+        );
+
+        const tryAgain = await agent.post("/api/v1/user/login").send({
+          email: "turtle@test.com",
+          password: "test123"
+        });
+
+        tryAgain.should.have.status(400);
+        // console.log(res);
+        tryAgain.body.error.should.include.something.that.deep.equals(
+          errors.verifyAccountError
+        );
+      });
+
+      it("should update a users profile", async () => {
+        const agent = chai.request.agent(server);
+
+        const userToken = await User.findById(1);
+
+        const tokenRes = await chai
+          .request(server)
+          .get("/api/v1/user/verify/email/" + userToken.emailVerificationToken);
+
+        tokenRes.should.have.status(200);
+
+        const user = await agent.post("/api/v1/user/login").send({
+          email: "turtle@test.com",
+          password: "test123"
+        });
+
+        user.should.have.status(200);
+
+        const token = `Bearer ${user.body.token}`;
+        const cookie = `token=${user.body.token}`;
+
+        const res = await agent
+          .put(`/api/v1/user/profile/Shan`)
+          .set("content-type", "application/json")
+          .set("Authorization", token)
+          .set("Cookie", cookie)
+          .send({
+            description: "happy happy joy joy",
+            allowAdvertising: 1,
+            emailSubscriptions: 0
+          });
+
+        res.should.be.json;
+        res.should.have.status(200);
+        res.body.should.have.property("success", true);
+        res.body.should.have.property(
+          "message",
+          "Your profile has been updated."
+        );
+      });
     });
   });
 
   describe("/DELETE - USER ROUTES", () => {
     describe("DELETE /profile/:username/close", () => {
-      it("should close a user account", done => {});
+      it("should NOT close a user account", async () => {
+        const agent = chai.request.agent(server);
+
+        const user = await agent.post("/api/v1/user/login").send({
+          email,
+          password
+        });
+
+        user.should.have.status(200);
+
+        const token = `Bearer ${user.body.token}`;
+        const cookie = `token=${user.body.token}`;
+
+        const res = await agent
+          .delete(`/api/v1/user/profile/Shan/close`)
+          .set("content-type", "application/json")
+          .set("Authorization", token)
+          .set("Cookie", cookie);
+
+        res.should.be.json;
+        res.should.have.status(401);
+        res.body.error.should.include.something.that.deep.equals(
+          errors.notAuthorized
+        );
+      });
+
+      it("should close a user account", async () => {
+        const agent = chai.request.agent(server);
+
+        const user = await agent.post("/api/v1/user/login").send({
+          email,
+          password
+        });
+
+        user.should.have.status(200);
+
+        const token = `Bearer ${user.body.token}`;
+        const cookie = `token=${user.body.token}`;
+
+        const res = await agent
+          .delete(`/api/v1/user/profile/${username}/close`)
+          .set("content-type", "application/json")
+          .set("Authorization", token)
+          .set("Cookie", cookie);
+
+        res.should.be.json;
+        res.should.have.status(200);
+        res.body.should.have.property("success", true);
+        res.body.should.have.property(
+          "message",
+          "Oh No! Your leaving us. We hope that you come back and join us again soon."
+        );
+
+        const tryAgain = await agent.post("/api/v1/user/login").send({
+          email,
+          password
+        });
+
+        tryAgain.should.have.status(400);
+      });
     });
     describe("DELETE /profile/:username/", () => {
-      it("should permanently delete a user", done => {});
+      it("should abort if there is no username", async () => {
+        const agent = chai.request.agent(server);
+
+        const user = await agent.post("/api/v1/user/login").send({
+          email: "turtle@test.com",
+          password: "test123"
+        });
+
+        user.should.have.status(200);
+
+        const token = `Bearer ${user.body.token}`;
+        const cookie = `token=${user.body.token}`;
+
+        const res = await agent
+          .delete(`/api/v1/user/profile/PrinceOfDarkness`)
+          .set("content-type", "application/json")
+          .set("Authorization", token)
+          .set("Cookie", cookie)
+          .send({
+            email: "prince.of.darkness.18@test.com",
+            tag: "#12345",
+            name: user.body.username,
+            reason: "being evil!"
+          });
+
+        res.should.be.json;
+        res.should.have.status(400);
+
+        res.body.error.should.include.something.that.deep.equals(
+          errors.accountNotExists
+        );
+      });
+
+      it("should abort if the user is not an ADMIN", async () => {
+        const agent = chai.request.agent(server);
+
+        const user = await agent.post("/api/v1/user/login").send({
+          email: "moderator@test.com",
+          password: "secret"
+        });
+
+        user.should.have.status(200);
+
+        const token = `Bearer ${user.body.token}`;
+        const cookie = `token=${user.body.token}`;
+
+        const res = await agent
+          .delete(`/api/v1/user/profile/moderator`)
+          .set("content-type", "application/json")
+          .set("Authorization", token)
+          .set("Cookie", cookie)
+          .send({
+            email: "moderator@test.com",
+            tag: "#12345",
+            name: user.body.username,
+            reason: "being evil!"
+          });
+
+        res.should.be.json;
+        res.should.have.status(401);
+
+        res.body.error.should.include.something.that.deep.equals(
+          errors.notAuthorized
+        );
+      });
+
+      it("should NOT permanently delete an ADMIN user", async () => {
+        const agent = chai.request.agent(server);
+
+        const user = await agent.post("/api/v1/user/login").send({
+          email: "turtle@test.com",
+          password: "test123"
+        });
+
+        user.should.have.status(200);
+
+        const token = `Bearer ${user.body.token}`;
+        const cookie = `token=${user.body.token}`;
+
+        const res = await agent
+          .delete(`/api/v1/user/profile/Shan`)
+          .set("content-type", "application/json")
+          .set("Authorization", token)
+          .set("Cookie", cookie)
+          .send({
+            email: "turtle@test.com",
+            tag: "#12345",
+            name: user.body.username,
+            reason: "being naughty!"
+          });
+
+        res.should.be.json;
+        res.should.have.status(400);
+        res.body.should.have.property(
+          "message",
+          "This user is a Administrator, they must be demoted first. This action can only be completed by the sites owner."
+        );
+        res.body.error.should.include.something.that.deep.equals(
+          errors.notAuthorized
+        );
+      });
+
+      it("should should delete a user and add them to the blacklist", async () => {
+        const agent = chai.request.agent(server);
+
+        const user = await agent.post("/api/v1/user/login").send({
+          email: "turtle@test.com",
+          password: "test123"
+        });
+
+        user.should.have.status(200);
+
+        const token = `Bearer ${user.body.token}`;
+        const cookie = `token=${user.body.token}`;
+
+        const res = await agent
+          .delete(`/api/v1/user/profile/moderator`)
+          .set("content-type", "application/json")
+          .set("Authorization", token)
+          .set("Cookie", cookie)
+          .send({
+            email: "moderator@test.com",
+            tag: "#12345",
+            name: user.body.username,
+            reason: "being evil!"
+          });
+
+        res.should.be.json;
+        res.should.have.status(200);
+        res.body.should.have.property("success");
+      });
     });
   });
 });
