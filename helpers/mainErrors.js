@@ -10,6 +10,7 @@ const errors = {
   banError: ["You cannot ban this user.", 400],
   categoryExists: ["This category already exists.", 400],
   categoryError: ["This category does not exist.", 400],
+  categoryTitleError: ["Categories must be unique.", 400],
   emailError: ["A valid email address must be supplied.", 400],
   invalidLike: ["You cannot like your own thread/post.", 400],
   invalidRegister: ["You need to supply all required fields.", 400],
