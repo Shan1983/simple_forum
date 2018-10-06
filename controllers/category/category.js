@@ -7,6 +7,7 @@ const {
   Log
 } = require("../../models");
 const errors = require("../../helpers/mainErrors");
+const slug = require("slugify");
 
 exports.getAllCategory = async (req, res, next) => {
   try {
@@ -40,13 +41,13 @@ exports.newCategory = async (req, res, next) => {
     if (req.session.role === "Admin") {
       const { title, description } = req.body;
 
-      console.log(req.body.title, description);
+      console.log(slug(req.body.title), description);
 
-      Category.create({ title, description });
+      Category.create({ title: slug(title), description });
 
       res.json({
         success: true,
-        message: `Category: ${title}, has been created.`
+        message: `Category: ${slug(title)}, has been created.`
       });
     } else {
       res.status(401);
@@ -58,12 +59,47 @@ exports.newCategory = async (req, res, next) => {
 };
 exports.updateCategory = async (req, res, next) => {
   try {
+    if (req.session.role === "Admin") {
+      const category = await Category.findById(req.params.id);
+
+      if (!category) {
+        res.status(400);
+        res.json({ error: [errors.categoryError] });
+      } else {
+        const { title, description } = req.body;
+
+        await category.update({
+          title: slug(title).toUpperCase(),
+          description
+        });
+
+        res.json({ success: true, category: category.toJSON() });
+      }
+    } else {
+      res.status(401);
+      res.json({ error: [errors.notAuthorized] });
+    }
   } catch (error) {
     next(error);
   }
 };
 exports.deleteCategory = async (req, res, next) => {
   try {
+    if (req.session.role === "Admin") {
+      const category = await Category.findById(req.params.id);
+
+      if (!category) {
+        res.status(400);
+        res.json({ error: [errors.categoryError] });
+      } else {
+        await category.destroy();
+
+        res.json({ success: true });
+      }
+    } else {
+      res.status(401);
+      res.json({ error: [errors.notAuthorized] });
+    }
   } catch (error) {
     next(error);
   }
