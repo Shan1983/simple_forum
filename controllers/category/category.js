@@ -13,6 +13,11 @@ exports.getAllCategory = async (req, res, next) => {
   try {
     const categories = await Category.findAll();
 
+    if (!categories) {
+      res.status(400);
+      res.json({ error: [errors.categoryError] });
+    }
+
     res.json(categories);
   } catch (error) {
     next(error);

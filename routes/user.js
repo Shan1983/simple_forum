@@ -8,7 +8,7 @@ const multer = require("multer");
 const controller = require("../controllers/user/user");
 
 const storage = multer.diskStorage({
-  destination: "uploads/",
+  destination: __dirname + "/uploads/",
   filename: (req, file, cb) => {
     const filename = file.originalname;
 
@@ -18,7 +18,7 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage: storage, limits: { fileSize: 1000000 } });
 
 router.get(
   "/test",
