@@ -11,9 +11,7 @@ module.exports = (sequelize, DataTypes) => {
         unique: true,
         allowNull: false,
         validate: {
-          notEmpty: {
-            msg: "Category must have a name."
-          },
+          notEmpty: { msg: "Category must have a name." },
           isString(val) {
             if (typeof val !== "string") {
               throw new sequelize.ValidationError(
@@ -23,17 +21,16 @@ module.exports = (sequelize, DataTypes) => {
           }
         }
       },
-      description: {
-        type: DataTypes.TEXT
-      },
+      description: { type: DataTypes.TEXT },
       colorIcon: {
         type: DataTypes.STRING,
         defaultValue() {
           return randomColor();
         }
-      }
+      },
+      deletedAt: { type: DataTypes.DATE }
     },
-    {}
+    { paranoid: true }
   );
 
   // class methods
