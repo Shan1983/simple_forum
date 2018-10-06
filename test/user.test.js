@@ -212,6 +212,60 @@ describe("USER", () => {
       });
     });
 
+    describe("POST /api/v1/user/profile/:username/upload", () => {
+      it("should NOT upload a avatar", async () => {
+        const agent = chai.request.agent(server);
+
+        const user = await agent.post("/api/v1/user/login").send({
+          email,
+          password
+        });
+
+        user.should.have.status(200);
+
+        const token = `Bearer ${user.body.token}`;
+        const cookie = `token=${user.body.token}`;
+
+        const res = await agent
+          .post(`/api/v1/user/profile/Shan/upload`)
+          .set("Authorization", token)
+          .set("Cookie", cookie)
+          .field("content-type", "multipart/form-data")
+          .field("avatar", "pretend.jpeg")
+          .attach("avatar", "/Users/shan/Desktop/pretend.jpeg");
+
+        res.should.have.status(401);
+        res.body.error.should.include.something.that.deep.equals(
+          errors.notAuthorized
+        );
+      });
+      it("should upload a avatar", async () => {
+        const agent = chai.request.agent(server);
+
+        const user = await agent.post("/api/v1/user/login").send({
+          email,
+          password
+        });
+
+        user.should.have.status(200);
+
+        const token = `Bearer ${user.body.token}`;
+        const cookie = `token=${user.body.token}`;
+
+        const res = await agent
+          .post(`/api/v1/user/profile/${username}/upload`)
+          .set("Authorization", token)
+          .set("Cookie", cookie)
+          .field("content-type", "multipart/form-data")
+          .field("avatar", "pretend.jpeg")
+          .attach("avatar", "/Users/shan/Desktop/pretend.jpeg");
+
+        res.should.have.status(200);
+        res.body.should.have.property("success", true);
+        res.body.should.have.property("message", "Avatar uploaded.");
+      });
+    });
+
     describe("POST /api/v1/user/logout", () => {
       it("should allow a user to logout", done => {
         chai
@@ -233,6 +287,17 @@ describe("USER", () => {
   });
 
   describe("/GET - USER ROUTES", () => {
+    describe("Get /api/v1/user/:username/avatar", () => {
+      it("should return a avatar", done => {
+        chai
+          .request(server)
+          .get(`/api/v1/user/${username}/avatar`)
+          .end((err, res) => {
+            res.should.have.status(200);
+            done();
+          });
+      });
+    });
     describe("GET /api/v1/user/all", () => {
       it("ADMIN: should return a list of users", async () => {
         const agent = chai.request.agent(server);
