@@ -7,7 +7,13 @@ const controller = require("../controllers/category/category");
 router.get(
   "/",
   passport.authenticate("jwt", { session: false }),
-  controller.getCategory
+  controller.getAllCategory
+);
+
+router.get(
+  "/:id/threads",
+  passport.authenticate("jwt", { session: false }),
+  controller.getAllThreadsInCategory
 );
 
 router.post(
@@ -17,13 +23,13 @@ router.post(
 );
 
 router.put(
-  "/",
+  "/:id",
   passport.authenticate("jwt", { session: false }),
   controller.updateCategory
 );
 
 router.delete(
-  "/",
+  "/:id",
   passport.authenticate("jwt", { session: false }),
   controller.deleteCategory
 );
