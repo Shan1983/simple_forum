@@ -10,6 +10,7 @@ const errors = {
   banError: ["You cannot ban this user.", 400],
   categoryExists: ["This category already exists.", 400],
   categoryError: ["This category does not exist.", 400],
+  emailError: ["A valid email address must be supplied.", 400],
   invalidLike: ["You cannot like your own thread/post.", 400],
   invalidRegister: ["You need to supply all required fields.", 400],
   lockedError: ["This thread is locked, posting is not allowed.", 400],
@@ -17,6 +18,7 @@ const errors = {
   notAuthorized: ["You are not authorized to continue.", 401],
   noUsers: ["Currently there are no users.", 400],
   passwordsAreTheSame: ["You cannot use your old password.", 400],
+  passwordError: ["The supplied password was incorrect.", 400],
   postRemoved: ["This post has been removed, replying is not allowed.", 400],
   settingError: ["There was an error with the settings options.", 400],
   unknown: [
