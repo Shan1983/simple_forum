@@ -48,5 +48,12 @@ module.exports = (sequelize, DataTypes) => {
       category.title = title;
     }
   });
+
+  //instance methods
+
+  Category.prototype.getAttributes = function(category) {
+    return category.toJSON();
+  };
+
   return Category;
 };
