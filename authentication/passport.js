@@ -9,6 +9,8 @@ let options = {};
 options.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 options.secretOrKey = jwtHelper.getJwtSecret();
 
+// jtw strategy
+
 module.exports = passport => {
   passport.use(
     new JwtStrategy(options, async (jwt_payload, done) => {
