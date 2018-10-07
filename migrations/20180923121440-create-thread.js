@@ -54,9 +54,6 @@ module.exports = {
         lockedMessage: {
           type: Sequelize.STRING
         },
-        movedTo: {
-          type: Sequelize.INTEGER
-        },
         isSticky: {
           type: Sequelize.BOOLEAN,
           defaultValue: false
