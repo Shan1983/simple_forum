@@ -60,6 +60,7 @@ app.use(session);
 // the api routes
 app.use("/api/v1/user", require("./routes/user"));
 app.use("/api/v1/category", require("./routes/category"));
+app.use("/api/v1/thread", require("./routes/thread"));
 
 // setup general error handler
 app.use(require("./helpers/generalErrors"));
