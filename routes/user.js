@@ -5,7 +5,7 @@ const uuidv5 = require("uuid/v5");
 
 const multer = require("multer");
 
-const controller = require("../controllers/user/user");
+const controller = require("../controllers/user");
 
 const storage = multer.diskStorage({
   destination: "/uploads/",

@@ -2,7 +2,7 @@ const express = require("express");
 const passport = require("passport");
 const router = express.Router();
 
-const controller = require("../controllers/category/category");
+const controller = require("../controllers/category/index.js");
 
 router.get(
   "/",
