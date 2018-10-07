@@ -40,7 +40,7 @@ describe("Category", () => {
           .set("content-type", "application/json")
           .set("Authorization", token)
           .set("Cookie", cookie)
-          .send({ title: "test", description: "test" });
+          .send({ title: "birds", description: "birds from test suit" });
 
         category.should.have.status(200);
         category.body.should.have.property("success", true);
@@ -260,37 +260,5 @@ describe("Category", () => {
         category.body.should.have.property("success", true);
       });
     });
-  });
-});
-
-describe("SETUP STEP", () => {
-  it("should post a new category", async () => {
-    const agent = chai.request.agent(server);
-
-    const user = await agent.post("/api/v1/user/login").send({
-      email: "shan@test.com",
-      password: "secret"
-    });
-
-    user.should.have.status(200);
-
-    const token = `Bearer ${user.body.token}`;
-    const cookie = `token=${user.body.token}`;
-
-    const category = await agent
-      .post(`/api/v1/category`)
-      .set("content-type", "application/json")
-      .set("Authorization", token)
-      .set("Cookie", cookie)
-      .send({ title: "javascript", description: "test" });
-    const category2 = await agent
-      .post(`/api/v1/category`)
-      .set("content-type", "application/json")
-      .set("Authorization", token)
-      .set("Cookie", cookie)
-      .send({ title: "npm", description: "test" });
-
-    category.should.have.status(200);
-    category2.should.have.status(200);
   });
 });
