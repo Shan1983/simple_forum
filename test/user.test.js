@@ -819,7 +819,7 @@ describe("USER", () => {
         );
       });
 
-      it("should should delete a user and add them to the blacklist", async () => {
+      it("should delete a user and add them to the blacklist", async () => {
         const agent = chai.request.agent(server);
 
         const user = await agent.post("/api/v1/user/login").send({
@@ -840,7 +840,7 @@ describe("USER", () => {
           .send({
             email: "moderator@test.com",
             tag: "#12345",
-            name: user.body.username,
+            name: "moderator",
             reason: "being evil!"
           });
 
