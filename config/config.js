@@ -11,11 +11,11 @@ module.exports = {
     logging: false
   },
   test: {
-    username: "root",
-    password: null,
-    database: "test",
-    host: "127.0.0.1",
-    dialect: "mysql",
+    username: process.env.DATABASE_USER_TEST,
+    password: process.env.DATABASE_PASSWORD_TEST,
+    database: process.env.DATABASE_TEST,
+    host: process.env.DATABASE_PORT_TEST,
+    dialect: process.env.DATABASE_DIALECT_TEST,
     operatorsAliases: false,
     logging: false
   },
