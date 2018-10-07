@@ -1,6 +1,5 @@
 "use strict";
 const errors = require("../helpers/mainErrors");
-const marked = require("../helpers/markedSetup");
 
 module.exports = (sequelize, DataTypes) => {
   const Post = sequelize.define(

@@ -2,8 +2,15 @@
 const slug = require("slugify");
 const randomColor = require("randomcolor");
 const moment = require("moment");
-const marked = require("../helpers/markedSetup");
 const errors = require("../helpers/mainErrors");
+const marked = require("marked");
+
+marked.setOptions({
+  highlight: function() {
+    return require("highlight.js").highlightAuto(val).value;
+  },
+  sanitize: true
+});
 
 module.exports = (sequelize, DataTypes) => {
   const Thread = sequelize.define(
@@ -41,7 +48,6 @@ module.exports = (sequelize, DataTypes) => {
       CategoryId: { type: DataTypes.INTEGER },
       UserId: { type: DataTypes.INTEGER },
       PollQueryId: { type: DataTypes.INTEGER },
-      movedTo: { type: DataTypes.INTEGER },
       isSticky: { type: DataTypes.BOOLEAN, defaultValue: false },
       stickyDuration: { type: DataTypes.DATE },
       threadPosition: { type: DataTypes.INTEGER },
@@ -60,12 +66,6 @@ module.exports = (sequelize, DataTypes) => {
       discussion: {
         type: DataTypes.TEXT,
         set(val) {
-          if (!val) {
-            throw new sequelize.ValidationError(sequelize, {
-              error: "discussion must be a string.",
-              field: "discussion"
-            });
-          }
           this.setDataValue("discussion", marked(val)); // set up with editor options later
         },
         allowNull: false
