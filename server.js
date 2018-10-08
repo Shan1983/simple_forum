@@ -65,6 +65,15 @@ app.use("/api/v1/thread", require("./routes/thread"));
 // setup general error handler
 app.use(require("./helpers/generalErrors"));
 
+// 404 errors
+app.use((req, res, next) => {
+  res.status(404);
+  if (req.accepts("json")) {
+    res.send({ error: "Not Found." });
+    return;
+  }
+});
+
 // setup the html side for the SPA
 // TODO complete this once the frontend is complete
 
