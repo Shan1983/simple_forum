@@ -23,12 +23,11 @@ module.exports = (sequelize, DataTypes) => {
       UserId: { type: DataTypes.INTEGER },
       ThreadId: { type: DataTypes.INTEGER },
       bestPost: { type: DataTypes.BOOLEAN, defaultValue: false },
-      replyToUser: {
-        type: DataTypes.STRING
-      },
-      ReplyId: { type: DataTypes.INTEGER }
+      replyToUser: { type: DataTypes.STRING },
+      ReplyId: { type: DataTypes.INTEGER },
+      deletedAt: { type: DataTypes.DATE }
     },
-    {}
+    { paranoid: true }
   );
 
   // class methods
