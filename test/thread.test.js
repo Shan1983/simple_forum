@@ -25,7 +25,47 @@ describe("THREAD", () => {
       it("should return deleted threads");
     });
   });
-  describe("/POST THREAD ROUTES", () => {});
-  describe("/PUT THREAD ROUTES", () => {});
-  describe("/DELETE THREAD ROUTES", () => {});
+  describe("/POST THREAD ROUTES", () => {
+    describe("POST /thread/:categoryId", () => {
+      it("should NOT proceed if unauthorised");
+      it("should check if category exists");
+      it("should post a new thread");
+    });
+    describe("POST /thread/:threadId/lock", () => {
+      it("should NOT proceed if unauthorised");
+      it('should NOT proceed if role is "Member"');
+      it("should check if thread exists");
+      it("should lock a thread");
+    });
+    describe("POST /thread/:threadId/make-sticky", () => {
+      it("should NOT proceed if unauthorised");
+      it('should NOT proceed if role is "Member"');
+      it("should check if thread exists");
+      it("should check if thread is locked");
+      it("should make a thread sticky");
+    });
+    describe("POST /thread/:categoryId/move", () => {
+      it("should NOT proceed if unauthorised");
+      it('should NOT proceed if role is "Member"');
+      it("should check if thread exists");
+      it("should check if category exists");
+      it("should move a thread");
+    });
+  });
+  describe("/PUT THREAD ROUTES", () => {
+    describe("PUT /thread/:threadId", () => {
+      it("should NOT proceed if unauthorised");
+      it("should check if thread exists");
+      it("should check if the thread belongs to the user");
+      it("should update a thread");
+    });
+  });
+  describe("/DELETE THREAD ROUTES", () => {
+    describe("DELETE /thread/:threadId", () => {
+      it("should NOT proceed if unaithorised");
+      it('should NOT proceed if role is not "Admin"');
+      it("should check if thread exists");
+      it("should delete a thread");
+    });
+  });
 });
