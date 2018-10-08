@@ -237,7 +237,7 @@ describe("Category", () => {
         category.should.have.status(401);
       });
 
-      it("should update a category", async () => {
+      it("should delete a category", async () => {
         const agent = chai.request.agent(server);
 
         const user = await agent.post("/api/v1/user/login").send({
