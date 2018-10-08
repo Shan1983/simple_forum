@@ -26,9 +26,7 @@ module.exports = (sequelize, DataTypes) => {
           }
         },
         validate: {
-          notEmpty: {
-            msg: "The title cannot be empty."
-          },
+          notEmpty: { msg: "The title cannot be empty." },
           len: {
             args: [3, 240],
             msg: "The title must be between 3 and 240 characters."
@@ -45,18 +43,24 @@ module.exports = (sequelize, DataTypes) => {
       slug: { type: DataTypes.STRING },
       postCount: { type: DataTypes.INTEGER, defaultValue: 0 },
       locked: { type: DataTypes.BOOLEAN, defaultValue: false },
+      lockedReason: {
+        type: DataTypes.ENUM,
+        values: [
+          "Spam",
+          "Inappropriate",
+          "Harrassment",
+          "Poster Requested",
+          "Duplicate"
+        ]
+      },
+      lockedMessage: { type: DataTypes.STRING },
       CategoryId: { type: DataTypes.INTEGER },
       UserId: { type: DataTypes.INTEGER },
       PollQueryId: { type: DataTypes.INTEGER },
       isSticky: { type: DataTypes.BOOLEAN, defaultValue: false },
       stickyDuration: { type: DataTypes.DATE },
-      threadPosition: { type: DataTypes.INTEGER },
-      SubscriptionId: {
-        type: DataTypes.INTEGER
-      },
-      LikeId: {
-        type: DataTypes.INTEGER
-      },
+      SubscriptionId: { type: DataTypes.INTEGER },
+      LikeId: { type: DataTypes.INTEGER },
       titleBGColor: {
         type: DataTypes.STRING,
         defaultValue() {
@@ -66,12 +70,17 @@ module.exports = (sequelize, DataTypes) => {
       discussion: {
         type: DataTypes.TEXT,
         set(val) {
+          if (typeof val !== "string") {
+            throw new sequelize.ValidationError("Email must be a string");
+          }
+
           this.setDataValue("discussion", marked(val)); // set up with editor options later
         },
         allowNull: false
-      }
+      },
+      deletedAt: { type: DataTypes.DATE }
     },
-    {}
+    { paranoid: true }
   );
 
   // class methods
@@ -121,6 +130,18 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   // instance methods
+
+  Thread.prototype.getAttributes = function(thread) {
+    return thread.toJSON();
+  };
+
+  Thread.prototype.lockThread = async function(
+    thread,
+    lockedReason,
+    lockedMessage
+  ) {
+    await thread.update({ locked: true, lockedReason, lockedMessage });
+  };
 
   Thread.prototype.getMetaData = function(limit) {
     let meta = {};
@@ -178,36 +199,38 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
 
-  Thread.prototype.moveThisThreadTo = async function(id, newCategory) {
-    const { Thread, Category } = sequelize.models;
-    const currentCategory = await Category.findByPrimary(this.CategoryId);
-    const allCategories = await Category.findAll();
+  Thread.prototype.markAsSticky = async function(thread, duration) {
+    // duration is an number of days
+    const time = moment(new Date(), "YYYY-MM-DD HH:mm:ss").add(
+      duration,
+      "days"
+    );
 
-    if (id === currentCategory.id) {
-      throw errors.parameterError(
-        "CategoryId",
-        "You cannot move this thread to the same category."
-      );
-    } else if (!allCategories) {
-      throw errors.categoryError;
-    } else {
-      Thread.update({
-        CategoryId: id
-      });
-    }
+    thread.update({
+      isSticky: true,
+      stickyDuration: time
+    });
+    thread.reload();
   };
 
-  Thread.prototype.markAsSticky = async function(id) {
-    const thread = await Thread.findById(id);
-    const currentThreadPosition = thread.threadPosition;
-
-    if (!thread) {
-      throw errors.parameterError("threadId", "That thread does not exist.");
-    }
-
-    thread.unshift(currentThreadPosition);
-
+  Thread.prototype.removeSticky = async function(thread) {
+    thread.update({
+      isSticky: false,
+      stickyDuration: null
+    });
     thread.reload();
+  };
+
+  Thread.prototype.moveThread = async function(attr, category) {
+    const StrippedString = attr.discussion.replace(/(<([^>]+)>)/gi, "");
+
+    await Thread.create({
+      title: attr.title,
+      slug: slug(attr.slug),
+      CategoryId: category.id,
+      UserId: attr.UserId,
+      discussion: StrippedString
+    });
   };
 
   Thread.prototype.checkStickyDuration = async function() {
