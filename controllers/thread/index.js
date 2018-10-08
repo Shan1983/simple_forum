@@ -130,46 +130,46 @@ exports.moveThread = async (req, res, next) => {
 
 // /:threadId
 exports.getThread = async (req, res, next) => {
-  const thread = await Thread.findOne({
-    where: { id: req.params.threadId },
-    include: [{ model: Category, attributes: ["title"] }, Post]
-  });
-
-  if (!thread) {
-    res.status(400);
-    res.json({ error: [errors.threadError] });
-  } else {
-    const attr = thread.getAttributes(thread);
-
-    if (attr.locked) {
-      res.status(400);
-      res.json({ error: [errors.lockedError] });
-    } else {
-      // check sticky duration
-      if (attr.isSticky) {
-        if (attr.duration > new Date()) {
-          thread.removeSticky(thread);
-        }
-      }
-
-      res.json({
-        title: attr.title,
-        slug: attr.slug,
-        postCount: attr.postCount,
-        locked: attr.locked,
-        lockedReason: attr.lockedReason,
-        lockedMessage: attr.lockedMessage,
-        isSticky: attr.isSticky,
-        stickyDuration: attr.stickyDuration,
-        titleBGColor: attr.titleBGColor,
-        discussion: attr.discussion,
-        createdAt: attr.createdAt,
-        Category: attr.Category.title,
-        Posts: attr.Posts
-      });
-    }
-  }
   try {
+    const thread = await Thread.findOne({
+      where: { id: req.params.threadId },
+      include: [{ model: Category, attributes: ["title"] }, Post]
+    });
+
+    if (!thread) {
+      res.status(400);
+      res.json({ error: [errors.threadError] });
+    } else {
+      const attr = thread.getAttributes(thread);
+
+      if (attr.locked) {
+        res.status(400);
+        res.json({ error: [errors.lockedError] });
+      } else {
+        // check sticky duration
+        if (attr.isSticky) {
+          if (attr.duration > new Date()) {
+            thread.removeSticky(thread);
+          }
+        }
+
+        res.json({
+          title: attr.title,
+          slug: attr.slug,
+          postCount: attr.postCount,
+          locked: attr.locked,
+          lockedReason: attr.lockedReason,
+          lockedMessage: attr.lockedMessage,
+          isSticky: attr.isSticky,
+          stickyDuration: attr.stickyDuration,
+          titleBGColor: attr.titleBGColor,
+          discussion: attr.discussion,
+          createdAt: attr.createdAt,
+          Category: attr.Category.title,
+          Posts: attr.Posts
+        });
+      }
+    }
   } catch (error) {
     next(error);
   }
