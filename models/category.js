@@ -44,7 +44,7 @@ module.exports = (sequelize, DataTypes) => {
       throw new sequelize.ValidationError("The category must have a title");
     } else {
       // slugify the category title
-      const title = slug(category.title).toUpperCase();
+      const title = slug(category.title);
       category.title = title;
     }
   });
