@@ -27,14 +27,32 @@ exports.getAllThreadsInCategory = async (req, res, next) => {
   try {
     const category = await Category.findOne({
       where: { id: req.params.id },
-      include: [Thread]
+      include: [
+        { model: Thread, attributes: ["id", "titleBGColor", "title", "slug"] }
+      ]
     });
 
     if (!category) {
       res.status(400);
       res.json({ error: [errors.categoryError] });
     } else {
-      res.json(category.toJSON());
+      const catAttr = category.getAttributes(category);
+
+      const customThread = catAttr.Threads.map(e => {
+        return {
+          title: e.title,
+          icon: e.titleBGColor,
+          path: `api/v1/thread/${e.id}`
+        };
+      });
+
+      res.json({
+        title: catAttr.title,
+        description: catAttr.description,
+        colorIcon: catAttr.colorIcon,
+        createdAt: catAttr.createdAt,
+        Threads: customThread
+      });
     }
   } catch (error) {
     next(error);
@@ -51,7 +69,7 @@ exports.newCategory = async (req, res, next) => {
       let categoryError = false;
 
       allCategories.map(e => {
-        if (e.title === slug(title).toUpperCase()) {
+        if (e.title === slug(title)) {
           categoryError = true;
         }
       });
