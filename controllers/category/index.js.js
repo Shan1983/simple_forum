@@ -131,9 +131,28 @@ exports.deleteCategory = async (req, res, next) => {
         res.status(400);
         res.json({ error: [errors.categoryError] });
       } else {
+        // so that threads aren't left without a category
+        // let's create a new one and assign the thread to it..
+
+        const OtherCategory = await Category.findOrCreate({
+          where: { title: "Other" },
+          defaults: { colorIcon: "#303030" }
+        });
+
+        // re assign effected threads
+        await Thread.update(
+          { CategoryId: OtherCategory[0].id },
+          {
+            where: { CategoryId: req.params.id }
+          }
+        );
+
         await category.destroy();
 
-        res.json({ success: true });
+        res.json({
+          success: true,
+          createdOther: OtherCategory[1] ? OtherCategory[0] : null
+        });
       }
     } else {
       res.status(401);
