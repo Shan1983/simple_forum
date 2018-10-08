@@ -6,21 +6,21 @@ module.exports = {
       "categories",
       [
         {
-          title: "TEST",
+          title: "test",
           description: "Seeded test category",
           colorIcon: "#26af6d",
           createdAt: new Date(),
           updatedAt: new Date()
         },
         {
-          title: "JAVASCRIPT",
+          title: "javascript",
           description: "Seeded Javascript category",
           colorIcon: "#29af8d",
           createdAt: new Date(),
           updatedAt: new Date()
         },
         {
-          title: "NPM",
+          title: "npm",
           description: "Seeded NPM category",
           colorIcon: "#22af0d",
           createdAt: new Date(),
