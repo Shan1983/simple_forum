@@ -265,17 +265,21 @@ exports.updateThread = async (req, res, next) => {
 // /:threadId
 // make sure only a admin can do this!
 exports.deleteThread = async (req, res, next) => {
-  if (req.session.role !== "Admin") {
-    res.status(401);
-    res.json({ error: [errors.notAuthorized] });
-  } else {
-    const thread = await Thread.findById(req.params.threadId);
-
-    await thread.destroy();
-
-    res.json({ success: true });
-  }
   try {
+    if (req.session.role !== "Admin") {
+      res.status(401);
+      res.json({ error: [errors.notAuthorized] });
+    } else {
+      const thread = await Thread.findById(req.params.threadId);
+
+      if (!thread) {
+        await thread.destroy();
+        res.json({ success: true });
+      } else {
+        res.status(400);
+        res.json({ error: [errors.threadError] });
+      }
+    }
   } catch (error) {
     next(error);
   }
