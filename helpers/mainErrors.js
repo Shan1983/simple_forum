@@ -14,7 +14,7 @@ const errors = {
   emailError: ["A valid email address must be supplied.", 400],
   invalidLike: ["You cannot like your own thread/post.", 400],
   invalidRegister: ["You need to supply all required fields.", 400],
-  lockedError: ["This thread is locked, posting is not allowed.", 400],
+  lockedError: ["This thread is locked.", 400],
   loginError: ["The username or password provided was incorrect.", 401],
   notAuthorized: ["You are not authorized to continue.", 401],
   noUsers: ["Currently there are no users.", 400],
@@ -22,6 +22,7 @@ const errors = {
   passwordError: ["The supplied password was incorrect.", 400],
   postRemoved: ["This post has been removed, replying is not allowed.", 400],
   settingError: ["There was an error with the settings options.", 400],
+  threadError: ["This thread does not exist.", 400],
   unknown: [
     "Whoops! something on our end screwed up :( reload and try again.",
     500
