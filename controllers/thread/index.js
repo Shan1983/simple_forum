@@ -1,4 +1,4 @@
-const { User, Category, Thread, Post } = require("../../models");
+const { User, Category, Thread, Post, Village } = require("../../models");
 const errors = require("../../helpers/mainErrors");
 const slug = require("slugify");
 
@@ -24,6 +24,10 @@ exports.postNewThread = async (req, res, next) => {
           UserId: req.session.userId,
           discussion: req.body.discussion
         });
+
+        const user = await User.findById(req.session.userId);
+
+        await user.increment("postCount", { by: 1 });
 
         res.json({
           success: true
@@ -133,7 +137,25 @@ exports.getThread = async (req, res, next) => {
   try {
     const thread = await Thread.findOne({
       where: { id: req.params.threadId },
-      include: [{ model: Category, attributes: ["title"] }, Post]
+      include: [
+        { model: Category, attributes: ["title"] },
+        {
+          model: Post,
+          attributes: ["discussion", "bestPost", "createdAt"],
+          include: [
+            {
+              model: User,
+              attributes: ["username", "colorIcon", "points", "postCount"],
+              includes: [
+                {
+                  model: Village,
+                  attributes: ["townhallLevel", "playerTag", "clanRole"]
+                }
+              ]
+            }
+          ]
+        }
+      ]
     });
 
     if (!thread) {
