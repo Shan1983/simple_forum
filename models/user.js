@@ -47,6 +47,7 @@ module.exports = (sequelize, DataTypes) => {
           return randomColor();
         }
       },
+      postCount: { type: DataTypes.INTEGER, defaultValue: 0 },
       password: {
         type: DataTypes.STRING,
         allowNull: false,
