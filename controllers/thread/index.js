@@ -225,7 +225,7 @@ exports.updateThread = async (req, res, next) => {
     res.json({ error: [errors.threadError] });
   } else {
     const threadAttr = thread.getAttributes(thread);
-    if (req.session.userId === threadAttr.id) {
+    if (req.session.userId === threadAttr.UserId) {
       const { title, discussion } = req.body;
       await thread.update({
         title: `Edited - ${title}`,
@@ -273,11 +273,11 @@ exports.deleteThread = async (req, res, next) => {
       const thread = await Thread.findById(req.params.threadId);
 
       if (!thread) {
-        await thread.destroy();
-        res.json({ success: true });
-      } else {
         res.status(400);
         res.json({ error: [errors.threadError] });
+      } else {
+        await thread.destroy();
+        res.json({ success: true });
       }
     }
   } catch (error) {
