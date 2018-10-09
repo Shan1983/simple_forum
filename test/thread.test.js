@@ -54,7 +54,7 @@ describe("THREAD", () => {
           errors.lockedError
         );
       });
-      it("should check sticky duration");
+
       it("should return a thread", async () => {
         const agent = chai.request.agent(server);
 
