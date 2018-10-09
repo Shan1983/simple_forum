@@ -3,3 +3,6 @@
 forum.xml
 .env
 /uploads/
+build
+npm-debug.log
+.DS_Store
