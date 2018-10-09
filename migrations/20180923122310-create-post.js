@@ -14,16 +14,6 @@ module.exports = {
           type: Sequelize.TEXT,
           allowNull: false
         },
-        postPosition: {
-          type: Sequelize.INTEGER
-        },
-        removed: {
-          type: Sequelize.BOOLEAN,
-          defaultValue: false
-        },
-        movedTo: {
-          type: Sequelize.INTEGER
-        },
         UserId: {
           type: Sequelize.INTEGER
         },
@@ -37,10 +27,6 @@ module.exports = {
         LikeId: {
           type: Sequelize.INTEGER
         },
-        replyToUser: {
-          type: Sequelize.STRING
-        },
-        ReplyId: { type: Sequelize.INTEGER },
         createdAt: {
           allowNull: false,
           type: Sequelize.DATE
