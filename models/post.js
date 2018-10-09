@@ -14,17 +14,14 @@ module.exports = (sequelize, DataTypes) => {
               field: "discussion"
             });
           }
-          this.setDataValue("discussion", marked(val)); // set up with editor options later
+          this.setDataValue("discussion", val); // set up with editor options later
         },
         allowNull: false
       },
-      postPosition: { type: DataTypes.INTEGER },
-      removed: { type: DataTypes.BOOLEAN, defaultValue: false },
       UserId: { type: DataTypes.INTEGER },
       ThreadId: { type: DataTypes.INTEGER },
       bestPost: { type: DataTypes.BOOLEAN, defaultValue: false },
-      replyToUser: { type: DataTypes.STRING },
-      ReplyId: { type: DataTypes.INTEGER },
+
       deletedAt: { type: DataTypes.DATE }
     },
     { paranoid: true }
@@ -35,13 +32,16 @@ module.exports = (sequelize, DataTypes) => {
   Post.associate = function(models) {
     Post.belongsTo(models.User);
     Post.belongsTo(models.Thread);
-    Post.hasMany(models.Post, { as: "Replies", foreignKey: "ReplyId" });
     Post.hasMany(models.Like, { foreignKeyConstraint: true });
     Post.hasMany(models.Report, {
       foreignKeyConstraint: true,
       onDelete: "CASCADE",
       hooks: true
     });
+  };
+
+  Post.markAsBest = async function(postId) {
+    await Post.update({ bestPost: true }, { where: { id: postId } });
   };
 
   // return data from required models
@@ -92,6 +92,10 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   // instance methods
+
+  Post.prototype.getAttributes = function(post) {
+    return post.toJSON();
+  };
 
   Post.prototype.getReplyToUser = function() {
     return Post.findByPrimary(this.replyId);
