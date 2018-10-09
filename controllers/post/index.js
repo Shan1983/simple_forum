@@ -113,15 +113,49 @@ exports.quote = async (req, res, next) => {
   }
 };
 // "/:postId",
+// must be OP
 exports.updatePost = async (req, res, next) => {
   try {
+    const post = await Post.findById(req.params.postId);
+
+    if (!post) {
+      res.status(400);
+      res.json({ error: [errors.postError] });
+    } else {
+      const postAttr = post.getAttributes(post);
+      if (req.session.userId === postAttr.UserId) {
+        post.update({
+          discussion: req.body.discussion
+        });
+        res.json({ success: true });
+      } else {
+        res.status(401);
+        res.json({ error: [errors.notAuthorized] });
+      }
+    }
   } catch (error) {
     next(error);
   }
 };
 //   "/:postId",
+// must be admin
 exports.deletePost = async (req, res, next) => {
   try {
+    const post = await Post.findById(req.params.postId);
+
+    if (!post) {
+      res.status(400);
+      res.json({ error: [errors.postError] });
+    } else {
+      if (req.session.role !== "Admin") {
+        res.status(401);
+        res.json({ error: [errors.notAuthorized] });
+      } else {
+        await post.destroy();
+
+        res.json({ success: true });
+      }
+    }
   } catch (error) {
     next(error);
   }
