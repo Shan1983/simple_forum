@@ -21,6 +21,7 @@ const errors = {
   passwordsAreTheSame: ["You cannot use your old password.", 400],
   passwordError: ["The supplied password was incorrect.", 400],
   postRemoved: ["This post has been removed, replying is not allowed.", 400],
+  postError: ["This post does not exist.", 400],
   settingError: ["There was an error with the settings options.", 400],
   threadError: ["This thread does not exist.", 400],
   unknown: [
