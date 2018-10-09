@@ -11,6 +11,7 @@ module.exports = {
           type: Sequelize.INTEGER
         },
         username: { type: Sequelize.STRING },
+        postCount: { type: Sequelize.INTEGER, defaultValue: 0 },
         description: { type: Sequelize.TEXT },
         colorIcon: { type: Sequelize.STRING },
         password: { type: Sequelize.STRING },
