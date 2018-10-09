@@ -3,14 +3,6 @@ const slug = require("slugify");
 const randomColor = require("randomcolor");
 const moment = require("moment");
 const errors = require("../helpers/mainErrors");
-const marked = require("marked");
-
-marked.setOptions({
-  highlight: function() {
-    return require("highlight.js").highlightAuto(val).value;
-  },
-  sanitize: true
-});
 
 module.exports = (sequelize, DataTypes) => {
   const Thread = sequelize.define(
@@ -74,7 +66,7 @@ module.exports = (sequelize, DataTypes) => {
             throw new sequelize.ValidationError("Email must be a string");
           }
 
-          this.setDataValue("discussion", marked(val)); // set up with editor options later
+          this.setDataValue("discussion", val); // set up with editor options later
         },
         allowNull: false
       },
