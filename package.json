@@ -2,7 +2,7 @@
   "name": "simple_forum",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "cross-env NODE_ENV=test npm run kill:test && npm run dev:test && npm run seed:test && mocha --harmony --timeout 10000 --exit ",
     "dev": "cross-env NODE_ENV=development && sequelize db:migrate",
