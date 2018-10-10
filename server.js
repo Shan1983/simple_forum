@@ -62,6 +62,7 @@ app.use("/api/v1/user", require("./routes/user"));
 app.use("/api/v1/category", require("./routes/category"));
 app.use("/api/v1/thread", require("./routes/thread"));
 app.use("/api/v1/post", require("./routes/post"));
+app.use("/api/v1/ban", require("./routes/ban"));
 
 // setup general error handler
 app.use(require("./helpers/generalErrors"));
