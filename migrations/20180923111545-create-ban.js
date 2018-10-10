@@ -14,8 +14,7 @@ module.exports = {
           type: Sequelize.INTEGER
         },
         ipBanned: {
-          type: Sequelize.BOOLEAN,
-          defaultValue: false
+          type: Sequelize.STRING
         },
         reason: {
           type: Sequelize.TEXT
