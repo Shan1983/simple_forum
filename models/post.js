@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
   Post.associate = function(models) {
     Post.belongsTo(models.User);
     Post.belongsTo(models.Thread);
-    Post.hasMany(models.Like, { foreignKeyConstraint: true });
+    Post.hasMany(models.Like, { through: "likeposts" });
     Post.hasMany(models.Report, {
       foreignKeyConstraint: true,
       onDelete: "CASCADE",
