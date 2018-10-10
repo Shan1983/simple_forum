@@ -37,6 +37,7 @@ describe("POST", () => {
           .post(`/api/v1/post/6`)
           .set("content-type", "application/json")
           .set("Authorization", token)
+
           .send({
             discussion: "A really long rant about something...",
             UserId: 2,
@@ -154,6 +155,7 @@ describe("POST", () => {
           .post(`/api/v1/post/1/1/quote`)
           .set("content-type", "application/json")
           .set("Authorization", token)
+
           .send({ discussion: "test" });
 
         post.should.have.status(200);
@@ -186,6 +188,7 @@ describe("POST", () => {
           .put(`/api/v1/post/99`)
           .set("content-type", "application/json")
           .set("Authorization", token)
+
           .send({ discussion: "test" });
 
         post.should.have.status(400);
@@ -205,6 +208,7 @@ describe("POST", () => {
           .put(`/api/v1/post/1`)
           .set("content-type", "application/json")
           .set("Authorization", token)
+
           .send({ discussion: "test" });
 
         post.should.have.status(401);
@@ -224,6 +228,7 @@ describe("POST", () => {
           .put(`/api/v1/post/1`)
           .set("content-type", "application/json")
           .set("Authorization", token)
+
           .send({ discussion: "updated!" });
 
         post.should.have.status(200);
