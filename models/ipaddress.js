@@ -17,16 +17,15 @@ module.exports = (sequelize, DataTypes) => {
     IpAddress.belongsToMany(models.User, { through: "userip" });
   };
 
-  IpAddress.createIpIfEmpty = async function(ip, user) {
+  IpAddress.createIpIfEmpty = async function(ip, id) {
     const { User } = sequelize.models;
     // get ip if user had one already
     const ipa = await IpAddress.findOne({
-      where: { ipAddress: ip },
-      include: [{ model: User, where: { id: user.id } }]
+      where: { UserId: id }
     });
 
     if (!ipa) {
-      await IpAddress.create({ ipAddress: ip, UserId: user.id });
+      await IpAddress.create({ ipAddress: ip, UserId: id });
     }
   };
 
