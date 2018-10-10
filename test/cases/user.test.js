@@ -224,12 +224,11 @@ describe("USER", () => {
         user.should.have.status(200);
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const res = await agent
           .post(`/api/v1/user/profile/Shan/upload`)
           .set("Authorization", token)
-          .set("Cookie", cookie)
+
           .field("content-type", "multipart/form-data")
           .field("avatar", "pretend.jpeg")
           .attach("avatar", "/Users/shan/Desktop/pretend.jpeg");
@@ -250,12 +249,11 @@ describe("USER", () => {
         user.should.have.status(200);
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const res = await agent
           .post(`/api/v1/user/profile/${username}/upload`)
           .set("Authorization", token)
-          .set("Cookie", cookie)
+
           .field("content-type", "multipart/form-data")
           .field("avatar", "pretend.jpeg")
           .attach("avatar", "/Users/shan/Desktop/pretend.jpeg");
@@ -314,13 +312,11 @@ describe("USER", () => {
         user.body.should.have.property("token");
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const res = await agent
           .get("/api/v1/user/all")
           .set("content-type", "application/json")
-          .set("Authorization", token)
-          .set("Cookie", cookie);
+          .set("Authorization", token);
 
         res.should.be.json;
         res.should.have.status(200);
@@ -344,13 +340,11 @@ describe("USER", () => {
         user.body.should.have.property("token");
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const res = await agent
           .get("/api/v1/user/all")
           .set("content-type", "application/json")
-          .set("Authorization", token)
-          .set("Cookie", cookie);
+          .set("Authorization", token);
 
         res.should.be.json;
         res.should.have.status(401);
@@ -372,13 +366,11 @@ describe("USER", () => {
         user.body.should.have.property("token");
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const res = await agent
           .get(`/api/v1/user/profile/${username}`)
           .set("content-type", "application/json")
-          .set("Authorization", token)
-          .set("Cookie", cookie);
+          .set("Authorization", token);
 
         res.should.be.json;
         res.should.have.status(200);
@@ -400,12 +392,7 @@ describe("USER", () => {
 
         user.should.have.status(200);
 
-        const cookie = `token=${user.body.token}`;
-
-        const res = await agent
-          .put(`/api/v1/user/profile/Shan`)
-
-          .set("Cookie", cookie);
+        const res = await agent.put(`/api/v1/user/profile/Shan`);
 
         res.should.have.status(401);
       });
@@ -421,13 +408,11 @@ describe("USER", () => {
         user.should.have.status(200);
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const res = await agent
           .put(`/api/v1/user/profile/Shan`)
           .set("content-type", "application/json")
-          .set("Authorization", token)
-          .set("Cookie", cookie);
+          .set("Authorization", token);
 
         res.should.be.json;
         res.should.have.status(401);
@@ -446,13 +431,11 @@ describe("USER", () => {
         user.should.have.status(200);
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const res = await agent
           .put(`/api/v1/user/profile/qwertychickenduck`)
           .set("content-type", "application/json")
-          .set("Authorization", token)
-          .set("Cookie", cookie);
+          .set("Authorization", token);
 
         res.should.be.json;
         res.should.have.status(401);
@@ -472,13 +455,12 @@ describe("USER", () => {
         user.should.have.status(200);
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const oldPw = await agent
           .put(`/api/v1/user/profile/Shan`)
           .set("content-type", "application/json")
           .set("Authorization", token)
-          .set("Cookie", cookie)
+
           .send({ password: "secret", oldPassword: "secret" });
 
         oldPw.should.have.status(400);
@@ -498,13 +480,12 @@ describe("USER", () => {
         user.should.have.status(200);
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const oldPw = await agent
           .put(`/api/v1/user/profile/Shan`)
           .set("content-type", "application/json")
           .set("Authorization", token)
-          .set("Cookie", cookie)
+
           .send({ password: "secret", oldPassword: "secrets" });
 
         oldPw.should.have.status(400);
@@ -524,13 +505,12 @@ describe("USER", () => {
         user.should.have.status(200);
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const res = await agent
           .put(`/api/v1/user/profile/Shan`)
           .set("content-type", "application/json")
           .set("Authorization", token)
-          .set("Cookie", cookie)
+
           .send({ password: "test123", oldPassword: "secret" });
 
         res.should.be.json;
@@ -553,13 +533,12 @@ describe("USER", () => {
         user.should.have.status(200);
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const res = await agent
           .put(`/api/v1/user/profile/Shan`)
           .set("content-type", "application/json")
           .set("Authorization", token)
-          .set("Cookie", cookie)
+
           .send({ email: "turtle@" });
 
         res.should.be.json;
@@ -580,13 +559,12 @@ describe("USER", () => {
         user.should.have.status(200);
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const res = await agent
           .put(`/api/v1/user/profile/Shan`)
           .set("content-type", "application/json")
           .set("Authorization", token)
-          .set("Cookie", cookie)
+
           .send({ email: "turtle@test.com" });
 
         res.should.be.json;
@@ -629,13 +607,12 @@ describe("USER", () => {
         user.should.have.status(200);
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const res = await agent
           .put(`/api/v1/user/profile/Shan`)
           .set("content-type", "application/json")
           .set("Authorization", token)
-          .set("Cookie", cookie)
+
           .send({
             description: "happy happy joy joy",
             allowAdvertising: 1,
@@ -666,13 +643,11 @@ describe("USER", () => {
         user.should.have.status(200);
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const res = await agent
           .delete(`/api/v1/user/profile/Shan/close`)
           .set("content-type", "application/json")
-          .set("Authorization", token)
-          .set("Cookie", cookie);
+          .set("Authorization", token);
 
         res.should.be.json;
         res.should.have.status(401);
@@ -692,13 +667,11 @@ describe("USER", () => {
         user.should.have.status(200);
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const res = await agent
           .delete(`/api/v1/user/profile/${username}/close`)
           .set("content-type", "application/json")
-          .set("Authorization", token)
-          .set("Cookie", cookie);
+          .set("Authorization", token);
 
         res.should.be.json;
         res.should.have.status(200);
@@ -728,13 +701,12 @@ describe("USER", () => {
         user.should.have.status(200);
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const res = await agent
           .delete(`/api/v1/user/profile/PrinceOfDarkness`)
           .set("content-type", "application/json")
           .set("Authorization", token)
-          .set("Cookie", cookie)
+
           .send({
             email: "prince.of.darkness.18@test.com",
             tag: "#12345",
@@ -761,13 +733,12 @@ describe("USER", () => {
         user.should.have.status(200);
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const res = await agent
           .delete(`/api/v1/user/profile/moderator`)
           .set("content-type", "application/json")
           .set("Authorization", token)
-          .set("Cookie", cookie)
+
           .send({
             email: "moderator@test.com",
             tag: "#12345",
@@ -794,13 +765,12 @@ describe("USER", () => {
         user.should.have.status(200);
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const res = await agent
           .delete(`/api/v1/user/profile/Shan`)
           .set("content-type", "application/json")
           .set("Authorization", token)
-          .set("Cookie", cookie)
+
           .send({
             email: "turtle@test.com",
             tag: "#12345",
@@ -830,13 +800,12 @@ describe("USER", () => {
         user.should.have.status(200);
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const res = await agent
           .delete(`/api/v1/user/profile/moderator`)
           .set("content-type", "application/json")
           .set("Authorization", token)
-          .set("Cookie", cookie)
+
           .send({
             email: "moderator@test.com",
             tag: "#12345",
