@@ -10,8 +10,16 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER
       },
       ipBanned: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
+        type: DataTypes.STRING
+        // validate: {
+        //   isString(val) {
+        //     if (typeof val !== "string") {
+        //       throw new sequelize.ValidationError(
+        //         "The IP Adress must be a string."
+        //       );
+        //     }
+        //   }
+        // }
       },
       reason: {
         type: DataTypes.TEXT,
@@ -35,53 +43,22 @@ module.exports = (sequelize, DataTypes) => {
     Ban.belongsTo(models.User);
   };
 
+  Ban.getAttributes = function(banned) {
+    return banned.toJSON();
+  };
+
   // ban a user from accessing the forum
-  Ban.banUser = async function(username, reason) {
-    const { User, Ip } = sequelize.models;
+  Ban.banUser = async function(userId, ip, reason) {
+    await Ban.create({
+      UserId: userId,
+      ipBanned: ip,
+      reason
+    });
+  };
 
-    if (username) {
-      // get the user details
-      const user = await User.findOne({
-        where: { username }
-      });
-
-      // check if they are super system or an admin
-      if (user.Role.role === "System" || user.Role.role === "Administrator") {
-        return errors.banError;
-      }
-
-      // get the users ip address
-      const ip = await Ip.findOne({
-        where: { UserId: user.id },
-        include: [
-          {
-            model: User,
-            attributes: ["id", "username", "avatar"]
-          }
-        ]
-      });
-
-      // if the user doesnt have an ip, if the user
-      // doesn't somehow have an ip we will ban them using their email address
-      if (!ip) {
-        Ban.banByEmail(user);
-      }
-
-      // right now for the banning
-      if (!ip) {
-        Ban.update({
-          bannedEmail: user.email,
-          UserId: user.id,
-          reason
-        });
-      } else if (ip) {
-        Ban.update({
-          UserId: user.id,
-          ipBanned: true,
-          ipAddress: ip.ipAddress
-        });
-      }
-    }
+  // unban a user from accessing the forum
+  Ban.unbanUser = async function(userId) {
+    await Ban.destroy({ where: { UserId: userId } });
   };
 
   Ban.checkIfBanned = async function(user) {
