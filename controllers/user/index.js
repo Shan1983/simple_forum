@@ -200,10 +200,12 @@ exports.login = async (req, res, next) => {
           const role = await jwtHelper.getUserRole(user);
           const token = await jwtHelper.generateNewToken(user);
 
+          const userAttributes = user.getAttributes(user);
+
           /**
            * Set the users ipaddress
            */
-          await IpAddress.createIpIfEmpty(req.ip, user);
+          await IpAddress.createIpIfEmpty(req.ip, userAttributes.id);
 
           /**
            * Set the user internal session data
@@ -268,10 +270,12 @@ exports.register = async (req, res, next) => {
 
         await UserRole.assignRole(user);
 
+        const userAttributes = user.getAttributes(user);
+
         /**
          * Set the users ipaddress
          */
-        await IpAddress.createIpIfEmpty(req.ip, user);
+        await IpAddress.createIpIfEmpty(req.ip, userAttributes.id);
 
         res.json({ message: "Ok", path: `api/v1/user/login` });
       }
