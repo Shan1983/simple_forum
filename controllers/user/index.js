@@ -188,6 +188,7 @@ exports.login = async (req, res, next) => {
       /**
        * Check if the user is banned
        */
+      // FIX THIS!!! NOT WORKING
       await Ban.checkIfBanned(user);
 
       /**
