@@ -1,6 +1,4 @@
-const passport = require("passport");
 const jwt = require("jsonwebtoken");
-const moment = require("moment");
 
 const { Role, UserRole } = require("../models");
 
@@ -21,11 +19,7 @@ module.exports = {
   async generateNewToken(user) {
     // get the users role
 
-    const roleRecord = await UserRole.findById(user.id);
-
-    const roleResult = await Role.findById(roleRecord.RoleId);
-
-    const role = roleResult.toJSON().role;
+    const role = await this.getUserRole(user);
 
     const exp = 3600;
 
