@@ -55,13 +55,12 @@ describe("Category", () => {
         user.should.have.status(200);
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const category = await agent
           .post(`/api/v1/category`)
           .set("content-type", "application/json")
           .set("Authorization", token)
-          .set("Cookie", cookie)
+
           .send({ title: "birds", description: "birds from test suit" });
 
         category.should.have.status(200);
@@ -79,13 +78,12 @@ describe("Category", () => {
         user.should.have.status(200);
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const category = await agent
           .post(`/api/v1/category`)
           .set("content-type", "application/json")
           .set("Authorization", token)
-          .set("Cookie", cookie)
+
           .send({ title: "test", description: "test" });
 
         category.should.have.status(400);
@@ -118,13 +116,11 @@ describe("Category", () => {
         user.should.have.status(200);
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const category = await agent
           .get(`/api/v1/category`)
           .set("content-type", "application/json")
-          .set("Authorization", token)
-          .set("Cookie", cookie);
+          .set("Authorization", token);
 
         category.should.have.status(200);
       });
@@ -151,13 +147,11 @@ describe("Category", () => {
         user.should.have.status(200);
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const category = await agent
           .get(`/api/v1/category/1/threads`)
           .set("content-type", "application/json")
-          .set("Authorization", token)
-          .set("Cookie", cookie);
+          .set("Authorization", token);
 
         category.should.have.status(200);
       });
@@ -188,13 +182,12 @@ describe("Category", () => {
         user.should.have.status(200);
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const category = await agent
           .put(`/api/v1/category/1`)
           .set("content-type", "application/json")
           .set("Authorization", token)
-          .set("Cookie", cookie)
+
           .send({ title: "spiders", description: "scary" });
 
         category.should.have.status(401);
@@ -211,13 +204,12 @@ describe("Category", () => {
         user.should.have.status(200);
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const category = await agent
           .put(`/api/v1/category/1`)
           .set("content-type", "application/json")
           .set("Authorization", token)
-          .set("Cookie", cookie)
+
           .send({ title: "spiders", description: "scary" });
 
         category.should.have.status(200);
@@ -248,13 +240,11 @@ describe("Category", () => {
         user.should.have.status(200);
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const category = await agent
           .delete(`/api/v1/category/1`)
           .set("content-type", "application/json")
-          .set("Authorization", token)
-          .set("Cookie", cookie);
+          .set("Authorization", token);
 
         category.should.have.status(401);
       });
@@ -270,13 +260,11 @@ describe("Category", () => {
         user.should.have.status(200);
 
         const token = `Bearer ${user.body.token}`;
-        const cookie = `token=${user.body.token}`;
 
         const category = await agent
           .delete(`/api/v1/category/1`)
           .set("content-type", "application/json")
-          .set("Authorization", token)
-          .set("Cookie", cookie);
+          .set("Authorization", token);
 
         category.should.have.status(200);
         category.body.should.have.property("success", true);
