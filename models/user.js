@@ -113,6 +113,7 @@ module.exports = (sequelize, DataTypes) => {
   User.associate = function(models) {
     User.hasMany(models.Post);
     User.hasMany(models.Thread);
+    User.hasMany(models.Friend);
     User.belongsToMany(models.IpAddress, { through: "userip" });
     User.hasOne(models.Village);
     User.belongsToMany(models.Role, { through: "userroles" });
