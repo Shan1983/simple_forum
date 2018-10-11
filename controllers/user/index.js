@@ -185,11 +185,12 @@ exports.login = async (req, res, next) => {
       res.status(400);
       res.json({ error: [errors.loginError] });
     } else {
+      const attributes = user.getAttributes(user);
+
       /**
        * Check if the user is banned
        */
-      // FIX THIS!!! NOT WORKING
-      await Ban.checkIfBanned(user);
+      await Ban.checkIfBanned(attributes);
 
       /**
        * Check the users password check out
