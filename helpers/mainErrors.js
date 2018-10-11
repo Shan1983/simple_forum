@@ -15,6 +15,7 @@ const errors = {
   emailError: ["A valid email address must be supplied.", 400],
   invalidLike: ["You cannot like your own thread/post.", 400],
   invalidRegister: ["You need to supply all required fields.", 400],
+  likeError: ["This like does not exist.", 400],
   lockedError: ["This thread is locked.", 400],
   loginError: ["The username or password provided was incorrect.", 401],
   notAuthorized: ["You are not authorized to continue.", 401],
