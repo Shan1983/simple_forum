@@ -6,12 +6,12 @@ const passport = require("passport");
 
 router.post(
   "/",
-  passport.autheniticate("jwt", { session: false }),
-  controller.addLike
+  passport.authenticate("jwt", { session: false }),
+  controller.addThreadLike
 );
 
 router.delete(
-  "/:likeId",
+  "/remove",
   passport.authenticate("jwt", { session: false }),
   controller.removeLike
 );
