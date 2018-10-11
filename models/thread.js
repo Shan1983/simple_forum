@@ -86,7 +86,7 @@ module.exports = (sequelize, DataTypes) => {
       foreignKeyConstraint: true,
       onDelete: "CASCADE"
     });
-    Thread.hasMany(models.Like, { foreignKeyConstraint: true });
+    Thread.belongsToMany(models.Like, { through: "postlikes" });
   };
 
   // get other related thread data to return
