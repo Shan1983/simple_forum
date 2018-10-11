@@ -62,13 +62,6 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   Ban.checkIfBanned = async function(user) {
-    if (!user) {
-      errors.parameterError(
-        "username",
-        "The username supplied does not exist."
-      );
-    }
-
     // check if the user is actually banned
     const banned = await Ban.findOne({
       where: { UserId: user.id }
@@ -77,9 +70,7 @@ module.exports = (sequelize, DataTypes) => {
     if (!banned) {
       return false;
     } else {
-      throw errors.sequelizeValidation(sequelize, {
-        error: banned.reason || "You have been banned!"
-      });
+      return true;
     }
   };
 
