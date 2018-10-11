@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
   Like.associate = function(models) {
     Like.belongsTo(models.User);
     Like.belongsTo(models.Thread);
-    Like.belongsToMany(models.Post, { through: "likeposts" });
+    Like.belongsTo(models.Post);
   };
   return Like;
 };
