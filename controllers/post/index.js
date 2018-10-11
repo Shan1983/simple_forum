@@ -32,7 +32,7 @@ exports.newPost = async (req, res, next) => {
         await Post.create({
           discussion,
           UserId: req.session.userId,
-          ThreadId: attr.id
+          ThreadId: req.params.threadId
         });
 
         const user = await User.findById(req.session.userId);
