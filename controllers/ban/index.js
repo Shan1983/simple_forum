@@ -13,16 +13,21 @@ exports.addBan = async (req, res, next) => {
         res.json({ error: [errors.notAuthorized] });
       } else {
         const user = await User.findById(req.body.userId);
-
         if (!user) {
           res.status(400);
           res.json({ error: [errors.accountNotExists] });
         } else {
-          await Ban.banUser(req.body.userId, req.ip, req.body.reason);
-          // send email explaining the reason of the banning
-          // and their options of having the decision reversed..
+          const userAttributes = user.getAttributes(user);
+          if (Ban.checkIfBanned(userAttributes)) {
+            await Ban.banUser(req.body.userId, req.ip, req.body.reason);
+            // send email explaining the reason of the banning
+            // and their options of having the decision reversed..
 
-          res.json({ success: true });
+            res.json({ success: true });
+          } else {
+            res.status(400);
+            res.json({ error: [errors.banError] });
+          }
         }
       }
     } else {
@@ -58,12 +63,16 @@ exports.removeBan = async (req, res, next) => {
           res.json({ error: [errors.accountNotExists] });
         } else {
           const userAttributes = user.getAttributes(user);
+          if (Ban.checkIfBanned(userAttributes)) {
+            await Ban.unbanUser(userAttributes.id);
 
-          await Ban.unbanUser(userAttributes.id);
+            // send email explaining that the ban has been lifted
 
-          // send email explaining that the ban has been lifted
-
-          res.json({ success: true });
+            res.json({ success: true });
+          } else {
+            res.status(400);
+            res.json({ error: [errors.banError] });
+          }
         }
       }
     } else {
