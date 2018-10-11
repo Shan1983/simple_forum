@@ -25,6 +25,7 @@ const errors = {
   postRemoved: ["This post has been removed, replying is not allowed.", 400],
   postError: ["This post does not exist.", 400],
   settingError: ["There was an error with the settings options.", 400],
+  sameLikeError: ["You can not like a Thread/Post more than once.", 400],
   threadError: ["This thread does not exist.", 400],
   unknown: [
     "Whoops! something on our end screwed up :( reload and try again.",
