@@ -13,32 +13,36 @@ exports.addThreadLike = async (req, res, next) => {
 
       if (threadId) {
         const thread = await Thread.findById(threadId);
-        console.log(req.session.username);
+
         if (!thread) {
           res.status(400);
           res.json({ error: [errors.threadError] });
         } else {
           const attributes = thread.getAttributes(thread);
 
-          const like = await Like.findAndCountAll({
-            where: { ThreadId: attributes.id }
-          });
-
-          let error = false;
-          like.rows.map(l => {
-            if (l.UserId === req.session.userId) {
-              console.log(l.UserId, attributes.UserId);
-              error = true;
-            }
-          });
-
-          if (!error) {
-            await Like.create({
-              UserId: req.session.userId,
-              ThreadId: attributes.id
+          if (attributes.UserId !== req.session.userId) {
+            const like = await Like.findAndCountAll({
+              where: { ThreadId: attributes.id }
             });
 
-            res.json({ success: true, count: like.count + 1 });
+            let error = false;
+            like.rows.map(l => {
+              if (l.UserId === req.session.userId) {
+                error = true;
+              }
+            });
+
+            if (!error) {
+              await Like.create({
+                UserId: req.session.userId,
+                ThreadId: attributes.id
+              });
+
+              res.json({ success: true, count: like.count + 1 });
+            } else {
+              res.status(400);
+              res.json({ error: [errors.invalidLike] });
+            }
           } else {
             res.status(400);
             res.json({ error: [errors.invalidLike] });
@@ -55,24 +59,29 @@ exports.addThreadLike = async (req, res, next) => {
         } else {
           const attributes = post.getAttributes(post);
 
-          const like = await Like.findAndCountAll({
-            where: { postId: attributes.id }
-          });
-
-          let error = false;
-          like.rows.map(l => {
-            if (l.UserId === attributes.UserId) {
-              error = true;
-            }
-          });
-
-          if (!error) {
-            await Like.create({
-              UserId: req.session.userId,
-              PostId: attributes.id
+          if (attributes.UserId !== req.session.userId) {
+            const like = await Like.findAndCountAll({
+              where: { PostId: attributes.id }
             });
 
-            res.json({ success: true, count: like.count + 1 });
+            let error = false;
+            like.rows.map(l => {
+              if (l.UserId === req.session.userId) {
+                error = true;
+              }
+            });
+
+            if (!error) {
+              await Like.create({
+                UserId: req.session.userId,
+                PostId: attributes.id
+              });
+
+              res.json({ success: true, count: like.count + 1 });
+            } else {
+              res.status(400);
+              res.json({ error: [errors.invalidLike] });
+            }
           } else {
             res.status(400);
             res.json({ error: [errors.invalidLike] });
@@ -80,12 +89,8 @@ exports.addThreadLike = async (req, res, next) => {
         }
       }
     } else {
-      // file a report on the user trying to do something out of the norm
-      // grab their ip address
-      // sign them out
-      // destroy any sessions
-      // send them to a warning page
-      res.redirect("/views/warning/activity");
+      res.status(401);
+      res.json({ error: [errors.notAuthorized] });
     }
   } catch (error) {
     next(error);
