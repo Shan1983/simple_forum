@@ -114,6 +114,7 @@ module.exports = (sequelize, DataTypes) => {
     User.hasMany(models.Post);
     User.hasMany(models.Thread);
     User.hasMany(models.Friend);
+    User.hasMany(models.FriendPending);
     User.belongsToMany(models.IpAddress, { through: "userip" });
     User.hasOne(models.Village);
     User.belongsToMany(models.Role, { through: "userroles" });
