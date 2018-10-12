@@ -11,13 +11,25 @@ router.get(
 );
 
 router.post(
+  "/:userId/accept",
+  passport.authenticate("jwt", { session: false }),
+  controller.accept
+);
+
+router.post(
+  "/:userId/decline",
+  passport.authenticate("jwt", { session: false }),
+  controller.decline
+);
+
+router.post(
   "/:userId/new",
   passport.authenticate("jwt", { session: false }),
   controller.addFriend
 );
 
 router.delete(
-  "/remove/:userId/remove",
+  "/:fromId/:toId/remove",
   passport.authenticate("jwt", { session: false }),
   controller.removeFriend
 );
