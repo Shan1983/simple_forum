@@ -10,34 +10,13 @@ module.exports = {
           primaryKey: true,
           type: Sequelize.INTEGER
         },
-        username: {
-          type: Sequelize.STRING
-        },
-        UserId: {
-          type: Sequelize.INTEGER
-        },
-        requestTo: {
-          type: Sequelize.INTEGER
-        },
-        requestFrom: {
-          type: Sequelize.INTEGER
-        },
-        accepted: {
-          type: Sequelize.BOOLEAN,
-          defaultValue: false
-        },
-        createdAt: {
-          allowNull: false,
-          type: Sequelize.DATE
-        },
-        updatedAt: {
-          allowNull: false,
-          type: Sequelize.DATE
-        }
+        requestingFriend: { type: Sequelize.INTEGER },
+        acceptingFriend: { type: Sequelize.INTEGER },
+        createdAt: { allowNull: false, type: Sequelize.DATE },
+        updatedAt: { allowNull: false, type: Sequelize.DATE },
+        deletedAt: { type: Sequelize.DATE }
       },
-      {
-        charset: "utf8mb4"
-      }
+      { charset: "utf8mb4" }
     );
   },
   down: (queryInterface, Sequelize) => {
