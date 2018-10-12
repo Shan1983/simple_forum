@@ -6,76 +6,22 @@ module.exports = (sequelize, DataTypes) => {
   const Friend = sequelize.define(
     "Friend",
     {
-      username: DataTypes.STRING,
-      UserId: DataTypes.INTEGER,
-      requestTo: { type: DataTypes.INTEGER },
-      requestFrom: { type: DataTypes.INTEGER },
-      accepted: { type: DataTypes.BOOLEAN, defaultValue: false }
+      requestingFriend: {
+        type: DataTypes.INTEGER
+      },
+      acceptingFriend: {
+        type: DataTypes.INTEGER
+      },
+      deletedAt: { type: DataTypes.DATE }
     },
-    {}
+    { paranoid: true }
   );
 
   // class methods
 
   Friend.associate = function(models) {
     Friend.belongsTo(models.User);
-  };
-
-  // instance methods
-
-  Friend.prototype.getFriendCount = function() {
-    return Friend.count();
-  };
-
-  // data contains {myId, theirId}
-  Friend.prototype.newFriendRequest = async function(data) {
-    const { User, Friend } = sequelize.models;
-
-    // get the request from user
-    const me = await User.findById(data.myId);
-
-    // get the request to user
-    const you = await User.findById(data.theirId);
-
-    if (!you) {
-      throw errors.sequelizeValidation(sequelize, {
-        errors: "That user does not exist.",
-        id: theirId
-      });
-    }
-
-    const friend = await Friend.create({
-      UserId: me.id,
-      requestTo: you.id,
-      requestFrom: me.id,
-      username: me.username
-    });
-
-    return friend;
-  };
-
-  Friend.prototype.acceptFriendRequest = async function(data) {
-    const { User, FriendUser } = sequelize.models;
-
-    // get the request from user
-    const me = await User.findById(data.myId);
-
-    // get the request to user
-    const you = await User.findById(data.theirId);
-
-    const friendUser = FriendUser.create();
-    friendUser.setUser(me);
-    friendUser.setUser(you);
-  };
-
-  Friend.prototype.declineFriendRequest = async function(data) {
-    const { FriendUser } = sequelize.models;
-
-    await FriendUser.destroy({
-      where: { UserId: data.id }
-    });
-
-    return true;
+    Friend.belongsTo(models.FriendPending);
   };
 
   return Friend;
