@@ -1,11 +1,10 @@
 const express = require("express");
-const passport = require("passport");
 const router = express.Router();
 const uuidv5 = require("uuid/v5");
-
 const multer = require("multer");
 
 const controller = require("../controllers/user");
+const middleware = require("../services/middlewares/authMiddleware");
 
 const storage = multer.diskStorage({
   destination: "/uploads/",
@@ -21,26 +20,18 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage, limits: { fileSize: 1000000 } });
 
 router.get(
-  "/test",
-  passport.authenticate("jwt", { session: false }),
-  (req, res, next) => {
-    res.json({ success: 200 });
-  }
-);
-
-router.get(
   "/all",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
+  middleware.canContinue,
+  middleware.isAdmin,
   controller.getAllUsers
 );
-router.get(
-  "/:username",
-  passport.authenticate("jwt", { session: false }),
-  controller.getUserMeta
-);
+
+router.get("/:username", middleware.isAuthenticated, controller.getUserMeta);
 router.get(
   "/profile/:username",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
+  middleware.canContinue,
   controller.userProfile
 );
 
@@ -53,28 +44,34 @@ router.post("/logout", controller.logout);
 
 router.post(
   "/profile/:username/upload",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
+  middleware.canContinue,
   upload.single("avatar"),
   controller.upload
 );
 
 router.put(
   "/profile/:username",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
+  middleware.canContinue,
   controller.updateProfile
 );
 
 // soft deletes account
 router.delete(
   "/profile/:username/close",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
+  middleware.canContinue,
+  middleware.isAdmin,
   controller.closeAccount
 );
 
 // perminately deletes a users account - requires admin
 router.delete(
   "/profile/:username",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
+  middleware.canContinue,
+  middleware.isAdmin,
   controller.deleteUser
 );
 
