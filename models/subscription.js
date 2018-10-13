@@ -1,6 +1,6 @@
 "use strict";
 
-const nodemailer = require("../helpers/nodeMailer");
+const nodemailer = require("../services/nodeMailer");
 
 module.exports = (sequelize, DataTypes) => {
   const Subscription = sequelize.define(
