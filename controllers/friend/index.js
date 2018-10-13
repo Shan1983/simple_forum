@@ -1,5 +1,6 @@
 const { Friend, FriendPending, User } = require("../../models");
 const errors = require("../../helpers/mainErrors");
+const attributes = require("../../helpers/getModelAttributes");
 
 // "/:userId/all";
 exports.getAllUserFriends = async (req, res, next) => {
@@ -175,12 +176,17 @@ exports.addFriend = async (req, res, next) => {
       } else {
         const reqUserAttributes = requestToUser.getAttributes(requestToUser);
         // assign username the requestFrom user, and fill in the rest
-        await FriendPending.create({
+        const request = await FriendPending.create({
           username: req.session.username,
           requestTo: reqUserAttributes.id,
           requestFrom: req.session.userId,
           accepted: false
         });
+
+        // convert request
+        attributes.convert(request);
+
+        requestToUser.update({ FriendPendingId: request.id });
 
         // send socket alert..
 
