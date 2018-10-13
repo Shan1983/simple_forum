@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 
-const { Role, UserRole } = require("../models");
+const attributes = require("./getModelAttributes");
 
 const errors = require("./mainErrors");
 
@@ -19,7 +19,7 @@ module.exports = {
   async generateNewToken(user) {
     // get the users role
 
-    const role = await this.getUserRole(user);
+    const role = await attributes.getUserRole(user);
 
     const exp = 3600;
 
@@ -34,21 +34,6 @@ module.exports = {
         expiresIn: exp
       }
     );
-  },
-  /**
-   * Returns a users role
-   * @param {Request} req
-   * @param {String} token
-   * @returns {string}
-   */
-  async getUserRole(user) {
-    const roleRecord = await UserRole.findById(user.id);
-
-    const roleResult = await Role.findById(roleRecord.RoleId);
-
-    const role = roleResult.toJSON().role;
-
-    return role;
   },
 
   decodeJwt(token) {
