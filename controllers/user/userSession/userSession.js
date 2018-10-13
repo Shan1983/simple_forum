@@ -30,7 +30,7 @@ exports.setupUserSession = (req, res, username, userId, role, token) => {
    * they will not be able to access that route.
    */
   if (role !== "Member") {
-    res.cookie("UIadmin", !!role.admin); // !! coerces to boolean
+    res.cookie("UIadmin", true);
   }
 
   /**
