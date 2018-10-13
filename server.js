@@ -26,10 +26,6 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// setup passport auth
-app.use(passport.initialize());
-require("./authentication/passport")(passport);
-
 // setup the sequelize session
 const sessionStore = new SequelizeStore({ db: sequelize });
 const session = expressSession({
@@ -56,6 +52,10 @@ if (process.env.NODE_ENV === "production") {
 
 // allow express to start the db sessions
 app.use(session);
+
+// setup passport auth
+app.use(passport.initialize());
+require("./services/authentication/passport")(passport);
 
 // the api routes
 app.use("/api/v1/user", require("./routes/user"));
