@@ -1,7 +1,6 @@
 const passport = require("passport");
 const errors = require("../../helpers/mainErrors");
 const jwtHelper = require("../../helpers/jwtHelper");
-const attributes = require("../../helpers/getModelAttributes");
 /**
  * A series of middlewares that check if the user is authenticated,
  * and acts in a certain role
