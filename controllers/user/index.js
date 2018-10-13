@@ -1,17 +1,12 @@
-const multer = require("multer");
 const bcrypt = require("bcryptjs");
 const sharp = require("sharp");
-const color = require("color");
 const uuidv5 = require("uuid/v5");
 const session = require("./userSession/userSession");
-
 const {
   User,
   Post,
   Thread,
   Blacklist,
-  Category,
-  Sequelize,
   IpAddress,
   UserRole,
   Role,
@@ -25,7 +20,8 @@ const {
 const pagination = require("../../helpers/pagination");
 const errors = require("../../helpers/mainErrors");
 const jwtHelper = require("../../helpers/jwtHelper");
-const validateEmail = require("../../helpers/validateEmail");
+const validate = require("../../helpers/validation");
+const attributes = require("../../helpers/getModelAttributes");
 
 /*
 sharp(profilePicture.file)
@@ -43,37 +39,34 @@ sharp(profilePicture.file)
  */
 exports.getAllUsers = async (req, res, next) => {
   try {
-    // get the users token
-
-    const token = req.cookies.token;
-    const decodedToken = jwtHelper.decodeJwt(token);
-
-    if (req.session.role === "Admin") {
-      if (decodedToken.role === req.session.role) {
-        const users = await User.findAll({
-          attributes: {
-            exclude: [
-              "password",
-              "emailVerificationToken",
-              "emailVerified",
-              "description",
-              "RoleId",
-              "updatedAt",
-              "deletedAt"
-            ]
-          },
-          include: [{ model: Role, attributes: ["role"] }]
-        });
-
-        res.json(users);
-      } else {
-        res.status(401);
-        res.json({ error: [errors.notAuthorized] });
+    const users = await User.findAll({
+      attributes: {
+        exclude: [
+          "password",
+          "emailVerificationToken",
+          "emailVerified",
+          "description",
+          "RoleId",
+          "updatedAt"
+        ]
       }
-    } else {
-      res.status(401);
-      res.json({ error: [errors.notAuthorized] });
-    }
+    });
+
+    const userObj = users.map(async usr => {
+      return {
+        id: usr.id,
+        avatar: usr.avatar,
+        username: usr.username,
+        email: usr.email,
+        colorIcon: usr.colorIcon,
+        role: await attributes.getUserRole(usr),
+        deleted: usr.deletedAt
+      };
+    });
+
+    Promise.all(userObj).then(complete => {
+      res.json({ users: complete });
+    });
   } catch (error) {
     next(error);
   }
@@ -155,7 +148,6 @@ exports.userProfile = async (req, res, next) => {
   try {
     const user = await User.findOne({
       where: { username: req.params.username },
-      include: [Role, Village, Troop, Spell, Hero],
       attributes: {
         exclude: [
           "password",
@@ -168,7 +160,12 @@ exports.userProfile = async (req, res, next) => {
       }
     });
 
-    res.json(user.toJSON());
+    if (!user) {
+      res.status(400);
+      res.json({ error: [errors.accountNotExists] });
+    } else {
+      res.json(attributes.convert(user));
+    }
   } catch (error) {
     next(error);
   }
@@ -185,12 +182,12 @@ exports.login = async (req, res, next) => {
       res.status(400);
       res.json({ error: [errors.loginError] });
     } else {
-      const attributes = user.getAttributes(user);
+      const userAttributes = attributes.convert(user);
 
       /**
        * Check if the user is banned
        */
-      await Ban.checkIfBanned(attributes);
+      await Ban.checkIfBanned(userAttributes);
 
       /**
        * Check the users password check out
@@ -199,10 +196,9 @@ exports.login = async (req, res, next) => {
         // create a new token
         if (user.accountVerified(user)) {
           // get the role and token
-          const role = await jwtHelper.getUserRole(user);
-          const token = await jwtHelper.generateNewToken(user);
 
-          const userAttributes = user.getAttributes(user);
+          const token = await jwtHelper.generateNewToken(user);
+          const role = await attributes.getUserRole(user);
 
           /**
            * Set the users ipaddress
@@ -243,7 +239,11 @@ exports.register = async (req, res, next) => {
      */
     const { username, email, password } = req.body;
 
-    if (username === "" || email === "" || password === "") {
+    if (
+      validate.isEmpty(username) &&
+      validate.isEmpty(email) &&
+      validate.isEmpty(password)
+    ) {
       res.status(400);
       res.json({ error: [errors.invalidRegister] });
     } else {
@@ -270,16 +270,16 @@ exports.register = async (req, res, next) => {
          */
         const user = await User.create(params);
 
-        await UserRole.assignRole(user);
+        const userReq = attributes.convert(user);
 
-        const userAttributes = user.getAttributes(user);
+        await UserRole.assignRole(userReq);
 
         /**
          * Set the users ipaddress
          */
-        await IpAddress.createIpIfEmpty(req.ip, userAttributes.id);
+        await IpAddress.createIpIfEmpty(req.ip, userReq.id);
 
-        res.json({ message: "Ok", path: `api/v1/user/login` });
+        res.json({ success: true, redirect: "/verify" });
       }
     }
   } catch (error) {
@@ -305,66 +305,57 @@ exports.logout = async (req, res, next) => {
 };
 exports.updateProfile = async (req, res, next) => {
   try {
-    const { username } = req.params;
-    const token = req.cookies.token;
-    const decodedToken = jwtHelper.decodeJwt(token);
+    const user = await User.findById(req.session.userId);
 
-    if (decodedToken.username === req.session.username) {
-      const user = await User.findById(req.session.userId);
+    const userReq = attributes.convert(user);
 
-      const foundUser = user.toJSON();
+    if (req.params.username === userReq.username) {
+      // update the users profile
 
-      if (username === foundUser.username) {
-        // update the users profile
+      if (
+        req.body.password !== undefined &&
+        req.body.oldPassword !== undefined
+      ) {
+        await user.updatePassword(req.body.password, req.body.oldPassword);
 
-        if (
-          req.body.password !== undefined &&
-          req.body.oldPassword !== undefined
-        ) {
-          await user.updatePassword(req.body.password, req.body.oldPassword);
+        res.json({
+          success: true,
+          message: "Your password has been updated."
+        });
+      }
 
-          res.json({
-            success: true,
-            message: "Your password has been updated."
-          });
-        }
-
-        if (req.body.email !== undefined) {
-          if (validateEmail(req.body.email)) {
-            await user.update({
-              email: req.body.email,
-              emailVerificationToken: uuidv5(req.body.email, uuidv5.DNS),
-              emailVerified: false
-            });
-            return res.json({
-              success: true,
-              message:
-                "Your email has been updated. Please validate your new email address."
-            });
-          } else {
-            res.status(400);
-            res.json({ error: [errors.emailError] });
-          }
-        }
-        if (
-          req.body.password === undefined &&
-          req.body.oldPassword === undefined &&
-          req.body.email === undefined
-        ) {
+      if (req.body.email !== undefined) {
+        if (validate.validateEmail(req.body.email)) {
           await user.update({
-            description: req.body.description,
-            allowAdvertising: !!req.body.allowAdvertising,
-            emailSubscriptions: !!req.body.emailSubscriptions
+            email: req.body.email,
+            emailVerificationToken: uuidv5(req.body.email, uuidv5.DNS),
+            emailVerified: false
           });
-
           return res.json({
             success: true,
-            message: "Your profile has been updated."
+            message:
+              "Your email has been updated. Please validate your new email address."
           });
+        } else {
+          res.status(400);
+          res.json({ error: [errors.emailError] });
         }
-      } else {
-        res.status(401);
-        res.json({ error: [errors.notAuthorized] });
+      }
+      if (
+        req.body.password === undefined &&
+        req.body.oldPassword === undefined &&
+        req.body.email === undefined
+      ) {
+        await user.update({
+          description: req.body.description,
+          allowAdvertising: !!req.body.allowAdvertising,
+          emailSubscriptions: !!req.body.emailSubscriptions
+        });
+
+        return res.json({
+          success: true,
+          message: "Your profile has been updated."
+        });
       }
     } else {
       res.status(401);
@@ -378,13 +369,8 @@ exports.updateProfile = async (req, res, next) => {
 exports.upload = async (req, res, next) => {
   try {
     const { username } = req.params;
-    const token = req.cookies.token;
-    const decodedToken = jwtHelper.decodeJwt(token);
 
-    if (
-      decodedToken.username !== username &&
-      req.session.username !== username
-    ) {
+    if (req.session.username !== username) {
       res.status(401);
       res.json({ error: [errors.notAuthorized] });
     } else {
@@ -427,13 +413,8 @@ exports.getAvatar = async (req, res, next) => {
 exports.closeAccount = async (req, res, next) => {
   try {
     const { username } = req.params;
-    const token = req.cookies.token;
-    const decodedToken = jwtHelper.decodeJwt(token);
 
-    if (
-      decodedToken.username === req.session.username &&
-      req.session.username === username
-    ) {
+    if (req.session.username === username) {
       const user = await User.findById(req.session.userId);
 
       // close their account
@@ -459,62 +440,31 @@ exports.closeAccount = async (req, res, next) => {
 // perminatly deletes a users account
 exports.deleteUser = async (req, res, next) => {
   try {
-    const token = req.cookies.token;
-    const decodedToken = jwtHelper.decodeJwt(token);
-    const username = req.params.username;
+    // removing a user's account perminatly -
+    // this will add the user to the blacklist
 
-    if (decodedToken.role === req.session.role) {
-      if (req.session.role === "Admin") {
-        // remove a user's account perminatly -
-        // this will add the user to the blacklist
+    const user = await User.findOne({ where: { email: req.body.email } });
 
-        const user = await User.findOne({ where: { email: req.body.email } });
-
-        if (!user) {
-          res.status(400);
-          return res.json({ error: [errors.accountNotExists] });
-        }
-
-        const deletedUserRole = await jwtHelper.getUserRole(user);
-
-        if (deletedUserRole === "Admin") {
-          res.status(400);
-          res.json({
-            message:
-              "This user is a Administrator, they must be demoted first. This action can only be completed by the sites owner.",
-            error: [errors.notAuthorized]
-          });
-        } else {
-          const { tag, name, reason } = req.body;
-
-          await Blacklist.create({
-            playerTag: tag,
-            currentName: name,
-            previousName: name,
-            reason
-          });
-
-          await user.destroy({ force: true });
-
-          req.session.destroy(() => {
-            res.clearCookie("username");
-            res.clearCookie("UIadmin");
-            res.clearCookie("token");
-            res.json({
-              success: true
-            });
-          });
-        }
-      } else {
-        res.status(401);
-        res.json({
-          error: [errors.notAuthorized]
-        });
-      }
+    if (!user) {
+      res.status(400);
+      return res.json({ error: [errors.accountNotExists] });
     } else {
-      res.status(401);
-      res.json({
-        error: [errors.notAuthorized]
+      const { tag, name, reason } = req.body;
+
+      await Blacklist.create({
+        playerTag: tag,
+        currentName: name,
+        previousName: name,
+        reason
+      });
+
+      await user.destroy({ force: true });
+
+      req.session.destroy(() => {
+        res.clearCookie("username");
+        res.clearCookie("UIadmin");
+        res.clearCookie("token");
+        res.json({ success: true });
       });
     }
   } catch (error) {
@@ -522,7 +472,6 @@ exports.deleteUser = async (req, res, next) => {
   }
 };
 
-// TEMP FUNCTION!!
 exports.verifyEmail = async (req, res, next) => {
   try {
     const token = req.params.token;
@@ -536,7 +485,7 @@ exports.verifyEmail = async (req, res, next) => {
         emailVerified: 1
       });
 
-      return res.json({ message: "Ok" });
+      return res.json({ success: true });
     } else {
       res.status(401);
       res.json({
