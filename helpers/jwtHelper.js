@@ -21,7 +21,7 @@ module.exports = {
 
     const role = await attributes.getUserRole(user);
 
-    const exp = 3600;
+    const exp = 3600; // 1 hour
 
     return jwt.sign(
       {
@@ -38,10 +38,6 @@ module.exports = {
 
   decodeJwt(token) {
     const decoded = jwt.verify(token, this.getJwtSecret());
-    if (!decoded) {
-      throw errors.parameterError("token", "We could not decode the token.");
-    } else {
-      return decoded;
-    }
+    return decoded;
   }
 };
