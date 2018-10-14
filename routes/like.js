@@ -2,17 +2,19 @@ const express = require("express");
 const router = express.Router();
 
 const controller = require("../controllers/like");
-const passport = require("passport");
+const middleware = require("../services/middlewares/authMiddleware");
 
 router.post(
   "/",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
+  middleware.canContinue,
   controller.addThreadLike
 );
 
 router.delete(
   "/remove",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
+  middleware.canContinue,
   controller.removeLike
 );
 
