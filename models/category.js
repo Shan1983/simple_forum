@@ -51,9 +51,5 @@ module.exports = (sequelize, DataTypes) => {
 
   //instance methods
 
-  Category.prototype.getAttributes = function(category) {
-    return category.toJSON();
-  };
-
   return Category;
 };
