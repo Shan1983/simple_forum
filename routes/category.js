@@ -3,34 +3,43 @@ const passport = require("passport");
 const router = express.Router();
 
 const controller = require("../controllers/category/index.js");
+const middleware = require("../services/middlewares/authMiddleware");
 
 router.get(
   "/",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
+  middleware.canContinue,
   controller.getAllCategory
 );
 
 router.get(
   "/:id/threads",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
+  middleware.isAdmin,
   controller.getAllThreadsInCategory
 );
 
 router.post(
   "/",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
+  middleware.canContinue,
+  middleware.isAdmin,
   controller.newCategory
 );
 
 router.put(
   "/:id",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
+  middleware.canContinue,
+  middleware.isLeader,
   controller.updateCategory
 );
 
 router.delete(
   "/:id",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
+  middleware.canContinue,
+  middleware.isAdmin,
   controller.deleteCategory
 );
 
