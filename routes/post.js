@@ -1,33 +1,31 @@
 const express = require("express");
 const router = express.Router();
-const passport = require("passport");
+const middleware = require("../services/middlewares/authMiddleware");
 
 const controller = require("../controllers/post");
+const limitr = require("../services/middlewares/ratelimit");
 
 router.post(
   "/:threadId",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
+  limitr,
   controller.newPost
 );
-router.post(
-  "/:postId/best",
-  passport.authenticate("jwt", { session: false }),
-  controller.markAsBest
-);
+
+router.post("/:postId/best", middleware.isAuthenticated, controller.markAsBest);
 
 router.post(
   "/:threadId/:postId/quote",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
   controller.quote
 );
-router.put(
-  "/:postId",
-  passport.authenticate("jwt", { session: false }),
-  controller.updatePost
-);
+
+router.put("/:postId", middleware.isAuthenticated, controller.updatePost);
+
 router.delete(
   "/:postId",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
+  middleware.isLeader,
   controller.deletePost
 );
 
