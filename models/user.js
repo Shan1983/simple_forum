@@ -205,9 +205,5 @@ module.exports = (sequelize, DataTypes) => {
     ];
   };
 
-  User.prototype.getAttributes = function(user) {
-    return user.toJSON();
-  };
-
   return User;
 };
