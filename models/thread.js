@@ -89,6 +89,16 @@ module.exports = (sequelize, DataTypes) => {
     Thread.belongsToMany(models.Like, { through: "postlikes" });
   };
 
+  Thread.hook("beforeCreate", thread => {
+    if (!thread.title) {
+      throw new sequelize.ValidationError("The thread must have a title");
+    } else {
+      // slugify the category title
+      const title = slug(this.title);
+      this.title = title;
+    }
+  });
+
   // get other related thread data to return
   Thread.threadOptions = function(from, limit) {
     const { User, Category, Post, Thread, Villlage } = sequelize.models;
@@ -122,10 +132,6 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   // instance methods
-
-  Thread.prototype.getAttributes = function(thread) {
-    return thread.toJSON();
-  };
 
   Thread.prototype.lockThread = async function(
     thread,
