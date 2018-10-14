@@ -10,6 +10,7 @@ const helmet = require("helmet");
 const compression = require("compression");
 const passport = require("passport");
 const app = express();
+const apiLimiter = require("./helpers/ratelimiting");
 
 // import the models
 const { sequelize } = require("./models");
@@ -25,6 +26,7 @@ app.use(compression());
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use("/api/", apiLimiter);
 
 // setup the sequelize session
 const sessionStore = new SequelizeStore({ db: sequelize });
