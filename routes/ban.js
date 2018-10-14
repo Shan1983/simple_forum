@@ -1,17 +1,21 @@
 const express = require("express");
 const router = express.Router();
-passport = require("passport");
 
 const controller = require("../controllers/ban/");
+const middleware = require("../services/middlewares/authMiddleware");
 
 router.post(
   "/",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
+  middleware.canContinue,
+  middleware.isAdmin,
   controller.addBan
 );
 router.delete(
   "/",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
+  middleware.canContinue,
+  middleware.isAdmin,
   controller.removeBan
 );
 
