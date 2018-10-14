@@ -1,54 +1,73 @@
 const express = require("express");
-const passport = require("passport");
 const router = express.Router();
 
 const controller = require("../controllers/thread");
+const middleware = require("../services/middlewares/authMiddleware");
 
 router.post(
   "/:category/",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
+  middleware.canContinue,
   controller.postNewThread
 );
 
 router.post(
   "/:threadId/lock",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
+  middleware.canContinue,
+  middleware.isLeader,
   controller.lockThread
+);
+
+router.get(
+  "/:threadId/reasons",
+  middleware.isAuthenticated,
+  controller.lockReasons
 );
 
 router.post(
   "/:threadId/make-sticky",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
+  middleware.canContinue,
+  middleware.isLeader,
   controller.stickyThread
 );
 
 router.post(
   "/:threadId/move",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
+  middleware.canContinue,
+  middleware.isLeader,
   controller.moveThread
 );
 
 router.get(
   "/:threadId",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
+  middleware.canContinue,
   controller.getThread
 );
 
 router.get(
   "/:categoryId/deleted/threads",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
+  middleware.canContinue,
+  middleware.isAdmin,
   controller.getDeletedThreads
 );
 
 router.put(
   "/:threadId",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
+  middleware.canContinue,
   controller.updateThread
 );
 
 router.delete(
   "/:threadId",
-  passport.authenticate("jwt", { session: false }),
+  middleware.isAuthenticated,
+  middleware.canContinue,
+  middleware.isAdmin,
   controller.deleteThread
 );
 module.exports = router;
