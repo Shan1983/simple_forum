@@ -43,10 +43,6 @@ module.exports = (sequelize, DataTypes) => {
     Ban.belongsTo(models.User);
   };
 
-  Ban.getAttributes = function(banned) {
-    return banned.toJSON();
-  };
-
   // ban a user from accessing the forum
   Ban.banUser = async function(userId, ip, reason) {
     await Ban.create({
