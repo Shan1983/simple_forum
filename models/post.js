@@ -93,10 +93,6 @@ module.exports = (sequelize, DataTypes) => {
 
   // instance methods
 
-  Post.prototype.getAttributes = function(post) {
-    return post.toJSON();
-  };
-
   Post.prototype.getReplyToUser = function() {
     return Post.findByPrimary(this.replyId);
   };
