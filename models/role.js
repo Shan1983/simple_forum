@@ -23,60 +23,6 @@ module.exports = (sequelize, DataTypes) => {
 
   // instance methods
 
-  // check if user can do admin stuff
-  Role.prototype.isAdmin = async function(id) {
-    const { Role } = sequelize.models;
-
-    const userRole = await Role.findOne({
-      where: { UserId: id }
-    });
-
-    //loop?
-
-    // check if admin
-    if (!userRole.role === "Administrator") {
-      throw errors.notAuthorized;
-    } else {
-      return true;
-    }
-  };
-
-  // check if user can do mod stuff
-  Role.prototype.isModerator = async function(id) {
-    const { Role } = sequelize.models;
-
-    const userRole = await Role.findOne({
-      where: { UserId: id }
-    });
-
-    //loop?
-
-    // check if admin
-    if (!userRole.role === "Moderator") {
-      throw errors.notAuthorized;
-    } else {
-      return true;
-    }
-  };
-
-  // check if user can do system system stuff
-  Role.prototype.isAdmin = async function(id) {
-    const { Role } = sequelize.models;
-
-    const userRole = await Role.findOne({
-      where: { UserId: id }
-    });
-
-    //loop?
-
-    // check if admin
-    if (!userRole.role === "System") {
-      throw errors.notAuthorized;
-    } else {
-      return true;
-    }
-  };
-
   // promote a new admin user
   Role.prototype.promoteToAdmin = async function(id) {
     const { Role, User } = sequelize.models;
