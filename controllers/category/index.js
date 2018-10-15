@@ -73,7 +73,7 @@ exports.newCategory = async (req, res, next) => {
     let categoryError = false;
 
     allCategories.map(e => {
-      if (e.title === slug(title)) {
+      if (e.title === title) {
         categoryError = true;
       }
     });
