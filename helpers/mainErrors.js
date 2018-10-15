@@ -9,6 +9,7 @@ const errors = {
   accountNotExists: ["This account does not exist.", 400],
   banError: ["You cannot ban this user.", 400],
   alreadyBanError: ["This user is already banned.", 400],
+  canNotDeleteAdmin: ["You cannot delete a admin.", 400],
   categoryExists: ["This category already exists.", 400],
   categoryError: ["This category does not exist.", 400],
   categoryTitleError: ["Categories must be unique.", 400],
