@@ -94,7 +94,7 @@ module.exports = (sequelize, DataTypes) => {
       throw new sequelize.ValidationError("The thread must have a title");
     } else {
       // slugify the category title
-      const title = slug(this.title);
+      const title = slug(thread.title);
       this.title = title;
     }
   });
