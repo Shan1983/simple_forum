@@ -15,10 +15,15 @@ exports.postNewThread = async (req, res, next) => {
       res.status(400);
       res.json({ error: [errors.categoryError] });
     } else {
-      const categoryReq = attributes.convert(category);
+      console.log(
+        req.body.title,
+        req.params.category,
+        req.session.userId,
+        req.body.discussion
+      );
       await Thread.create({
         title: req.body.title,
-        CategoryId: categoryReq.id,
+        CategoryId: req.params.category,
         UserId: req.session.userId,
         discussion: req.body.discussion
       });
@@ -110,7 +115,7 @@ exports.moveThread = async (req, res, next) => {
         // move the thread to the new category
         await thread.lockThread(thread, null, `Moved to: ${categoryReq.title}`);
 
-        if (attr.isSticky) {
+        if (threadReq.isSticky) {
           await thread.removeSticky(thread);
         }
 
@@ -169,7 +174,6 @@ exports.getThread = async (req, res, next) => {
 
         res.json({
           title: threadReq.title,
-          slug: threadReq.slug,
           postCount: threadReq.postCount,
           locked: threadReq.locked,
           lockedReason: threadReq.lockedReason,
@@ -208,7 +212,6 @@ exports.getDeletedThreads = async (req, res, next) => {
           return {
             category: catReq.title,
             title: e.title,
-            slug: e.slug,
             postCount: e.postCount,
             titleBGColor: e.titleBGColor,
             discussion: e.discussion,
@@ -250,7 +253,6 @@ exports.updateThread = async (req, res, next) => {
 
         res.json({
           title: updateReq.title,
-          slug: updateReq.slug,
           postCount: updateReq.postCount,
           locked: updateReq.locked,
           lockedReason: updateReq.lockedReason,
