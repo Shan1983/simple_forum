@@ -62,7 +62,6 @@ router.delete(
   "/profile/:username/close",
   middleware.isAuthenticated,
   middleware.canContinue,
-  middleware.isAdmin,
   controller.closeAccount
 );
 
