@@ -449,23 +449,29 @@ exports.deleteUser = async (req, res, next) => {
       res.status(400);
       return res.json({ error: [errors.accountNotExists] });
     } else {
-      const { tag, name, reason } = req.body;
+      const role = await attributes.getUserRole(user);
+      if (role === "Admin") {
+        res.status(400);
+        res.json({ error: [errors.canNotDeleteAdmin] });
+      } else {
+        const { tag, name, reason } = req.body;
 
-      await Blacklist.create({
-        playerTag: tag,
-        currentName: name,
-        previousName: name,
-        reason
-      });
+        await Blacklist.create({
+          playerTag: tag,
+          currentName: name,
+          previousName: name,
+          reason
+        });
 
-      await user.destroy({ force: true });
+        await user.destroy({ force: true });
 
-      req.session.destroy(() => {
-        res.clearCookie("username");
-        res.clearCookie("UIadmin");
-        res.clearCookie("token");
-        res.json({ success: true });
-      });
+        req.session.destroy(() => {
+          res.clearCookie("username");
+          res.clearCookie("UIadmin");
+          res.clearCookie("token");
+          res.json({ success: true });
+        });
+      }
     }
   } catch (error) {
     next(error);
