@@ -154,7 +154,6 @@ describe("THREAD", () => {
           .set("Authorization", token)
           .send({
             title: "test thread from fred",
-            slug: "test-thread-from-fred",
             category: 2,
             discussion: "big long rant about nothing in particular"
           });
@@ -441,7 +440,6 @@ describe("THREAD", () => {
           .set("Authorization", token)
           .send({
             title: "stuff",
-            slug: "stuff",
             category: 2,
             discussion: "big long rant about stuff in particular"
           });
@@ -468,7 +466,6 @@ describe("THREAD", () => {
           .set("Authorization", token)
           .send({
             title: "stuff",
-            slug: "stuff",
             category: 2,
             discussion: "big long rant about stuff in particular"
           });
@@ -495,7 +492,6 @@ describe("THREAD", () => {
           .set("Authorization", token)
           .send({
             title: "stuff",
-            slug: "stuff",
             category: 2,
             discussion: "big long rant about stuff in particular"
           });
