@@ -17,7 +17,7 @@ exports.addThreadLike = async (req, res, next) => {
 
         if (threadReq.UserId !== req.session.userId) {
           const like = await Like.findAndCountAll({
-            where: { ThreadId: attributes.id }
+            where: { ThreadId: threadReq.id }
           });
 
           let error = false;
@@ -56,7 +56,7 @@ exports.addThreadLike = async (req, res, next) => {
 
         if (postReq.UserId !== req.session.userId) {
           const like = await Like.findAndCountAll({
-            where: { PostId: attributes.id }
+            where: { PostId: postReq.id }
           });
 
           let error = false;
