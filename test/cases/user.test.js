@@ -49,8 +49,7 @@ describe("USER", () => {
           .end((err, res) => {
             if (err) console.log(`${err}`);
             res.should.have.status(200);
-            res.body.should.have.property("message");
-            res.body.should.have.property("path");
+            res.body.should.have.property("redirect");
             done();
           });
       });
@@ -76,7 +75,7 @@ describe("USER", () => {
           .request(server)
           .post("/api/v1/user/register")
           .set("content-type", "application/json")
-          .send({ username, email: "", password, RoleId: 1 })
+          .send({ username: "", email: "", password: "", RoleId: 1 })
           .end((err, res) => {
             if (err) console.log(`${err}`);
             res.should.have.status(400);
@@ -320,10 +319,10 @@ describe("USER", () => {
 
         res.should.be.json;
         res.should.have.status(200);
-        res.body.should.have.property("length", res.body.length);
-        res.body[0].should.have.deep.property("username", "Shan");
-        res.body[1].should.have.deep.property("username", "moderator");
-        res.body[2].should.have.deep.property("username", username);
+        res.body.users.should.have.property("length", res.body.users.length);
+        res.body.users[0].should.have.deep.property("username", "Shan");
+        res.body.users[1].should.have.deep.property("username", "moderator");
+        res.body.users[2].should.have.deep.property("username", username);
       });
       it("should NOT return a list of users", async () => {
         const agent = chai.request.agent(server);
@@ -669,7 +668,7 @@ describe("USER", () => {
         const token = `Bearer ${user.body.token}`;
 
         const res = await agent
-          .delete(`/api/v1/user/profile/${username}/close`)
+          .delete(`/api/v1/user/profile/${user.body.username}/close`)
           .set("content-type", "application/json")
           .set("Authorization", token);
 
@@ -770,22 +769,13 @@ describe("USER", () => {
           .delete(`/api/v1/user/profile/Shan`)
           .set("content-type", "application/json")
           .set("Authorization", token)
-
-          .send({
-            email: "turtle@test.com",
-            tag: "#12345",
-            name: user.body.username,
-            reason: "being naughty!"
-          });
+          .send({ email: "turtle@test.com" });
 
         res.should.be.json;
         res.should.have.status(400);
-        res.body.should.have.property(
-          "message",
-          "This user is a Administrator, they must be demoted first. This action can only be completed by the sites owner."
-        );
+
         res.body.error.should.include.something.that.deep.equals(
-          errors.notAuthorized
+          errors.canNotDeleteAdmin
         );
       });
 
