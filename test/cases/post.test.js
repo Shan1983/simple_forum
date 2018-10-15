@@ -4,12 +4,9 @@ const server = require("../../server");
 const chai = require("chai");
 const should = chai.should();
 const expect = chai.expect;
-const errors = require("../../helpers/mainErrors");
 
 chai.use(require("chai-http"));
 chai.use(require("chai-things"));
-
-const { User } = require("../../models");
 
 describe("POST", () => {
   describe("/POST POST ROUTES", () => {
@@ -249,8 +246,8 @@ describe("POST", () => {
       it("should not proceed if post is NOT found", async () => {
         const agent = chai.request.agent(server);
         const login = await agent.post("/api/v1/user/login").send({
-          email: "fred@test.com",
-          password: "secret"
+          email: "turtle@test.com",
+          password: "test123"
         });
 
         login.should.have.status(200);
