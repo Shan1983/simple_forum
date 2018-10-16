@@ -107,7 +107,7 @@ exports.decline = async (req, res, next) => {
     // get the requestFrom user
     const user = await User.findById(req.params.userId);
 
-    if (!request) {
+    if (!user) {
       res.status(400);
       res.json({ error: [errors.accountNotExists] });
     } else {
