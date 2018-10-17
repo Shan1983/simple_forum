@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
   const Friend = sequelize.define(
     "Friend",
     {
-      requestingFriend: {
+      UserId: {
         type: DataTypes.INTEGER
       },
       acceptingFriend: {
