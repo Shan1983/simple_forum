@@ -10,7 +10,7 @@ module.exports = {
           primaryKey: true,
           type: Sequelize.INTEGER
         },
-        requestingFriend: { type: Sequelize.INTEGER },
+        UserId: { type: Sequelize.INTEGER },
         acceptingFriend: { type: Sequelize.INTEGER },
         createdAt: { allowNull: false, type: Sequelize.DATE },
         updatedAt: { allowNull: false, type: Sequelize.DATE },
