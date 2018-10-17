@@ -14,7 +14,7 @@ module.exports = {
       requestTo: {
         type: Sequelize.INTEGER
       },
-      requestFrom: {
+      UserId: {
         type: Sequelize.INTEGER
       },
       accepted: {
