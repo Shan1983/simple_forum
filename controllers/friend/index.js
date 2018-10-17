@@ -6,57 +6,44 @@ const attributes = require("../../helpers/getModelAttributes");
 exports.getAllUserFriends = async (req, res, next) => {
   try {
     // find the user and include friendships
-    const user = await User.findOne({
+    const me = await User.findOne({
       where: { id: req.params.userId },
-      exlude: ["password"],
-      include: [
-        { model: Friend, attributes: ["requestingFriend", "acceptingFriend"] }
-      ]
+      exclude: ["password"],
+      include: [{ model: Friend, attributes: ["UserId", "acceptingFriend"] }]
     });
 
-    if (!user) {
+    console.log("after finding user");
+
+    if (!me) {
       res.status(400);
       res.json({ error: [errors.accountNotExists] });
     } else {
       // format what will be returned
-      const userReq = attributes.convert(user);
+      const userReq = attributes.convert(me);
+
+      console.log(userReq);
 
       // find the friends account
 
-      const friend = await User.findOne({
-        where: { id: userReq.Friend.acceptingFriend },
-        exlude: ["password"]
+      let friendObj = {};
+
+      userReq.Friends.map(async f => {
+        const friend = await User.findOne({
+          where: { id: f.acceptingFriend },
+          exclude: ["password"]
+        });
+        console.log("found friend!", await attributes.convert(friend));
+        // put the found friend in the obj
       });
 
-      const friendReq = attributes.convert(friend);
+      console.log("friends", friendArray);
 
-      if (!friend) {
+      if (friendArray.length <= 0) {
         res.status(400);
         res.json({ error: [errors.accountNotExists] });
       } else {
-        // get the createdAt date for friendship
-        const date = await FriendPending.findAll({
-          where: {
-            requestTo: data.id,
-            requestFrom: data.Friend.acceptingFriend
-          }
-        });
-        // build the returning object
-
-        const friends = {
-          requestFromId: userReq.id,
-          username: userReq.username,
-          avatar: userReq.avatar,
-          colorIcon: userReq.colorIcon,
-          requestTo: friendReq.id,
-          friendUsername: friendReq.username,
-          friendAvatar: friendReq.avatar,
-          friendColorIcon: friendReq.colorIcon,
-          friendFromDate: date.rows.createdAt
-        };
-
         // return the data
-        res.json({ friends });
+        res.json({ friendArray });
       }
     }
   } catch (error) {
@@ -75,23 +62,32 @@ exports.accept = async (req, res, next) => {
     } else {
       // find the pending request
       const requestUserReq = attributes.convert(requestFromUser);
+
       const pending = await FriendPending.findAll({
         where: {
-          requestTo: req.session.userId,
-          requestFrom: requestUserReq.id
+          requestTo: requestUserReq.id,
+          UserId: req.session.userId
         }
       });
 
-      if (!pending) {
+      if (pending.length <= 0) {
         res.status(400);
         res.json({ error: [errors.friendRequestError] });
       } else {
         // update friendpending with accepted true
-        await pending.update({ accept: true });
+        await FriendPending.update(
+          { accepted: true },
+          {
+            where: {
+              requestTo: requestUserReq.id,
+              UserId: req.session.userId
+            }
+          }
+        );
         // create new friend with both user id's
         await Friend.create({
-          requestingFriend: requestUserReq.id,
-          acceptingFriend: req.session.userId
+          UserId: req.session.userId,
+          acceptingFriend: requestUserReq.id
         });
         // return success
         res.json({ success: true });
@@ -114,15 +110,20 @@ exports.decline = async (req, res, next) => {
       const userReq = attributes.convert(user);
       // find the pending request
       const pending = await FriendPending.findAll({
-        where: { requestTo: req.session.userId, requestFrom: userReq.id }
+        where: { requestTo: userReq.id, UserId: req.session.userId }
       });
 
-      if (!pending) {
+      if (pending.length <= 0) {
         res.status(400);
         res.json({ error: [errors.friendRequestError] });
       } else {
         // destroy the request
-        await pending.destroy();
+        await FriendPending.destroy({
+          where: {
+            requestTo: userReq.id,
+            UserId: req.session.userId
+          }
+        });
         // return success
         res.json({ success: true });
       }
@@ -147,7 +148,7 @@ exports.addFriend = async (req, res, next) => {
       const request = await FriendPending.create({
         username: req.session.username,
         requestTo: userReq.id,
-        requestFrom: req.session.userId,
+        UserId: req.session.userId,
         accepted: false
       });
 
@@ -170,7 +171,7 @@ exports.removeFriend = async (req, res, next) => {
   try {
     // remove from friend pending
     const pending = await FriendPending.findAll({
-      where: { requestTo: req.params.fromId, requestFrom: req.params.toId }
+      where: { requestTo: req.params.fromId, UserId: req.params.toId }
     });
 
     if (!pending) {
@@ -180,7 +181,7 @@ exports.removeFriend = async (req, res, next) => {
       // remove from friend
       const friendship = await Friend.findAll({
         where: {
-          requestingFriend: req.params.fromId,
+          UserId: req.params.fromId,
           acceptingFriend: req.params.toId
         }
       });
