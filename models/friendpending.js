@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       username: DataTypes.STRING,
       requestTo: DataTypes.INTEGER,
-      requestFrom: DataTypes.INTEGER,
+      UserId: DataTypes.INTEGER,
       accepted: DataTypes.BOOLEAN,
       deletedAt: { type: DataTypes.DATE }
     },
