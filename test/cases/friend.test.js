@@ -258,8 +258,6 @@ describe("FRIEND", () => {
           .get(`/api/v1/friend/1/all`)
           .set("content-type", "application/json");
 
-        console.log(friend.body);
-
         friend.should.have.status(401);
       });
       it("should NOT return a nonregistered user", async () => {
@@ -304,9 +302,62 @@ describe("FRIEND", () => {
   });
   describe("DELETE FRIEND ROUTES", () => {
     describe("DELETE /api/v1/friend/:fromId/:toId/remove", () => {
-      it("should not proceed if unauthenticated");
-      it("should fail if pending request does not exist");
-      it("should remove a friend");
+      it("should not proceed if unauthenticated", async () => {
+        const agent = chai.request.agent(server);
+
+        const user = await agent.post("/api/v1/user/login").send({
+          email: "fred@test.com",
+          password: "secret"
+        });
+
+        user.should.have.status(200);
+
+        // const token = `Bearer ${user.body.token}`;
+
+        const friend = await agent
+          .delete(`/api/v1/friend/4/5/remove`)
+          .set("content-type", "application/json");
+
+        friend.should.have.status(401);
+      });
+      it("should fail if pending request does not exist", async () => {
+        const agent = chai.request.agent(server);
+
+        const fred = await agent.post("/api/v1/user/login").send({
+          email: "fred@test.com",
+          password: "secret"
+        });
+
+        fred.should.have.status(200);
+
+        const token = `Bearer ${fred.body.token}`;
+
+        const friend = await agent
+          .delete(`/api/v1/friend/1/1/remove`)
+          .set("content-type", "application/json")
+          .set("Authorization", token);
+
+        friend.should.have.status(400);
+      });
+      it("should remove a friend", async () => {
+        const agent = chai.request.agent(server);
+
+        const fred = await agent.post("/api/v1/user/login").send({
+          email: "fred@test.com",
+          password: "secret"
+        });
+
+        fred.should.have.status(200);
+
+        const token = `Bearer ${fred.body.token}`;
+
+        const friend = await agent
+          .delete(`/api/v1/friend/4/5/remove`)
+          .set("content-type", "application/json")
+          .set("Authorization", token);
+
+        friend.should.have.status(200);
+      });
     });
   });
 });
