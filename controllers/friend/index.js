@@ -12,8 +12,6 @@ exports.getAllUserFriends = async (req, res, next) => {
       include: [{ model: Friend, attributes: ["UserId", "acceptingFriend"] }]
     });
 
-    console.log("after finding user");
-
     if (!me) {
       res.status(400);
       res.json({ error: [errors.accountNotExists] });
@@ -35,21 +33,6 @@ exports.getAllUserFriends = async (req, res, next) => {
       Promise.all(friendObj).then(done => {
         res.json({ friends: done });
       });
-      // const userObj = users.map(async usr => {
-      //   return {
-      //     id: usr.id,
-      //     avatar: usr.avatar,
-      //     username: usr.username,
-      //     email: usr.email,
-      //     colorIcon: usr.colorIcon,
-      //     role: await attributes.getUserRole(usr),
-      //     deleted: usr.deletedAt
-      //   };
-      // });
-
-      // Promise.all(userObj).then(complete => {
-      //   res.json({ users: complete });
-      // });
     }
   } catch (error) {
     next(error);
@@ -68,14 +51,14 @@ exports.accept = async (req, res, next) => {
       // find the pending request
       const requestUserReq = attributes.convert(requestFromUser);
 
-      const pending = await FriendPending.findAll({
+      const pending = await FriendPending.findOne({
         where: {
           requestTo: requestUserReq.id,
           UserId: req.session.userId
         }
       });
 
-      if (pending.length <= 0) {
+      if (!pending) {
         res.status(400);
         res.json({ error: [errors.friendRequestError] });
       } else {
@@ -89,8 +72,13 @@ exports.accept = async (req, res, next) => {
             }
           }
         );
+
+        // get friend attributes
+        const friendReq = attributes.convert(pending);
+
         // create new friend with both user id's
         await Friend.create({
+          FriendPendingId: friendReq.id,
           UserId: req.session.userId,
           acceptingFriend: requestUserReq.id
         });
@@ -175,24 +163,24 @@ exports.addFriend = async (req, res, next) => {
 exports.removeFriend = async (req, res, next) => {
   try {
     // remove from friend pending
-    const pending = await FriendPending.findAll({
-      where: { requestTo: req.params.fromId, UserId: req.params.toId }
+    const pending = await FriendPending.findOne({
+      where: { requestTo: req.params.toId, UserId: req.params.fromId }
     });
 
     if (!pending) {
       res.status(400);
       res.json({ error: [errors.friendRequestError] });
     } else {
-      // remove from friend
-      const friendship = await Friend.findAll({
-        where: {
-          UserId: req.params.fromId,
-          acceptingFriend: req.params.toId
-        }
-      });
+      // get pending attributes
+      const pendingReq = attributes.convert(pending);
 
       await pending.destroy();
-      await friendship.destroy();
+
+      await Friend.destroy({
+        where: {
+          FriendPendingId: pendingReq.id
+        }
+      });
 
       // return success
 
