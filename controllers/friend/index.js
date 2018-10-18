@@ -8,7 +8,7 @@ exports.getAllUserFriends = async (req, res, next) => {
     // find the user and include friendships
     const me = await User.findOne({
       where: { id: req.params.userId },
-      exclude: ["password"],
+      attributes: { exclude: ["password"] },
       include: [{ model: Friend, attributes: ["UserId", "acceptingFriend"] }]
     });
 
@@ -21,30 +21,35 @@ exports.getAllUserFriends = async (req, res, next) => {
       // format what will be returned
       const userReq = attributes.convert(me);
 
-      console.log(userReq);
-
       // find the friends account
 
-      let friendObj = {};
-
-      userReq.Friends.map(async f => {
+      let friendObj = userReq.Friends.map(async f => {
         const friend = await User.findOne({
           where: { id: f.acceptingFriend },
-          exclude: ["password"]
+          attributes: { exclude: ["password"] }
         });
-        console.log("found friend!", await attributes.convert(friend));
-        // put the found friend in the obj
+
+        return friend;
       });
 
-      console.log("friends", friendArray);
+      Promise.all(friendObj).then(done => {
+        res.json({ friends: done });
+      });
+      // const userObj = users.map(async usr => {
+      //   return {
+      //     id: usr.id,
+      //     avatar: usr.avatar,
+      //     username: usr.username,
+      //     email: usr.email,
+      //     colorIcon: usr.colorIcon,
+      //     role: await attributes.getUserRole(usr),
+      //     deleted: usr.deletedAt
+      //   };
+      // });
 
-      if (friendArray.length <= 0) {
-        res.status(400);
-        res.json({ error: [errors.accountNotExists] });
-      } else {
-        // return the data
-        res.json({ friendArray });
-      }
+      // Promise.all(userObj).then(complete => {
+      //   res.json({ users: complete });
+      // });
     }
   } catch (error) {
     next(error);
