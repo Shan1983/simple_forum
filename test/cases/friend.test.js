@@ -262,7 +262,7 @@ describe("FRIEND", () => {
 
         friend.should.have.status(401);
       });
-      it("should NOT return a different users friends", async () => {
+      it("should NOT return a nonregistered user", async () => {
         const agent = chai.request.agent(server);
 
         const fred = await agent.post("/api/v1/user/login").send({
@@ -275,7 +275,7 @@ describe("FRIEND", () => {
         const token = `Bearer ${fred.body.token}`;
 
         const friend = await agent
-          .get(`/api/v1/friend/1/all`)
+          .get(`/api/v1/friend/99/all`)
           .set("content-type", "application/json")
           .set("Authorization", token);
 
@@ -297,8 +297,6 @@ describe("FRIEND", () => {
           .get(`/api/v1/friend/4/all`)
           .set("content-type", "application/json")
           .set("Authorization", token);
-
-        console.log(friend.body);
 
         friend.should.have.status(200);
       });
