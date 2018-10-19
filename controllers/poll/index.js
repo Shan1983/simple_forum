@@ -12,13 +12,46 @@ const validate = require("../../helpers/validation");
 // /:pollId
 exports.getAPoll = async (req, res, next) => {
   try {
+    const pollQuestion = await PollQuestion.findById(req.params.pollId);
+
+    if (!pollQuestion) {
+      res.status(400);
+      res.json({ error: [errors.pollError] });
+    } else {
+      const pollQuestionReq = attributes.convert(pollQuestion);
+      console.log(pollQuestionReq);
+      // get the questiosn responses
+      const pollResponses = await PollResponse.findAll({
+        where: { PollQuestionId: pollQuestionReq.id }
+      });
+
+      console.log(pollResponses);
+
+      const result = pollResponses.map(f => {
+        return f.response;
+      });
+
+      console.log(result);
+
+      Promise.all(result).then(complete => {
+        res.json({
+          poll: {
+            question: pollQuestionReq.question,
+            responses: complete
+          }
+        });
+      });
+    }
   } catch (error) {
     next(error);
   }
 };
+
 // /all
 exports.getAllPolls = async (req, res, next) => {
   try {
+    const polls = await PollQuestion.findAll();
+    res.json(polls);
   } catch (error) {
     next(error);
   }
