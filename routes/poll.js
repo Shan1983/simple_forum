@@ -19,17 +19,17 @@ router.get(
 );
 
 router.post(
-  "/new",
+  "/:threadId/new",
   middleware.isAuthenticated,
   middleware.canContinue,
   controller.newPoll
 );
 
 router.post(
-  "/:pollId/questions",
+  "/:pollId/vote",
   middleware.isAuthenticated,
   middleware.canContinue,
-  controller.newPollQuestions
+  controller.voteOnPoll
 );
 
 router.put(
