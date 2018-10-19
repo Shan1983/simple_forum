@@ -24,10 +24,7 @@ module.exports = (sequelize, DataTypes) => {
         }
       },
       UserId: { type: DataTypes.INTEGER },
-      active: { type: DataTypes.BOOLEAN, defaultValue: true },
-      completionDate: {
-        type: DataTypes.DATE
-      }
+      active: { type: DataTypes.BOOLEAN, defaultValue: true }
     },
     {}
   );
