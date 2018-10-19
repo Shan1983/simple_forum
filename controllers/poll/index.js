@@ -19,19 +19,15 @@ exports.getAPoll = async (req, res, next) => {
       res.json({ error: [errors.pollError] });
     } else {
       const pollQuestionReq = attributes.convert(pollQuestion);
-      console.log(pollQuestionReq);
+
       // get the questiosn responses
       const pollResponses = await PollResponse.findAll({
         where: { PollQuestionId: pollQuestionReq.id }
       });
 
-      console.log(pollResponses);
-
       const result = pollResponses.map(f => {
         return f.response;
       });
-
-      console.log(result);
 
       Promise.all(result).then(complete => {
         res.json({
@@ -152,22 +148,27 @@ exports.voteOnPoll = async (req, res, next) => {
   try {
     // get the poll question
     const poll = await PollQuestion.findById(req.params.pollId);
-    const pollReq = attributes.convert(poll);
-    // check if the user has already voted
-    const vote = await PollVote.findById(req.session.userId);
-    const voteReq = attributes.convert(vote);
-    if (voteReq.UserId === req.session.userId) {
+    if (!poll) {
       res.status(400);
-      res.json({ error: [errors.pollAlreadyVotedError] });
+      res.json({ error: [errors.pollError] });
     } else {
-      // record the users vote
-      await PollVote.create({
-        UserId: req.session.userId,
-        PollQuestionId: pollReq.id,
-        PollResponseId: req.params.responseId
-      });
-      // return response message
-      res.json({ success: true });
+      const pollReq = attributes.convert(poll);
+      // check if the user has already voted
+      const vote = await PollVote.findById(req.session.userId);
+      const voteReq = attributes.convert(vote);
+      if (voteReq.UserId === req.session.userId) {
+        res.status(400);
+        res.json({ error: [errors.pollAlreadyVotedError] });
+      } else {
+        // record the users vote
+        await PollVote.create({
+          UserId: req.session.userId,
+          PollQuestionId: pollReq.id,
+          PollResponseId: req.params.responseId
+        });
+        // return response message
+        res.json({ success: true });
+      }
     }
   } catch (error) {
     next(error);
