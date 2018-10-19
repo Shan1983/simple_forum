@@ -12,9 +12,10 @@ router.get(
 );
 
 router.get(
-  "/all",
+  "/",
   middleware.isAuthenticated,
   middleware.canContinue,
+  middleware.isLeader,
   controller.getAllPolls
 );
 
@@ -43,6 +44,7 @@ router.delete(
   "/:pollId/remove",
   middleware.isAuthenticated,
   middleware.canContinue,
+  middleware.isLeader,
   controller.removePoll
 );
 
