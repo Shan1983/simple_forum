@@ -15,12 +15,6 @@ exports.postNewThread = async (req, res, next) => {
       res.status(400);
       res.json({ error: [errors.categoryError] });
     } else {
-      console.log(
-        req.body.title,
-        req.params.category,
-        req.session.userId,
-        req.body.discussion
-      );
       await Thread.create({
         title: req.body.title,
         CategoryId: req.params.category,
