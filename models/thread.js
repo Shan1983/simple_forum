@@ -47,6 +47,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       lockedMessage: { type: DataTypes.STRING },
       CategoryId: { type: DataTypes.INTEGER },
+      PollVoteId: { type: DataTypes.INTEGER },
       UserId: { type: DataTypes.INTEGER },
       PollQueryId: { type: DataTypes.INTEGER },
       isSticky: { type: DataTypes.BOOLEAN, defaultValue: false },
@@ -80,7 +81,7 @@ module.exports = (sequelize, DataTypes) => {
   Thread.associate = function(models) {
     Thread.belongsTo(models.User);
     Thread.belongsTo(models.Category);
-    Thread.belongsTo(models.PollQuery);
+    Thread.belongsTo(models.PollVote);
     Thread.hasMany(models.Subscription, { foreignKeyConstraint: true });
     Thread.hasMany(models.Post, {
       foreignKeyConstraint: true,
