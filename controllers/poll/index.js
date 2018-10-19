@@ -37,7 +37,8 @@ exports.getAPoll = async (req, res, next) => {
         res.json({
           poll: {
             question: pollQuestionReq.question,
-            responses: complete
+            responses: complete,
+            results: pollQuestionReq.PollVotes
           }
         });
       });
@@ -52,6 +53,32 @@ exports.getAllPolls = async (req, res, next) => {
   try {
     const polls = await PollQuestion.findAndCountAll();
     res.json(polls);
+  } catch (error) {
+    next(error);
+  }
+};
+// /:pollId/result
+exports.generatePollResults = async (req, res, next) => {
+  try {
+    const results = await PollVote.findAndCountAll({
+      where: { PollQuestionId: req.params.pollId }
+    });
+
+    const question = await PollQuestion.findById(req.params.pollId);
+    const questionReq = attributes.convert(question);
+
+    const count = results.rows.reduce((sum, row) => {
+      sum[row.PollResponseId] = (sum[row.PollResponseId] || 0) + 1;
+      return sum;
+    }, {});
+
+    const resultObj = {
+      total: results.count,
+      questionId: questionReq.id,
+      results: count
+    };
+
+    res.json(resultObj);
   } catch (error) {
     next(error);
   }
@@ -120,9 +147,28 @@ exports.newPoll = async (req, res, next) => {
   }
 };
 
-// /:pollId/vote
+// /:pollId/:responseId/vote
 exports.voteOnPoll = async (req, res, next) => {
   try {
+    // get the poll question
+    const poll = await PollQuestion.findById(req.params.pollId);
+    const pollReq = attributes.convert(poll);
+    // check if the user has already voted
+    const vote = await PollVote.findById(req.session.userId);
+    const voteReq = attributes.convert(vote);
+    if (voteReq.UserId === req.session.userId) {
+      res.status(400);
+      res.json({ error: [errors.pollAlreadyVotedError] });
+    } else {
+      // record the users vote
+      await PollVote.create({
+        UserId: req.session.userId,
+        PollQuestionId: pollReq.id,
+        PollResponseId: req.params.responseId
+      });
+      // return response message
+      res.json({ success: true });
+    }
   } catch (error) {
     next(error);
   }
@@ -131,13 +177,86 @@ exports.voteOnPoll = async (req, res, next) => {
 // /:pollId
 exports.editPoll = async (req, res, next) => {
   try {
+    const poll = await PollQuestion.findOne({
+      where: { id: req.params.pollId }
+    });
+
+    if (!poll) {
+      res.status(400);
+      res.json({ error: [errors.pollError] });
+    } else {
+      const question = req.body.question;
+      const responses = req.body.responses;
+
+      // response validation
+      if (responses.length < 2) {
+        res.status(400);
+        res.json({ error: [errors.pollResponseError] });
+      } else if (responses.length !== new Set(responses).size) {
+        res.status(400);
+        res.json({ error: [errors.pollResponseDuplicates] });
+      } else if (validate.isEmpty(question)) {
+        res.status(400);
+        res.json({ error: [errors.pollQuestionError] });
+      } else {
+        // update a poll
+
+        // update the poll's question
+        const pollQuestion = await PollQuestion.update(
+          {
+            question,
+            UserId: req.session.userId
+          },
+          { where: { id: req.params.pollId } }
+        );
+
+        const questionReq = attributes.convert(pollQuestion);
+
+        // update the polls responses
+        await Promise.all(
+          responses.map((r, i) => {
+            return PollResponse.update(
+              {
+                response: r,
+                PollQuestionId: questionReq.id
+              },
+              { where: { id: ++i } }
+            );
+          })
+        );
+
+        res.json({ success: true });
+      }
+    }
   } catch (error) {
     next(error);
   }
 };
+
 // /:pollId/remove
 exports.removePoll = async (req, res, next) => {
   try {
+    // find poll
+    const poll = await PollQuestion.findById(req.params.pollId);
+    const pollReq = attributes.convert(poll);
+
+    // remove votes
+    await PollVote.destroy({
+      where: { PollQuestionId: pollReq.id }
+    });
+
+    // remove responses
+    await PollResponse.destroy({
+      where: { PollQuestionId: pollReq.id }
+    });
+
+    // remove question
+    await PollQuestion.destroy({
+      where: { id: pollReq.id }
+    });
+
+    // return response
+    res.json({ success: true });
   } catch (error) {
     next(error);
   }
