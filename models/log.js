@@ -21,8 +21,8 @@ module.exports = (sequelize, DataTypes) => {
     Log.belongsTo(models.PenaltyBox);
     Log.belongsTo(models.Post);
     Log.belongsTo(models.Category);
-    Log.belongsTo(models.PollQuery);
-    Log.belongsTo(models.PollBallot);
+    Log.belongsTo(models.PollQuestion);
+    Log.belongsTo(models.PollVote);
     Log.belongsTo(models.Report);
     Log.belongsTo(models.Search);
     Log.belongsTo(models.Setting);
