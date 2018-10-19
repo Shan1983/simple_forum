@@ -18,12 +18,12 @@ module.exports = (sequelize, DataTypes) => {
           }
         }
       },
-      PollQueryId: DataTypes.INTEGER
+      PollQuestionId: DataTypes.INTEGER
     },
     {}
   );
   PollResponse.associate = function(models) {
-    PollResponse.hasMany(models.PollBallot);
+    PollResponse.hasMany(models.PollVote);
   };
   return PollResponse;
 };
