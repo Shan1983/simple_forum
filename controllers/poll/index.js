@@ -50,7 +50,7 @@ exports.getAPoll = async (req, res, next) => {
 // /all
 exports.getAllPolls = async (req, res, next) => {
   try {
-    const polls = await PollQuestion.findAll();
+    const polls = await PollQuestion.findAndCountAll();
     res.json(polls);
   } catch (error) {
     next(error);
