@@ -15,6 +15,7 @@ module.exports = {
         postCount: { type: Sequelize.INTEGER, defaultValue: 0 },
         locked: { type: Sequelize.BOOLEAN, defaultValue: false },
         CategoryId: { type: Sequelize.INTEGER },
+        PollVoteId: { type: Sequelize.INTEGER },
         UserId: { type: Sequelize.INTEGER },
         PollQueryId: { type: Sequelize.INTEGER },
         titleBGColor: { type: Sequelize.STRING },
