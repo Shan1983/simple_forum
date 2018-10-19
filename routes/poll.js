@@ -19,6 +19,13 @@ router.get(
   controller.getAllPolls
 );
 
+router.get(
+  "/:pollId/results",
+  middleware.isAuthenticated,
+  middleware.canContinue,
+  controller.generatePollResults
+);
+
 router.post(
   "/:threadId/new",
   middleware.isAuthenticated,
@@ -27,7 +34,7 @@ router.post(
 );
 
 router.post(
-  "/:pollId/vote",
+  "/:pollId/:responseId/vote",
   middleware.isAuthenticated,
   middleware.canContinue,
   controller.voteOnPoll
