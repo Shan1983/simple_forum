@@ -14,7 +14,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: false
         },
-        PollQueryId: {
+        PollQuestionId: {
           type: Sequelize.INTEGER
         },
         createdAt: {
