@@ -8,6 +8,11 @@ const errors = {
   ],
   accountNotExists: ["This account does not exist.", 400],
   banError: ["You cannot ban this user.", 400],
+  blacklistError: ["The black list is empty.", 400],
+  blacklistValidationError: [
+    "The player tag, current name, and reason are required.",
+    400
+  ],
   alreadyBanError: ["This user is already banned.", 400],
   canNotDeleteAdmin: ["You cannot delete a admin.", 400],
   categoryExists: ["This category already exists.", 400],
