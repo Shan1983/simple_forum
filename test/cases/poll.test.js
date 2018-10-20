@@ -148,9 +148,60 @@ describe("POLL", () => {
 
         post.should.have.status(401);
       });
-      it("should not proceed if poll does not exist");
-      it("should not proceed if user has already voted");
-      it("should vote on a poll");
+      it("should not proceed if poll does not exist", async () => {
+        const agent = chai.request.agent(server);
+        const login = await agent.post("/api/v1/user/login").send({
+          email: "fred@test.com",
+          password: "secret"
+        });
+
+        login.should.have.status(200);
+
+        const token = `Bearer ${login.body.token}`;
+
+        const poll = await agent
+          .post(`/api/v1/poll/99/99/vote`)
+          .set("content-type", "application/json")
+          .set("Authorization", token);
+
+        poll.should.have.status(400);
+      });
+      it("should vote on a poll", async () => {
+        const agent = chai.request.agent(server);
+        const login = await agent.post("/api/v1/user/login").send({
+          email: "fred@test.com",
+          password: "secret"
+        });
+
+        login.should.have.status(200);
+
+        const token = `Bearer ${login.body.token}`;
+
+        const poll = await agent
+          .post(`/api/v1/poll/1/1/vote`)
+          .set("content-type", "application/json")
+          .set("Authorization", token);
+
+        poll.should.have.status(200);
+      });
+      it("should not proceed if user has already voted", async () => {
+        const agent = chai.request.agent(server);
+        const login = await agent.post("/api/v1/user/login").send({
+          email: "fred@test.com",
+          password: "secret"
+        });
+
+        login.should.have.status(200);
+
+        const token = `Bearer ${login.body.token}`;
+
+        const poll = await agent
+          .post(`/api/v1/poll/1/1/vote`)
+          .set("content-type", "application/json")
+          .set("Authorization", token);
+
+        poll.should.have.status(400);
+      });
     });
   });
   describe("GET POLL ROUTES", () => {
@@ -165,8 +216,42 @@ describe("POLL", () => {
 
         post.should.have.status(401);
       });
-      it("should not proceed if poll does not exist");
-      it("should return a poll");
+      it("should not proceed if poll does not exist", async () => {
+        const agent = chai.request.agent(server);
+        const login = await agent.post("/api/v1/user/login").send({
+          email: "fred@test.com",
+          password: "secret"
+        });
+
+        login.should.have.status(200);
+
+        const token = `Bearer ${login.body.token}`;
+
+        const poll = await agent
+          .get(`/api/v1/poll/99`)
+          .set("content-type", "application/json")
+          .set("Authorization", token);
+
+        poll.should.have.status(400);
+      });
+      it("should return a poll", async () => {
+        const agent = chai.request.agent(server);
+        const login = await agent.post("/api/v1/user/login").send({
+          email: "fred@test.com",
+          password: "secret"
+        });
+
+        login.should.have.status(200);
+
+        const token = `Bearer ${login.body.token}`;
+
+        const poll = await agent
+          .get(`/api/v1/poll/1`)
+          .set("content-type", "application/json")
+          .set("Authorization", token);
+
+        poll.should.have.status(200);
+      });
     });
     describe("GET /api/v1/poll/", () => {
       it("should not proceed if unauthenticated", async () => {
@@ -178,8 +263,42 @@ describe("POLL", () => {
 
         post.should.have.status(401);
       });
-      it("should only be accessed by a leader");
-      it("should return all polls");
+      it("should only be accessed by a leader", async () => {
+        const agent = chai.request.agent(server);
+        const login = await agent.post("/api/v1/user/login").send({
+          email: "fred@test.com",
+          password: "secret"
+        });
+
+        login.should.have.status(200);
+
+        const token = `Bearer ${login.body.token}`;
+
+        const poll = await agent
+          .get(`/api/v1/poll/`)
+          .set("content-type", "application/json")
+          .set("Authorization", token);
+
+        poll.should.have.status(401);
+      });
+      it("should return all polls", async () => {
+        const agent = chai.request.agent(server);
+        const login = await agent.post("/api/v1/user/login").send({
+          email: "turtle@test.com",
+          password: "test123"
+        });
+
+        login.should.have.status(200);
+
+        const token = `Bearer ${login.body.token}`;
+
+        const poll = await agent
+          .get(`/api/v1/poll/`)
+          .set("content-type", "application/json")
+          .set("Authorization", token);
+
+        poll.should.have.status(200);
+      });
     });
     describe("GET /api/v1/poll/:pollId/results", () => {
       it("should not proceed if not authenticated", async () => {
@@ -192,7 +311,24 @@ describe("POLL", () => {
 
         post.should.have.status(401);
       });
-      it("should return a polls current result");
+      it("should return a polls current result", async () => {
+        const agent = chai.request.agent(server);
+        const login = await agent.post("/api/v1/user/login").send({
+          email: "fred@test.com",
+          password: "secret"
+        });
+
+        login.should.have.status(200);
+
+        const token = `Bearer ${login.body.token}`;
+
+        const poll = await agent
+          .get(`/api/v1/poll/1/results`)
+          .set("content-type", "application/json")
+          .set("Authorization", token);
+
+        poll.should.have.status(200);
+      });
     });
   });
   describe("PUT POLL ROUTES", () => {
@@ -207,11 +343,102 @@ describe("POLL", () => {
 
         post.should.have.status(401);
       });
-      it("should Not proceed if a thread doesnot exist");
-      it("should Not proceed if a poll has less than 2 responses");
-      it("should Not proceed if a poll has duplicate data");
-      it("should Not proceed if a poll question is empty");
-      it("should update a poll");
+      it("should Not proceed if a poll has less than 2 responses", async () => {
+        const agent = chai.request.agent(server);
+        const login = await agent.post("/api/v1/user/login").send({
+          email: "fred@test.com",
+          password: "secret"
+        });
+
+        login.should.have.status(200);
+
+        const token = `Bearer ${login.body.token}`;
+
+        const data = ["0"];
+
+        const poll = await agent
+          .put(`/api/v1/poll/1`)
+          .set("content-type", "application/json")
+          .set("Authorization", token)
+          .send({
+            question: "some question",
+            responses: data
+          });
+
+        poll.should.have.status(400);
+      });
+      it("should Not proceed if a poll has duplicate data", async () => {
+        const agent = chai.request.agent(server);
+        const login = await agent.post("/api/v1/user/login").send({
+          email: "fred@test.com",
+          password: "secret"
+        });
+
+        login.should.have.status(200);
+
+        const token = `Bearer ${login.body.token}`;
+
+        const data = ["0", "0", "1"];
+
+        const poll = await agent
+          .put(`/api/v1/poll/1`)
+          .set("content-type", "application/json")
+          .set("Authorization", token)
+          .send({
+            question: "some question",
+            responses: data
+          });
+
+        poll.should.have.status(400);
+      });
+      it("should Not proceed if a poll question is empty", async () => {
+        const agent = chai.request.agent(server);
+        const login = await agent.post("/api/v1/user/login").send({
+          email: "fred@test.com",
+          password: "secret"
+        });
+
+        login.should.have.status(200);
+
+        const token = `Bearer ${login.body.token}`;
+
+        const data = ["0", "1", "3"];
+
+        const poll = await agent
+          .put(`/api/v1/poll/1`)
+          .set("content-type", "application/json")
+          .set("Authorization", token)
+          .send({
+            question: "",
+            responses: data
+          });
+
+        poll.should.have.status(400);
+      });
+      it("should update a poll", async () => {
+        const agent = chai.request.agent(server);
+        const login = await agent.post("/api/v1/user/login").send({
+          email: "fred@test.com",
+          password: "secret"
+        });
+
+        login.should.have.status(200);
+
+        const token = `Bearer ${login.body.token}`;
+
+        const data = ["0", "1", "11"];
+
+        const poll = await agent
+          .put(`/api/v1/poll/1`)
+          .set("content-type", "application/json")
+          .set("Authorization", token)
+          .send({
+            question: "some question test",
+            responses: data
+          });
+
+        poll.should.have.status(200);
+      });
     });
   });
   describe("DELETE POLL ROUTES", () => {
@@ -226,8 +453,42 @@ describe("POLL", () => {
 
         post.should.have.status(401);
       });
-      it("should only be accessed by a leader");
-      it("should delete a poll");
+      it("should only be accessed by a leader", async () => {
+        const agent = chai.request.agent(server);
+        const login = await agent.post("/api/v1/user/login").send({
+          email: "fred@test.com",
+          password: "secret"
+        });
+
+        login.should.have.status(200);
+
+        const token = `Bearer ${login.body.token}`;
+
+        const poll = await agent
+          .delete(`/api/v1/poll/1/remove`)
+          .set("content-type", "application/json")
+          .set("Authorization", token);
+
+        poll.should.have.status(401);
+      });
+      it("should delete a poll", async () => {
+        const agent = chai.request.agent(server);
+        const login = await agent.post("/api/v1/user/login").send({
+          email: "turtle@test.com",
+          password: "test123"
+        });
+
+        login.should.have.status(200);
+
+        const token = `Bearer ${login.body.token}`;
+
+        const poll = await agent
+          .delete(`/api/v1/poll/1/remove`)
+          .set("content-type", "application/json")
+          .set("Authorization", token);
+
+        poll.should.have.status(200);
+      });
     });
   });
 });
