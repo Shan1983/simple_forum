@@ -29,6 +29,7 @@ const errors = {
   pollResponseDuplicates: ["A poll cannot contain any duplicates.", 400],
   pollQuestionError: ["A poll question can not be blank.", 400],
   pollAlreadyVotedError: ["You can only vote once.", 400],
+  pollEndedError: ["This poll has finished.", 400],
   postRemoved: ["This post has been removed, replying is not allowed.", 400],
   postError: ["This post does not exist.", 400],
   settingError: ["There was an error with the settings options.", 400],
