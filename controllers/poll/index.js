@@ -154,9 +154,18 @@ exports.voteOnPoll = async (req, res, next) => {
     } else {
       const pollReq = attributes.convert(poll);
       // check if the user has already voted
-      const vote = await PollVote.findById(req.session.userId);
-      const voteReq = attributes.convert(vote);
-      if (voteReq.UserId === req.session.userId) {
+      const votes = await PollVote.findAll({
+        where: { UserId: req.session.userId }
+      });
+
+      let error = false;
+      votes.map(v => {
+        if (v.UserId === req.session.userId) {
+          error = true;
+        }
+      });
+
+      if (error) {
         res.status(400);
         res.json({ error: [errors.pollAlreadyVotedError] });
       } else {
