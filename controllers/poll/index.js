@@ -8,6 +8,7 @@ const {
 } = require("../../models");
 const attributes = require("../../helpers/getModelAttributes");
 const validate = require("../../helpers/validation");
+const moment = require("moment");
 
 // /:pollId
 exports.getAPoll = async (req, res, next) => {
@@ -20,24 +21,41 @@ exports.getAPoll = async (req, res, next) => {
     } else {
       const pollQuestionReq = attributes.convert(pollQuestion);
 
-      // get the questiosn responses
-      const pollResponses = await PollResponse.findAll({
-        where: { PollQuestionId: pollQuestionReq.id }
-      });
+      // check if the polls active
+      if (pollQuestionReq.active === false) {
+        res.status(400);
+        res.json({ error: [errors.pollEndedError] });
+      } else {
+        // check if the polls been open for 7 days
+        const days = moment(pollQuestionReq.createdAt).fromNow();
 
-      const result = pollResponses.map(f => {
-        return f.response;
-      });
+        console.log(days);
+        if (days >= 7) {
+          await PollQuestion.update(
+            { active: true },
+            { where: { id: pollQuestionReq.id } }
+          );
+        }
 
-      Promise.all(result).then(complete => {
-        res.json({
-          poll: {
-            question: pollQuestionReq.question,
-            responses: complete,
-            results: pollQuestionReq.PollVotes
-          }
+        // get the questiosn responses
+        const pollResponses = await PollResponse.findAll({
+          where: { PollQuestionId: pollQuestionReq.id }
         });
-      });
+
+        const result = pollResponses.map(f => {
+          return f.response;
+        });
+
+        Promise.all(result).then(complete => {
+          res.json({
+            poll: {
+              question: pollQuestionReq.question,
+              responses: complete,
+              results: pollQuestionReq.PollVotes
+            }
+          });
+        });
+      }
     }
   } catch (error) {
     next(error);
