@@ -69,6 +69,7 @@ app.use("/api/v1/like", require("./routes/like"));
 app.use("/api/v1/friend", require("./routes/friend"));
 app.use("/api/v1/poll", require("./routes/poll"));
 app.use("/api/v1/blacklist", require("./routes/blacklist"));
+app.use("/api/v1/penaltybox", require("./routes/penaltybox"));
 
 // setup general error handler
 app.use(require("./helpers/generalErrors"));
