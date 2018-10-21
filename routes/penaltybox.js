@@ -12,14 +12,6 @@ router.get(
   controller.getAllInBox
 );
 
-router.get(
-  "/:userId",
-  middleware.isAuthenticated,
-  middleware.canContinue,
-  middleware.isLeader,
-  controller.getAUserInBox
-);
-
 router.post(
   "/:userId",
   middleware.isAuthenticated,
