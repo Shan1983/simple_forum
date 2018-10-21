@@ -9,13 +9,7 @@ exports.getAllInBox = async (req, res, next) => {
     next(error);
   }
 };
-// "/:userId"
-exports.getAUserInBox = async (req, res, next) => {
-  try {
-  } catch (error) {
-    next(error);
-  }
-};
+
 // "/:userId"
 exports.putAUserInTheBox = async (req, res, next) => {
   try {
