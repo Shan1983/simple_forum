@@ -8,6 +8,7 @@ exports.getBlacklist = async (req, res, next) => {
   try {
     // grab everyone in the blacklist
     const blacklist = await Blacklist.findAndCountAll();
+
     if (blacklist.length <= 0) {
       res.status(400);
       res.json({ error: [errors.blacklistError] });
@@ -36,6 +37,7 @@ exports.addToBlacklist = async (req, res, next) => {
       await Blacklist.create({
         playerTag,
         currentName,
+        previousName: currentName,
         reason
       });
 
