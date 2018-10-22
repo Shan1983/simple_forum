@@ -6,11 +6,11 @@ exports.getReports = async (req, res, next) => {
   try {
     const reports = await Report.findAndCountAll();
 
-    const reportObj = reports.map(async r => {
+    const reportObj = Object.values(reports).map(async r => {
       const thread = await Thread.findOne({
         where: { id: r.ThreadId }
       });
-      const threadReq = attributes.convert(thread);
+      const threadReq = await attributes.convert(thread);
       return {
         Thread: threadReq.title,
         post: r.PostId,
