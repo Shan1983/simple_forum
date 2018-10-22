@@ -1,7 +1,7 @@
 const passport = require("passport");
 const errors = require("../../helpers/mainErrors");
 const jwtHelper = require("../../helpers/jwtHelper");
-const { PenaltyBox } = require("../../models");
+
 /**
  * A series of middlewares that check if the user is authenticated,
  * and acts in a certain role
@@ -68,11 +68,4 @@ exports.canContinue = (req, res, next) => {
     // res.redirect("/views/warning/activity");
     res.json({ error: [errors.notAuthorized] });
   }
-};
-
-exports.isUserInPenaltyBox = async (req, res, next) => {
-  // set sessions depending if a user is in the box
-  // not in the box
-  // is in the box
-  // what can the user do?
 };
