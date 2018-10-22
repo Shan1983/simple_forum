@@ -121,7 +121,7 @@ module.exports = (sequelize, DataTypes) => {
     User.hasMany(models.Troop);
     User.hasMany(models.Spell);
     User.hasMany(models.Hero);
-    // User.belongsToMany(models.UserRole, { through: "userroles" });
+    User.hasOne(models.PenaltyBox);
     // User.hasOne(models.Role);
   };
 
