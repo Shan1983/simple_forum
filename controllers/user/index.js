@@ -22,6 +22,7 @@ const errors = require("../../helpers/mainErrors");
 const jwtHelper = require("../../helpers/jwtHelper");
 const validate = require("../../helpers/validation");
 const attributes = require("../../helpers/getModelAttributes");
+const penatly = require("../../helpers/pentalybox");
 
 /*
 sharp(profilePicture.file)
@@ -217,6 +218,8 @@ exports.login = async (req, res, next) => {
             role,
             token
           );
+
+          penatly.isUserInPenaltyBox(req);
 
           res.json({ success: true, username: user.username, role, token });
         } else {
