@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const middleware = require("../services/middlewares/authMiddleware");
-const controller = require("../controllers/penatlybox");
+const controller = require("../controllers/penaltybox");
 
 router.get(
   "/",
