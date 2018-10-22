@@ -40,8 +40,8 @@ exports.putAUserInTheBox = async (req, res, next) => {
           UserId: req.params.userId,
           duration,
           reason,
-          userCanCreatePost: false,
-          userCanCreateThread: false,
+          userCanCreatePost: true,
+          userCanCreateThread: true,
           severity
         });
 
@@ -56,8 +56,8 @@ exports.putAUserInTheBox = async (req, res, next) => {
           UserId: req.params.userId,
           duration,
           reason,
-          userCanCreatePost: true,
-          userCanCreateThread: false,
+          userCanCreatePost: false,
+          userCanCreateThread: true,
           severity
         });
 
@@ -68,8 +68,6 @@ exports.putAUserInTheBox = async (req, res, next) => {
           } to the penalty box for ${duration} days.`
         });
       }
-
-      res.json({ error: [errors.unknown] });
     }
   } catch (error) {
     next(error);
