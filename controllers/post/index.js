@@ -19,7 +19,7 @@ exports.newPost = async (req, res, next) => {
 
     const threadReq = attributes.convert(thread);
 
-    if (penalty.penaltyCanCreatePost(req)) {
+    if (await penalty.penaltyCanCreatePost(req)) {
       if (!thread) {
         res.status(400);
         res.json({ error: [errors.threadError] });
