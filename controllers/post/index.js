@@ -9,41 +9,48 @@ const {
 } = require("../../models");
 const errors = require("../../helpers/mainErrors");
 const attributes = require("../../helpers/getModelAttributes");
+const penalty = require("../../helpers/pentalybox");
 
 // "/:threadId",
 exports.newPost = async (req, res, next) => {
   try {
+    await penalty.penaltyDuration(req);
     const thread = await Thread.findById(req.params.threadId);
 
     const threadReq = attributes.convert(thread);
 
-    if (!thread) {
-      res.status(400);
-      res.json({ error: [errors.threadError] });
-    } else if (threadReq.locked) {
-      res.status(400);
-      res.json({ error: [errors.lockedError] });
+    if (penalty.penaltyCanCreatePost(req)) {
+      if (!thread) {
+        res.status(400);
+        res.json({ error: [errors.threadError] });
+      } else if (threadReq.locked) {
+        res.status(400);
+        res.json({ error: [errors.lockedError] });
+      } else {
+        const discussion = req.body.discussion;
+
+        await Post.create({
+          discussion,
+          UserId: req.session.userId,
+          ThreadId: req.params.threadId
+        });
+
+        const user = await User.findById(req.session.userId);
+        //   const rewards = await Rewards.findAll({
+        //     attributes: ["pointsPerPost"]
+        //   });
+
+        //   // fix this when u work on settings
+        //   const points = rewards.toJSON();
+
+        await user.increment("postCount", { by: 1 });
+        //   await rewards.increment("points", { by: points.pointsPerPost });
+
+        res.json({ success: true });
+      }
     } else {
-      const discussion = req.body.discussion;
-
-      await Post.create({
-        discussion,
-        UserId: req.session.userId,
-        ThreadId: req.params.threadId
-      });
-
-      const user = await User.findById(req.session.userId);
-      //   const rewards = await Rewards.findAll({
-      //     attributes: ["pointsPerPost"]
-      //   });
-
-      //   // fix this when u work on settings
-      //   const points = rewards.toJSON();
-
-      await user.increment("postCount", { by: 1 });
-      //   await rewards.increment("points", { by: points.pointsPerPost });
-
-      res.json({ success: true });
+      res.status(400);
+      res.json({ error: [errors.penaltyError] });
     }
   } catch (error) {
     next(error);
