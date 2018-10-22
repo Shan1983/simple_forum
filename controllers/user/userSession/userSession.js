@@ -16,6 +16,11 @@ exports.setupUserSession = (req, res, username, userId, role, token) => {
   req.session.loggedIn = true;
   req.session.username = username;
   req.session.userId = userId;
+  req.session.penalty = true;
+  req.session.canCreateThread = false;
+  req.session.canCreatePost = false;
+  req.session.penaltyDuration = false;
+  req.session.penaltyCreatedAt = false;
 
   /**
    * set a cookie for the username
