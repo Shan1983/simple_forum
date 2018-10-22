@@ -219,7 +219,7 @@ exports.login = async (req, res, next) => {
             token
           );
 
-          penatly.isUserInPenaltyBox(req);
+          await penatly.isUserInPenaltyBox(user.id, req);
 
           res.json({ success: true, username: user.username, role, token });
         } else {
