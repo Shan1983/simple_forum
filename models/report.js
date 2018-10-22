@@ -38,7 +38,6 @@ module.exports = (sequelize, DataTypes) => {
       complaint: {
         type: DataTypes.TEXT,
         validate: {
-          allowNull: false,
           isString(val) {
             if (typeof val !== "string") {
               throw sequelize.ValidationError(
@@ -49,7 +48,7 @@ module.exports = (sequelize, DataTypes) => {
         }
       },
       submittedBy: {
-        type: DataTypes.INTEGER
+        type: DataTypes.STRING
       }
     },
     {}
@@ -58,7 +57,6 @@ module.exports = (sequelize, DataTypes) => {
   // class methods
 
   Report.associate = function(models) {
-    Report.belongsTo(models.User);
     Report.belongsTo(models.Thread);
     Report.belongsTo(models.Post);
   };
