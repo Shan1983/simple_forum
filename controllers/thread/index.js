@@ -7,7 +7,7 @@ const penalty = require("../../helpers/pentalybox");
 exports.postNewThread = async (req, res, next) => {
   try {
     penalty.penaltyDuration(req);
-    if (penalty.penaltyCanCreateThread(req)) {
+    if (await penalty.penaltyCanCreateThread(req)) {
       const id = req.params.category;
 
       const category = await Category.findOne({
