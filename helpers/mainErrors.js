@@ -27,6 +27,7 @@ const errors = {
   loginError: ["The username or password provided was incorrect.", 401],
   notAuthorized: ["You are not authorized to continue.", 401],
   noUsers: ["Currently there are no users.", 400],
+  penaltyError: ["You can not continue while in the penalty box.", 400],
   passwordsAreTheSame: ["You cannot use your old password.", 400],
   passwordError: ["The supplied password was incorrect.", 400],
   pollError: ["That poll does not exist.", 400],
