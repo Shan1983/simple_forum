@@ -9,3 +9,4 @@ require("./cases/friend.test");
 require("./cases/poll.test");
 require("./cases/blacklist.test");
 require("./cases/penaltybox.test");
+require("./cases/report.test");
