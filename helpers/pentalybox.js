@@ -2,18 +2,19 @@ const moment = require("moment");
 const { PenaltyBox } = require("../models");
 const attributes = require("./getModelAttributes");
 
-exports.isUserInPenaltyBox = async req => {
+exports.isUserInPenaltyBox = async (id, req) => {
   // set sessions depending if a user is in the box
   const user = await PenaltyBox.findOne({
-    where: { UserId: req.session.userId }
+    where: { UserId: id }
   });
 
   // if a user is in the box,
   // find out what they can do and how long theyre in there for.
   if (user) {
-    req.session.penalty = true;
     const userReq = attributes.convert(user);
-    req.session.canCreateThread = userReq.userCaneCreateThread;
+    req.session.penalty = true;
+
+    req.session.canCreateThread = userReq.userCanCreateThread;
     req.session.canCreatePost = userReq.userCanCreatePost;
     req.session.penaltyDuration = userReq.duration;
     req.session.penaltyCreatedAt = userReq.createdAt;
@@ -40,16 +41,16 @@ exports.penaltyDuration = async req => {
 
 exports.penaltyCanCreateThread = async req => {
   if (req.session.canCreateThread) {
-    return true;
-  } else {
     return false;
+  } else {
+    return true;
   }
 };
 
 exports.penaltyCanCreatePost = async req => {
   if (req.session.canCreatePost) {
-    return true;
-  } else {
     return false;
+  } else {
+    return true;
   }
 };
