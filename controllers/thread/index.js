@@ -1,34 +1,41 @@
 const { User, Category, Thread, Post, Village } = require("../../models");
 const errors = require("../../helpers/mainErrors");
 const attributes = require("../../helpers/getModelAttributes");
+const penalty = require("../../helpers/pentalybox");
 
 // /:category/
 exports.postNewThread = async (req, res, next) => {
   try {
-    const id = req.params.category;
+    penalty.penaltyDuration(req);
+    if (penalty.penaltyCanCreateThread(req)) {
+      const id = req.params.category;
 
-    const category = await Category.findOne({
-      where: { id }
-    });
+      const category = await Category.findOne({
+        where: { id }
+      });
 
-    if (!category) {
-      res.status(400);
-      res.json({ error: [errors.categoryError] });
+      if (!category) {
+        res.status(400);
+        res.json({ error: [errors.categoryError] });
+      } else {
+        await Thread.create({
+          title: req.body.title,
+          CategoryId: req.params.category,
+          UserId: req.session.userId,
+          discussion: req.body.discussion
+        });
+
+        const user = await User.findById(req.session.userId);
+
+        await user.increment("postCount", { by: 1 });
+
+        res.json({
+          success: true
+        });
+      }
     } else {
-      await Thread.create({
-        title: req.body.title,
-        CategoryId: req.params.category,
-        UserId: req.session.userId,
-        discussion: req.body.discussion
-      });
-
-      const user = await User.findById(req.session.userId);
-
-      await user.increment("postCount", { by: 1 });
-
-      res.json({
-        success: true
-      });
+      res.status(400);
+      res.json({ error: [errors.penalyError] });
     }
   } catch (error) {
     next(error);
