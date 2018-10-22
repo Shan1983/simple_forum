@@ -92,11 +92,6 @@ const start = port => {
 
     // setup global vars
     app.locals.started = true; // used for testing
-    app.locals.penalty = null;
-    app.locals.canCreateThread = null;
-    app.locals.canCreatePost = null;
-    app.locals.penaltyDuration = null;
-    app.locals.penaltyCreatedAt = null;
 
     // emit started event..
   });
