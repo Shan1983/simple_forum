@@ -70,7 +70,8 @@ module.exports = (sequelize, DataTypes) => {
       numberOfAdmins: { type: DataTypes.INTEGER },
       setMaxDiscussionWordLimit: { type: DataTypes.INTEGER },
       allowSubscriptions: { type: DataTypes.BOOLEAN, defaultValue: true },
-      allowStickyThreads: { type: DataTypes.BOOLEAN, defaultValue: true }
+      allowStickyThreads: { type: DataTypes.BOOLEAN, defaultValue: true },
+      init: { type: DataTypes.BOOLEAN, defaultValue: false }
     },
     {}
   );
@@ -89,21 +90,22 @@ module.exports = (sequelize, DataTypes) => {
       clanSize: data.clanSize,
       initialSetup: false,
       clanShield: data.clanShield,
-      // showDescription: true,
-      // showClanSize: true,
-      // showBlacklist: true,
-      // showClanShield: true,
-      // maintenance: false,
-      // lockForum: true,
-      // allowBestPosts: true,
-      // emailSubscriptionparticipants: true,
+      showDescription: true,
+      showClanSize: true,
+      showBlacklist: true,
+      showClanShield: true,
+      maintenance: false,
+      lockForum: true,
+      allowBestPosts: true,
+      emailSubscriptionparticipants: true,
       repostingDuration: data.repostingDuration,
-      // allowLikes: true,
+      allowLikes: true,
       editor: data.editor,
       setAdminUser: data.setUpUsersId,
-      setMaxDiscussionWordLimit: data.wordLimit
-      // allowSubscriptions: true,
-      // allowStickyThreads: true
+      setMaxDiscussionWordLimit: data.wordLimit,
+      allowSubscriptions: true,
+      allowStickyThreads: true,
+      init: true
     });
   };
 
