@@ -15,7 +15,6 @@ router.get(
   "/clan-shield",
   middelware.isAuthenticated,
   middelware.canContinue,
-  middelware.isAdmin,
   controller.getClanShield
 );
 
