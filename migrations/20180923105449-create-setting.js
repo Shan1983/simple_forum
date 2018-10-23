@@ -22,6 +22,10 @@ module.exports = {
         clanSize: {
           type: Sequelize.INTEGER
         },
+        init: {
+          type: Sequelize.BOOLEAN,
+          defaultValue: false
+        },
         BlacklistId: {
           type: Sequelize.INTEGER
         },
