@@ -11,6 +11,8 @@ const compression = require("compression");
 const passport = require("passport");
 const app = express();
 // const apiLimiter = require("./helpers/ratelimiting");
+const { Setting } = require("./models");
+const attributes = require("./helpers/getModelAttributes");
 
 // import the models
 const { sequelize } = require("./models");
@@ -89,11 +91,65 @@ app.use((req, res, next) => {
 // TODO complete this once the frontend is complete
 
 const start = port => {
-  const server = app.listen(port, () => {
+  const server = app.listen(port, async () => {
     console.log(`🖥  Server has started! on port: ${port}`);
 
     // setup global vars
     app.locals.started = true; // used for testing
+
+    // initial settings setup
+    const data = {
+      forumName: "Forum Name",
+      forumDescription: "Tell us about what your forum will be used for.",
+      clanTag: "#12345",
+      clanSize: 50,
+      initialSetup: true,
+      clanShield: "path/to/clan/shield",
+      showDescription: true,
+      showClanSize: true,
+      showBlacklist: true,
+      showClanShield: true,
+      maintenance: false,
+      lockForum: true,
+      allowBestPosts: true,
+      emailSubscriptionparticipants: true,
+      repostingDuration: 3,
+      allowLikes: true,
+      editor: "Plain Editor",
+      setAdminUser: 1,
+      setMaxDiscussionWordLimit: 1024,
+      allowSubscriptions: true,
+      allowStickyThreads: true
+    };
+
+    const settings = await Setting.findById(1);
+    const settingReq = attributes.convert(settings);
+    if (!settingReq.init) {
+      await Setting.initialSetup(data);
+    }
+    // setup express with the base varibles
+    app.locals.forumName = settingReq.forumName;
+    app.locals.forumDescription = settingReq.forumDescription;
+    app.locals.clanTag = settingReq.clanTag;
+    app.locals.clanSize = settingReq.clanSize;
+    app.locals.initialSetup = settingReq.initialSetup;
+    app.locals.clanShield = settingReq.clanShield;
+    app.locals.showDescription = settingReq.showDescription;
+    app.locals.showClanSize = settingReq.showClanSize;
+    app.locals.showBlacklist = settingReq.showBlacklist;
+    app.locals.showClanShield = settingReq.showClanShield;
+    app.locals.maintenance = settingReq.maintenance;
+    app.locals.lockForum = settingReq.lockForum;
+    app.locals.allowBestPosts = settingReq.allowBestPosts;
+    app.locals.emailSubscriptionparticipants =
+      settingReq.emailSubscriptionparticipants;
+    app.locals.repostingDuration = settingReq.repostingDuration;
+    app.locals.allowLikes = settingReq.allowLikes;
+    app.locals.editor = settingReq.editor;
+    app.locals.setAdminUser = settingReq.setAdminUser;
+    app.locals.setMaxDiscussionWordLimit = settingReq.setMaxDiscussionWordLimit;
+    app.locals.allowSubscriptions = settingReq.allowSubscriptions;
+    app.locals.allowStickyThreads = settingReq.allowStickyThreads;
 
     // emit started event..
   });
