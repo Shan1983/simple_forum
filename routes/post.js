@@ -5,6 +5,15 @@ const middleware = require("../services/middlewares/authMiddleware");
 const controller = require("../controllers/post");
 const limitr = require("../services/middlewares/ratelimit");
 
+router.all("*", (req, res, next) => {
+  if (req.app.locals.maintenance || req.app.locals.lockForum) {
+    res.status(503);
+    res.json({ status: 503 });
+  } else {
+    next();
+  }
+});
+
 router.post(
   "/:threadId",
   middleware.isAuthenticated,
