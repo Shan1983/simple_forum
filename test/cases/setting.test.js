@@ -399,7 +399,40 @@ describe("SETTING ROUTES", () => {
 
         setting.should.have.status(200);
       });
-      it("should maintenance mode should be active");
+      it("should maintenance mode should be active", async () => {
+        const agent = chai.request.agent(server);
+        const login = await agent.post("/api/v1/user/login").send({
+          email: "turtle@test.com",
+          password: "test123"
+        });
+
+        login.should.have.status(200);
+
+        const token = `Bearer ${login.body.token}`;
+
+        const setting = await agent
+          .post(`/api/v1/setting/maintenance`)
+          .set("content-type", "application/json")
+          .set("Authorization", token)
+          .send({ maintenance: true });
+
+        setting.should.have.status(200);
+
+        const category = await agent
+          .get(`/api/v1/category`)
+          .set("content-type", "application/json")
+          .set("Authorization", token);
+
+        category.should.have.status(503);
+
+        const setting2 = await agent
+          .post(`/api/v1/setting/maintenance`)
+          .set("content-type", "application/json")
+          .set("Authorization", token)
+          .send({ maintenance: false });
+
+        setting2.should.have.status(200);
+      });
     });
     describe("POST /api/v1/setting/lock-forum", () => {
       it("should not proceed if unauthenticated", async () => {
@@ -448,7 +481,40 @@ describe("SETTING ROUTES", () => {
 
         setting.should.have.status(200);
       });
-      it("should make forum unavaliable");
+      it("should make forum unavaliable", async () => {
+        const agent = chai.request.agent(server);
+        const login = await agent.post("/api/v1/user/login").send({
+          email: "turtle@test.com",
+          password: "test123"
+        });
+
+        login.should.have.status(200);
+
+        const token = `Bearer ${login.body.token}`;
+
+        const setting = await agent
+          .post(`/api/v1/setting/lock-forum`)
+          .set("content-type", "application/json")
+          .set("Authorization", token)
+          .send({ lockForum: true });
+
+        setting.should.have.status(200);
+
+        const category = await agent
+          .get(`/api/v1/category`)
+          .set("content-type", "application/json")
+          .set("Authorization", token);
+
+        category.should.have.status(503);
+
+        const setting2 = await agent
+          .post(`/api/v1/setting/lock-forum`)
+          .set("content-type", "application/json")
+          .set("Authorization", token)
+          .send({ lockForum: false });
+
+        setting2.should.have.status(200);
+      });
     });
     describe("POST /api/v1/setting/allow-best-post", () => {
       it("should not proceed if unauthenticated", async () => {
