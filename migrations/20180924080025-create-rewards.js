@@ -10,13 +10,14 @@ module.exports = {
           primaryKey: true,
           type: Sequelize.INTEGER
         },
+        init: { type: Sequelize.BOOLEAN, defaultValue: false },
         pointsPerPost: { type: Sequelize.INTEGER, defaultValue: 0 },
         pointsPerThread: { type: Sequelize.INTEGER, defaultValue: 0 },
         pointsPerLike: { type: Sequelize.INTEGER, defaultValue: 0 },
         pointsPerBestPost: { type: Sequelize.INTEGER, defaultValue: 0 },
         pointsForAdvertising: { type: Sequelize.INTEGER, defaultValue: 0 },
-        pointsPerPollQuery: { type: Sequelize.INTEGER, defaultValue: 0 },
-        pointsPerPollBallot: { type: Sequelize.INTEGER, defaultValue: 0 },
+        pointsPerPollQuestion: { type: Sequelize.INTEGER, defaultValue: 0 },
+        pointsPerPollVote: { type: Sequelize.INTEGER, defaultValue: 0 },
         createdAt: { allowNull: false, type: Sequelize.DATE },
         updatedAt: { allowNull: false, type: Sequelize.DATE }
       },
