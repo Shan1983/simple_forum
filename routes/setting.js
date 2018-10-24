@@ -4,6 +4,31 @@ const router = express.Router();
 const middelware = require("../services/middlewares/authMiddleware");
 const controller = require("../controllers/setting");
 
+router.post(
+  "/maintenance",
+  middelware.isAuthenticated,
+  middelware.canContinue,
+  middelware.isAdmin,
+  controller.postMaintenance
+);
+
+router.post(
+  "/lock-forum",
+  middelware.isAuthenticated,
+  middelware.canContinue,
+  middelware.isAdmin,
+  controller.postLockForum
+);
+
+router.all("*", (req, res, next) => {
+  if (req.app.locals.maintenance || req.app.locals.lockForum) {
+    res.status(503);
+    res.json({ status: 503 });
+  } else {
+    next();
+  }
+});
+
 router.get(
   "/",
   middelware.isAuthenticated,
@@ -68,14 +93,6 @@ router.post(
   middelware.canContinue,
   middelware.isAdmin,
   controller.postMaintenance
-);
-
-router.post(
-  "/lock-forum",
-  middelware.isAuthenticated,
-  middelware.canContinue,
-  middelware.isAdmin,
-  controller.postLockForum
 );
 
 router.post(
