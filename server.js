@@ -74,6 +74,7 @@ app.use("/api/v1/blacklist", require("./routes/blacklist"));
 app.use("/api/v1/penaltybox", require("./routes/penaltybox"));
 app.use("/api/v1/report", require("./routes/report"));
 app.use("/api/v1/setting", require("./routes/setting"));
+app.use("/api/v1/reward", require("./routes/reward"));
 
 // setup general error handler
 app.use(require("./helpers/generalErrors"));
