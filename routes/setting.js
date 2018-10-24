@@ -8,15 +8,11 @@ router.get(
   "/",
   middelware.isAuthenticated,
   middelware.canContinue,
+  middelware.isAdmin,
   controller.getAllSettings
 );
 
-router.get(
-  "/clan-shield",
-  middelware.isAuthenticated,
-  middelware.canContinue,
-  controller.getClanShield
-);
+router.get("/clan-shield", controller.getClanShield);
 
 router.post(
   "/forum-name",
