@@ -15,7 +15,7 @@ exports.intialSettingSetup = async () => {
     showBlacklist: true,
     showClanShield: true,
     maintenance: false,
-    lockForum: true,
+    lockForum: false,
     allowBestPosts: true,
     emailSubscriptionparticipants: true,
     repostingDuration: 3,
