@@ -19,6 +19,17 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage, limits: { fileSize: 1000000 } });
 
+router.post("/login", controller.login);
+
+router.all("*", (req, res, next) => {
+  if (req.app.locals.maintenance || req.app.locals.lockForum) {
+    res.status(503);
+    res.json({ status: 503 });
+  } else {
+    next();
+  }
+});
+
 router.get(
   "/all",
   middleware.isAuthenticated,
@@ -37,7 +48,6 @@ router.get(
 
 router.get("/:username/avatar", controller.getAvatar);
 
-router.post("/login", controller.login);
 router.post("/register", controller.register);
 
 router.post("/logout", controller.logout);
