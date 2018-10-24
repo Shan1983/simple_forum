@@ -11,8 +11,8 @@ const compression = require("compression");
 const passport = require("passport");
 const app = express();
 // const apiLimiter = require("./helpers/ratelimiting");
-const { Setting } = require("./models");
-const attributes = require("./helpers/getModelAttributes");
+const setting = require("./helpers/settingsHelper");
+const reward = require("./helpers/rewardHelper");
 
 // import the models
 const { sequelize } = require("./models");
@@ -97,59 +97,41 @@ const start = port => {
     // setup global vars
     app.locals.started = true; // used for testing
 
-    // initial settings setup
-    const data = {
-      forumName: "Forum Name",
-      forumDescription: "Tell us about what your forum will be used for.",
-      clanTag: "#12345",
-      clanSize: 50,
-      initialSetup: true,
-      clanShield: "path/to/clan/shield",
-      showDescription: true,
-      showClanSize: true,
-      showBlacklist: true,
-      showClanShield: true,
-      maintenance: false,
-      lockForum: true,
-      allowBestPosts: true,
-      emailSubscriptionparticipants: true,
-      repostingDuration: 3,
-      allowLikes: true,
-      editor: "Plain Editor",
-      setAdminUser: 1,
-      setMaxDiscussionWordLimit: 1024,
-      allowSubscriptions: true,
-      allowStickyThreads: true
-    };
+    const settings = await setting.intialSettingSetup();
+    const rewards = await reward.intialRewardsSetup();
 
-    const settings = await Setting.findById(1);
-    const settingReq = attributes.convert(settings);
-    if (!settingReq.init) {
-      await Setting.initialSetup(data);
-    }
     // setup express with the base varibles
-    app.locals.forumName = settingReq.forumName;
-    app.locals.forumDescription = settingReq.forumDescription;
-    app.locals.clanTag = settingReq.clanTag;
-    app.locals.clanSize = settingReq.clanSize;
-    app.locals.initialSetup = settingReq.initialSetup;
-    app.locals.clanShield = settingReq.clanShield;
-    app.locals.showDescription = settingReq.showDescription;
-    app.locals.showClanSize = settingReq.showClanSize;
-    app.locals.showBlacklist = settingReq.showBlacklist;
-    app.locals.showClanShield = settingReq.showClanShield;
-    app.locals.maintenance = settingReq.maintenance;
-    app.locals.lockForum = settingReq.lockForum;
-    app.locals.allowBestPosts = settingReq.allowBestPosts;
+    app.locals.forumName = settings.forumName;
+    app.locals.forumDescription = settings.forumDescription;
+    app.locals.clanTag = settings.clanTag;
+    app.locals.clanSize = settings.clanSize;
+    app.locals.initialSetup = settings.initialSetup;
+    app.locals.clanShield = settings.clanShield;
+    app.locals.showDescription = settings.showDescription;
+    app.locals.showClanSize = settings.showClanSize;
+    app.locals.showBlacklist = settings.showBlacklist;
+    app.locals.showClanShield = settings.showClanShield;
+    app.locals.maintenance = settings.maintenance;
+    app.locals.lockForum = settings.lockForum;
+    app.locals.allowBestPosts = settings.allowBestPosts;
     app.locals.emailSubscriptionparticipants =
-      settingReq.emailSubscriptionparticipants;
-    app.locals.repostingDuration = settingReq.repostingDuration;
-    app.locals.allowLikes = settingReq.allowLikes;
-    app.locals.editor = settingReq.editor;
-    app.locals.setAdminUser = settingReq.setAdminUser;
-    app.locals.setMaxDiscussionWordLimit = settingReq.setMaxDiscussionWordLimit;
-    app.locals.allowSubscriptions = settingReq.allowSubscriptions;
-    app.locals.allowStickyThreads = settingReq.allowStickyThreads;
+      settings.emailSubscriptionparticipants;
+    app.locals.repostingDuration = settings.repostingDuration;
+    app.locals.allowLikes = settings.allowLikes;
+    app.locals.editor = settings.editor;
+    app.locals.setAdminUser = settings.setAdminUser;
+    app.locals.setMaxDiscussionWordLimit = settings.setMaxDiscussionWordLimit;
+    app.locals.allowSubscriptions = settings.allowSubscriptions;
+    app.locals.allowStickyThreads = settings.allowStickyThreads;
+
+    // reward locals
+    app.locals.pointsPerPost = rewards.pointsPerPost;
+    app.locals.pointsPerThread = rewards.pointsPerThread;
+    app.locals.pointsPerLike = rewards.pointsPerLike;
+    app.locals.pointsPerBestPost = rewards.pointsPerBestPost;
+    app.locals.pointsForAdvertising = rewards.pointsForAdvertising;
+    app.locals.pointsPerPollQuestion = rewards.pointsPerPollQuestion;
+    app.locals.pointsPerPollVote = rewards.pointsPerPollVote;
 
     // emit started event..
   });
