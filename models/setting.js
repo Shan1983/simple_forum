@@ -95,7 +95,7 @@ module.exports = (sequelize, DataTypes) => {
       showBlacklist: true,
       showClanShield: true,
       maintenance: false,
-      lockForum: true,
+      lockForum: false,
       allowBestPosts: true,
       emailSubscriptionparticipants: true,
       repostingDuration: data.repostingDuration,
