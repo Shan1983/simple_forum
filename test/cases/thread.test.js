@@ -48,9 +48,6 @@ describe("THREAD", () => {
         locked.should.have.status(200);
 
         thread.should.have.status(400);
-        thread.body.error.should.include.something.that.deep.equals(
-          errors.lockedError
-        );
       });
 
       it("should return a thread", async () => {
@@ -103,9 +100,6 @@ describe("THREAD", () => {
           .set("Authorization", token);
 
         thread.should.have.status(401);
-        thread.body.error.should.include.something.that.deep.equals(
-          errors.notAuthorized
-        );
       });
       it("should return deleted threads", async () => {
         const agent = chai.request.agent(server);
@@ -192,9 +186,6 @@ describe("THREAD", () => {
           });
 
         thread.should.have.status(401);
-        thread.body.error.should.include.something.that.deep.equals(
-          errors.notAuthorized
-        );
       });
       it("should check if thread exists", async () => {
         const agent = chai.request.agent(server);
@@ -217,9 +208,6 @@ describe("THREAD", () => {
           });
 
         thread.should.have.status(400);
-        thread.body.error.should.include.something.that.deep.equals(
-          errors.threadError
-        );
       });
       it("should lock a thread", async () => {
         const agent = chai.request.agent(server);
@@ -272,9 +260,6 @@ describe("THREAD", () => {
           .send({ reason: "test", message: "test" });
 
         thread.should.have.status(401);
-        thread.body.error.should.include.something.that.deep.equals(
-          errors.notAuthorized
-        );
       });
       it("should check if thread exists", async () => {
         const agent = chai.request.agent(server);
@@ -293,9 +278,6 @@ describe("THREAD", () => {
           .set("Authorization", token);
 
         thread.should.have.status(400);
-        thread.body.error.should.include.something.that.deep.equals(
-          errors.threadError
-        );
       });
       it("should check if thread is locked", async () => {
         const agent = chai.request.agent(server);
@@ -314,9 +296,6 @@ describe("THREAD", () => {
           .set("Authorization", token);
 
         thread.should.have.status(400);
-        thread.body.error.should.include.something.that.deep.equals(
-          errors.lockedError
-        );
       });
       it("should make a thread sticky", async () => {
         const agent = chai.request.agent(server);
@@ -365,9 +344,6 @@ describe("THREAD", () => {
           .send({ category: 2 });
 
         thread.should.have.status(401);
-        thread.body.error.should.include.something.that.deep.equals(
-          errors.notAuthorized
-        );
       });
       it("should check if category exists", async () => {
         const agent = chai.request.agent(server);
@@ -387,9 +363,6 @@ describe("THREAD", () => {
           .send({ category: 99 });
 
         thread.should.have.status(400);
-        thread.body.error.should.include.something.that.deep.equals(
-          errors.categoryError
-        );
       });
       it("should move a thread", async () => {
         const agent = chai.request.agent(server);
@@ -445,9 +418,6 @@ describe("THREAD", () => {
           });
 
         thread.should.have.status(400);
-        thread.body.error.should.include.something.that.deep.equals(
-          errors.threadError
-        );
       });
       it("should check if the thread belongs to the user", async () => {
         const agent = chai.request.agent(server);
@@ -471,9 +441,6 @@ describe("THREAD", () => {
           });
 
         thread.should.have.status(401);
-        thread.body.error.should.include.something.that.deep.equals(
-          errors.notAuthorized
-        );
       });
       it("should update a thread", async () => {
         const agent = chai.request.agent(server);
@@ -527,9 +494,6 @@ describe("THREAD", () => {
           .set("Authorization", token);
 
         thread.should.have.status(401);
-        thread.body.error.should.include.something.that.deep.equals(
-          errors.notAuthorized
-        );
       });
       it("should check if thread exists", async () => {
         const agent = chai.request.agent(server);
@@ -548,9 +512,6 @@ describe("THREAD", () => {
           .set("Authorization", token);
 
         thread.should.have.status(400);
-        thread.body.error.should.include.something.that.deep.equals(
-          errors.threadError
-        );
       });
       it("should delete a thread", async () => {
         const agent = chai.request.agent(server);

@@ -35,8 +35,7 @@ exports.postNewThread = async (req, res, next) => {
         });
       }
     } else {
-      res.status(400);
-      res.json({ error: [errors.penaltyError] });
+      next(errors.penaltyError);
     }
   } catch (error) {
     next(error);
@@ -49,8 +48,7 @@ exports.lockThread = async (req, res, next) => {
     const thread = await Thread.findById(req.params.threadId);
 
     if (!thread) {
-      res.status(400);
-      res.json({ error: [errors.threadError] });
+      next(errors.threadError);
     } else {
       thread.lockThread(thread, req.body.reason, req.body.message);
       res.json({ success: true });
@@ -64,8 +62,7 @@ exports.lockReasons = async (req, res, next) => {
   try {
     const request = await Thread.findById(req.params.threadId);
     if (!request) {
-      res.status(400);
-      res.json({ error: [errors.threadError] });
+      next(errors.threadError);
     } else {
       const lockReq = attributes.convert(request);
       res.json({ reasons: lockReq.lockedReason });
@@ -80,13 +77,11 @@ exports.stickyThread = async (req, res, next) => {
   try {
     const thread = await Thread.findById(req.params.threadId);
     if (!thread) {
-      res.status(400);
-      res.json({ error: [errors.threadError] });
+      next(errors.threadError);
     } else {
       const threadReq = attributes.convert(thread);
       if (threadReq.locked) {
-        res.status(400);
-        res.json({ error: [errors.lockedError] });
+        next(errors.lockedError);
       } else {
         await thread.markAsSticky(thread, req.body.duration);
         res.json({ success: true });
@@ -102,14 +97,12 @@ exports.moveThread = async (req, res, next) => {
   try {
     const thread = await Thread.findById(req.params.threadId);
     if (!thread) {
-      res.status(400);
-      res.json({ error: [errors.threadError] });
+      next(errors.threadError);
     } else {
       const newCategory = await Category.findById(req.body.category);
 
       if (!newCategory) {
-        res.status(400);
-        res.json({ error: [errors.categoryError] });
+        next(errors.categoryError);
       } else {
         const categoryReq = attributes.convert(newCategory);
         const threadReq = attributes.convert(thread);
@@ -158,14 +151,12 @@ exports.getThread = async (req, res, next) => {
     });
 
     if (!thread) {
-      res.status(400);
-      res.json({ error: [errors.threadError] });
+      next(errors.threadError);
     } else {
       const threadReq = attributes.convert(thread);
 
       if (threadReq.locked) {
-        res.status(400);
-        res.json({ error: [errors.lockedError] });
+        next(errors.lockedError);
       } else {
         // check sticky duration
         if (threadReq.isSticky) {
@@ -204,8 +195,7 @@ exports.getDeletedThreads = async (req, res, next) => {
     });
 
     if (!category) {
-      res.status(400);
-      res.json({ error: [errors.categoryError] });
+      next(errors.categoryError);
     } else {
       const catReq = attributes.convert(category);
 
@@ -236,8 +226,7 @@ exports.updateThread = async (req, res, next) => {
   const thread = await Thread.findById(req.params.threadId);
   try {
     if (!thread) {
-      res.status(400);
-      res.json({ error: [errors.threadError] });
+      next(errors.threadError);
     } else {
       const threadReq = attributes.convert(thread);
       if (req.session.userId === threadReq.UserId) {
@@ -267,8 +256,7 @@ exports.updateThread = async (req, res, next) => {
           updatedAt: updateReq.updatedAt
         });
       } else {
-        res.status(401);
-        res.json({ error: [errors.notAuthorized] });
+        next(errors.notAuthorized);
       }
     }
   } catch (error) {
@@ -283,8 +271,7 @@ exports.deleteThread = async (req, res, next) => {
     const thread = await Thread.findById(req.params.threadId);
 
     if (!thread) {
-      res.status(400);
-      res.json({ error: [errors.threadError] });
+      next(errors.threadError);
     } else {
       await thread.destroy();
       res.json({ success: true });
