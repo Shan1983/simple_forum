@@ -21,11 +21,9 @@ exports.newPost = async (req, res, next) => {
 
     if (await penalty.penaltyCanCreatePost(req)) {
       if (!thread) {
-        res.status(400);
-        res.json({ error: [errors.threadError] });
+        next(errors.threadError);
       } else if (threadReq.locked) {
-        res.status(400);
-        res.json({ error: [errors.lockedError] });
+        next(errors.lockedError);
       } else {
         const discussion = req.body.discussion;
 
@@ -49,8 +47,7 @@ exports.newPost = async (req, res, next) => {
         res.json({ success: true });
       }
     } else {
-      res.status(400);
-      res.json({ error: [errors.penaltyError] });
+      next(errors.penaltyError);
     }
   } catch (error) {
     next(error);
@@ -63,14 +60,12 @@ exports.markAsBest = async (req, res, next) => {
     const post = await Post.findById(req.params.postId);
 
     if (!post) {
-      res.status(400);
-      res.json({ error: [errors.postError] });
+      next(errors.postError);
     } else {
       const postReq = attributes.convert(post);
 
       if (req.session.userId !== postReq.UserId) {
-        res.status(401);
-        res.json({ error: [errors.notAuthorized] });
+        next(errors.notAuthorized);
       } else {
         await Post.markAsBest(postReq.id);
 
@@ -88,15 +83,13 @@ exports.quote = async (req, res, next) => {
     const post = await Post.findById(req.params.postId);
 
     if (!post) {
-      res.status(400);
-      res.json({ error: [errors.postError] });
+      next(errors.postError);
     } else {
       // get the thread and check if it exists
       const thread = await Thread.findById(req.params.threadId);
 
       if (!thread) {
-        res.status(400);
-        res.json({ error: [errors.threadError] });
+        next(errors.threadError);
       } else {
         const threadReq = attributes.convert(thread);
         const { discussion } = req.body;
@@ -124,8 +117,7 @@ exports.updatePost = async (req, res, next) => {
     const post = await Post.findById(req.params.postId);
 
     if (!post) {
-      res.status(400);
-      res.json({ error: [errors.postError] });
+      next(errors.postError);
     } else {
       const postReq = attributes.convert(post);
       if (req.session.userId === postReq.UserId) {
@@ -134,8 +126,7 @@ exports.updatePost = async (req, res, next) => {
         });
         res.json({ success: true });
       } else {
-        res.status(401);
-        res.json({ error: [errors.notAuthorized] });
+        next(errors.notAuthorized);
       }
     }
   } catch (error) {
@@ -149,8 +140,7 @@ exports.deletePost = async (req, res, next) => {
     const post = await Post.findById(req.params.postId);
 
     if (!post) {
-      res.status(400);
-      res.json({ error: [errors.postError] });
+      next(errors.postError);
     } else {
       await post.destroy();
 
