@@ -3,12 +3,14 @@ const router = express.Router();
 
 const middelware = require("../services/middlewares/authMiddleware");
 const controller = require("../controllers/setting");
+const logger = require("../services/middlewares/logger");
 
 router.post(
   "/maintenance",
   middelware.isAuthenticated,
   middelware.canContinue,
   middelware.isAdmin,
+  logger.general,
   controller.postMaintenance
 );
 
@@ -17,6 +19,7 @@ router.post(
   middelware.isAuthenticated,
   middelware.canContinue,
   middelware.isAdmin,
+  logger.general,
   controller.postLockForum
 );
 
@@ -34,6 +37,7 @@ router.get(
   middelware.isAuthenticated,
   middelware.canContinue,
   middelware.isAdmin,
+  logger.general,
   controller.getAllSettings
 );
 
@@ -44,6 +48,7 @@ router.post(
   middelware.isAuthenticated,
   middelware.canContinue,
   middelware.isAdmin,
+  logger.general,
   controller.postForumName
 );
 
@@ -52,6 +57,7 @@ router.post(
   middelware.isAuthenticated,
   middelware.canContinue,
   middelware.isAdmin,
+  logger.general,
   controller.postForumDescription
 );
 
@@ -60,6 +66,7 @@ router.post(
   middelware.isAuthenticated,
   middelware.canContinue,
   middelware.isAdmin,
+  logger.general,
   controller.postShowDescription
 );
 
@@ -68,6 +75,7 @@ router.post(
   middelware.isAuthenticated,
   middelware.canContinue,
   middelware.isAdmin,
+  logger.general,
   controller.postShowClanSize
 );
 
@@ -76,6 +84,7 @@ router.post(
   middelware.isAuthenticated,
   middelware.canContinue,
   middelware.isAdmin,
+  logger.general,
   controller.postShowBlacklist
 );
 
@@ -84,6 +93,7 @@ router.post(
   middelware.isAuthenticated,
   middelware.canContinue,
   middelware.isAdmin,
+  logger.general,
   controller.postShowClanShield
 );
 
@@ -92,6 +102,7 @@ router.post(
   middelware.isAuthenticated,
   middelware.canContinue,
   middelware.isAdmin,
+  logger.general,
   controller.postMaintenance
 );
 
@@ -100,6 +111,7 @@ router.post(
   middelware.isAuthenticated,
   middelware.canContinue,
   middelware.isAdmin,
+  logger.general,
   controller.postAllowBestPost
 );
 
@@ -108,6 +120,7 @@ router.post(
   middelware.isAuthenticated,
   middelware.canContinue,
   middelware.isAdmin,
+  logger.general,
   controller.postAllowEmailSubs
 );
 
@@ -116,6 +129,7 @@ router.post(
   middelware.isAuthenticated,
   middelware.canContinue,
   middelware.isAdmin,
+  logger.general,
   controller.postReportTime
 );
 
@@ -124,6 +138,7 @@ router.post(
   middelware.isAuthenticated,
   middelware.canContinue,
   middelware.isAdmin,
+  logger.general,
   controller.postAllowLikes
 );
 
@@ -132,6 +147,7 @@ router.post(
   middelware.isAuthenticated,
   middelware.canContinue,
   middelware.isAdmin,
+  logger.general,
   controller.postEditor
 );
 
@@ -140,6 +156,7 @@ router.post(
   middelware.isAuthenticated,
   middelware.canContinue,
   middelware.isAdmin,
+  logger.general,
   controller.postSetAdmin
 );
 
@@ -148,6 +165,7 @@ router.post(
   middelware.isAuthenticated,
   middelware.canContinue,
   middelware.isAdmin,
+  logger.general,
   controller.postSetWordLimit
 );
 
@@ -156,6 +174,7 @@ router.post(
   middelware.isAuthenticated,
   middelware.canContinue,
   middelware.isAdmin,
+  logger.general,
   controller.postAllowSubs
 );
 
@@ -164,6 +183,7 @@ router.post(
   middelware.isAuthenticated,
   middelware.canContinue,
   middelware.isAdmin,
+  logger.general,
   controller.postAllowStickyPosts
 );
 
