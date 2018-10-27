@@ -5,6 +5,7 @@ const multer = require("multer");
 
 const controller = require("../controllers/user");
 const middleware = require("../services/middlewares/authMiddleware");
+const logger = require("../services/middlewares/logger");
 
 const storage = multer.diskStorage({
   destination: "/uploads/",
@@ -19,7 +20,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage, limits: { fileSize: 1000000 } });
 
-router.post("/login", controller.login);
+router.post("/login", logger.general, controller.login);
 
 router.all("*", (req, res, next) => {
   if (req.app.locals.maintenance || req.app.locals.lockForum) {
@@ -35,28 +36,37 @@ router.get(
   middleware.isAuthenticated,
   middleware.canContinue,
   middleware.isAdmin,
+  logger.general,
   controller.getAllUsers
 );
 
-router.get("/:username", middleware.isAuthenticated, controller.getUserMeta);
+router.get(
+  "/:username",
+  middleware.isAuthenticated,
+  middleware.canContinue,
+  logger.general,
+  controller.getUserMeta
+);
 router.get(
   "/profile/:username",
   middleware.isAuthenticated,
   middleware.canContinue,
+  logger.general,
   controller.userProfile
 );
 
-router.get("/:username/avatar", controller.getAvatar);
+router.get("/:username/avatar", logger.general, controller.getAvatar);
 
-router.post("/register", controller.register);
+router.post("/register", logger.general, controller.register);
 
-router.post("/logout", controller.logout);
+router.post("/logout", logger.general, controller.logout);
 
 router.post(
   "/profile/:username/upload",
   middleware.isAuthenticated,
   middleware.canContinue,
   upload.single("avatar"),
+  logger.general,
   controller.upload
 );
 
@@ -64,6 +74,7 @@ router.put(
   "/profile/:username",
   middleware.isAuthenticated,
   middleware.canContinue,
+  logger.general,
   controller.updateProfile
 );
 
@@ -72,6 +83,7 @@ router.delete(
   "/profile/:username/close",
   middleware.isAuthenticated,
   middleware.canContinue,
+  logger.general,
   controller.closeAccount
 );
 
@@ -81,10 +93,11 @@ router.delete(
   middleware.isAuthenticated,
   middleware.canContinue,
   middleware.isAdmin,
+  logger.general,
   controller.deleteUser
 );
 
 // TEMPORARY EMAIL VERIFICATION ROUTE
-router.get("/verify/email/:token", controller.verifyEmail);
+router.get("/verify/email/:token", logger.general, controller.verifyEmail);
 
 module.exports = router;
