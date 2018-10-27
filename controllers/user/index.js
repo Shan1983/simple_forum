@@ -162,8 +162,7 @@ exports.userProfile = async (req, res, next) => {
     });
 
     if (!user) {
-      res.status(400);
-      res.json({ error: [errors.accountNotExists] });
+      next(errors.accountNotExists);
     } else {
       res.json(attributes.convert(user));
     }
@@ -180,8 +179,7 @@ exports.login = async (req, res, next) => {
     });
 
     if (!user) {
-      res.status(400);
-      res.json({ error: [errors.loginError] });
+      next(errors.loginError);
     } else {
       const userAttributes = attributes.convert(user);
 
@@ -223,12 +221,10 @@ exports.login = async (req, res, next) => {
 
           res.json({ success: true, username: user.username, role, token });
         } else {
-          res.status(400);
-          res.json({ error: [errors.verifyAccountError] });
+          next(errors.verifyAccountError);
         }
       } else {
-        res.status(401);
-        res.json({ error: [errors.loginError] });
+        next(errors.loginError);
       }
     }
   } catch (error) {
@@ -247,8 +243,7 @@ exports.register = async (req, res, next) => {
       validate.isEmpty(email) &&
       validate.isEmpty(password)
     ) {
-      res.status(400);
-      res.json({ error: [errors.invalidRegister] });
+      next(errors.invalidRegister);
     } else {
       /**
        * Check if user does not exist
@@ -256,8 +251,7 @@ exports.register = async (req, res, next) => {
       const checkUser = await User.findOne({ where: { email } });
 
       if (checkUser) {
-        res.status(400);
-        res.json({ error: [errors.accountExists] });
+        next(errors.accountExists);
       } else {
         const params = {
           username: username,
@@ -340,8 +334,7 @@ exports.updateProfile = async (req, res, next) => {
               "Your email has been updated. Please validate your new email address."
           });
         } else {
-          res.status(400);
-          res.json({ error: [errors.emailError] });
+          next(errors.emailError);
         }
       }
       if (
@@ -361,8 +354,7 @@ exports.updateProfile = async (req, res, next) => {
         });
       }
     } else {
-      res.status(401);
-      res.json({ error: [errors.notAuthorized] });
+      next(errors.notAuthorized);
     }
   } catch (error) {
     next(error);
@@ -374,8 +366,7 @@ exports.upload = async (req, res, next) => {
     const { username } = req.params;
 
     if (req.session.username !== username) {
-      res.status(401);
-      res.json({ error: [errors.notAuthorized] });
+      next(errors.notAuthorized);
     } else {
       const user = await User.findOne({
         where: { username: req.session.username }
@@ -398,8 +389,7 @@ exports.upload = async (req, res, next) => {
 exports.getAvatar = async (req, res, next) => {
   try {
     if (!req.params.username) {
-      res.status(400);
-      res.json({ error: [errors.accountNotExists] });
+      next(errors.accountNotExists);
     } else {
       const user = await User.findOne({
         where: { username: req.params.username }
@@ -433,8 +423,7 @@ exports.closeAccount = async (req, res, next) => {
         });
       });
     } else {
-      res.status(401);
-      res.json({ error: [errors.notAuthorized] });
+      next(errors.notAuthorized);
     }
   } catch (error) {
     next(error);
@@ -449,13 +438,11 @@ exports.deleteUser = async (req, res, next) => {
     const user = await User.findOne({ where: { email: req.body.email } });
 
     if (!user) {
-      res.status(400);
-      return res.json({ error: [errors.accountNotExists] });
+      next(errors.accountNotExists);
     } else {
       const role = await attributes.getUserRole(user);
       if (role === "Admin") {
-        res.status(400);
-        res.json({ error: [errors.canNotDeleteAdmin] });
+        next(errors.canNotDeleteAdmin);
       } else {
         const { tag, name, reason } = req.body;
 
@@ -496,10 +483,7 @@ exports.verifyEmail = async (req, res, next) => {
 
       return res.json({ success: true });
     } else {
-      res.status(401);
-      res.json({
-        error: errors.notAuthorized
-      });
+      next(errors.notAuthorized);
     }
   } catch (error) {
     next(error);

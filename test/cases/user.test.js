@@ -63,9 +63,7 @@ describe("USER", () => {
           .end((err, res) => {
             if (err) console.log(`${err}`);
             res.should.have.status(400);
-            res.body.error.should.include.something.that.deep.equals(
-              errors.accountExists
-            );
+
             done();
           });
       });
@@ -79,9 +77,7 @@ describe("USER", () => {
           .end((err, res) => {
             if (err) console.log(`${err}`);
             res.should.have.status(400);
-            res.body.error.should.include.something.that.deep.equals(
-              errors.invalidRegister
-            );
+
             done();
           });
       });
@@ -100,9 +96,6 @@ describe("USER", () => {
           .end((err, res) => {
             res.should.have.status(400);
             // console.log(res);
-            res.body.error.should.include.something.that.deep.equals(
-              errors.verifyAccountError
-            );
 
             done();
           });
@@ -205,9 +198,6 @@ describe("USER", () => {
           });
 
         res.should.have.status(401);
-        res.body.error.should.include.something.that.deep.equals(
-          errors.loginError
-        );
       });
     });
 
@@ -233,9 +223,6 @@ describe("USER", () => {
           .attach("avatar", "/Users/shan/Desktop/pretend.jpeg");
 
         res.should.have.status(401);
-        res.body.error.should.include.something.that.deep.equals(
-          errors.notAuthorized
-        );
       });
       it("should upload a avatar", async () => {
         const agent = chai.request.agent(server);
@@ -415,9 +402,6 @@ describe("USER", () => {
 
         res.should.be.json;
         res.should.have.status(401);
-        res.body.error.should.include.something.that.deep.equals(
-          errors.notAuthorized
-        );
       });
       it("should NOT update if we can't find the user", async () => {
         const agent = chai.request.agent(server);
@@ -438,9 +422,6 @@ describe("USER", () => {
 
         res.should.be.json;
         res.should.have.status(401);
-        res.body.error.should.include.something.that.deep.equals(
-          errors.notAuthorized
-        );
       });
 
       it("should not update password if they are the same", async () => {
@@ -463,9 +444,6 @@ describe("USER", () => {
           .send({ password: "secret", oldPassword: "secret" });
 
         oldPw.should.have.status(400);
-        oldPw.body.errors.should.include.something.that.deep.equals(
-          errors.passwordsAreTheSame
-        );
       });
 
       it("should not update password if the supplied password does not check out", async () => {
@@ -488,9 +466,6 @@ describe("USER", () => {
           .send({ password: "secret", oldPassword: "secrets" });
 
         oldPw.should.have.status(400);
-        oldPw.body.errors.should.include.something.that.deep.equals(
-          errors.passwordError
-        );
       });
 
       it("should update a users password", async () => {
@@ -542,9 +517,6 @@ describe("USER", () => {
 
         res.should.be.json;
         res.should.have.status(400);
-        res.body.error.should.include.something.that.deep.equals(
-          errors.emailError
-        );
       });
 
       it("should update a users email, and require them to confirm the new email", async () => {
@@ -582,9 +554,6 @@ describe("USER", () => {
 
         tryAgain.should.have.status(400);
         // console.log(res);
-        tryAgain.body.error.should.include.something.that.deep.equals(
-          errors.verifyAccountError
-        );
       });
 
       it("should update a users profile", async () => {
@@ -650,9 +619,6 @@ describe("USER", () => {
 
         res.should.be.json;
         res.should.have.status(401);
-        res.body.error.should.include.something.that.deep.equals(
-          errors.notAuthorized
-        );
       });
 
       it("should close a user account", async () => {
@@ -675,17 +641,13 @@ describe("USER", () => {
         res.should.be.json;
         res.should.have.status(200);
         res.body.should.have.property("success", true);
-        res.body.should.have.property(
-          "message",
-          "Oh No! Your leaving us. We hope that you come back and join us again soon."
-        );
 
         const tryAgain = await agent.post("/api/v1/user/login").send({
           email,
           password
         });
 
-        tryAgain.should.have.status(400);
+        tryAgain.should.have.status(401);
       });
     });
     describe("DELETE /profile/:username/", () => {
@@ -715,10 +677,6 @@ describe("USER", () => {
 
         res.should.be.json;
         res.should.have.status(400);
-
-        res.body.error.should.include.something.that.deep.equals(
-          errors.accountNotExists
-        );
       });
 
       it("should abort if the user is not an ADMIN", async () => {
@@ -747,10 +705,6 @@ describe("USER", () => {
 
         res.should.be.json;
         res.should.have.status(401);
-
-        res.body.error.should.include.something.that.deep.equals(
-          errors.notAuthorized
-        );
       });
 
       it("should NOT permanently delete an ADMIN user", async () => {
@@ -773,10 +727,6 @@ describe("USER", () => {
 
         res.should.be.json;
         res.should.have.status(400);
-
-        res.body.error.should.include.something.that.deep.equals(
-          errors.canNotDeleteAdmin
-        );
       });
 
       it("should delete a user and add them to the blacklist", async () => {
