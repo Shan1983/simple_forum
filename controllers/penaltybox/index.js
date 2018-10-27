@@ -10,8 +10,7 @@ exports.getAllInBox = async (req, res, next) => {
     });
 
     if (penaltyBox.length <= 0) {
-      res.status(400);
-      res.json({ error: [errors.noUsers] });
+      next(errors.noUsers);
     } else {
       res.json(penaltyBox);
     }
@@ -30,8 +29,7 @@ exports.putAUserInTheBox = async (req, res, next) => {
     const userReq = attributes.convert(user);
 
     if (!user) {
-      res.status(400);
-      res.json({ error: [errors.accountNotExists] });
+      next(errors.accountNotExists);
     } else {
       const { duration, severity, reason } = req.body;
 
@@ -81,8 +79,7 @@ exports.removeAUserFromBox = async (req, res, next) => {
     });
 
     if (!user) {
-      res.status(400);
-      res.json({ error: [errors.accountNotExists] });
+      next(errors.accountNotExists);
     } else {
       await PenaltyBox.destroy({
         where: { UserId: req.params.userId }
