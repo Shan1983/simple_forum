@@ -3,6 +3,7 @@ const router = express.Router();
 
 const middleware = require("../services/middlewares/authMiddleware");
 const controller = require("../controllers/poll");
+const logger = require("../services/middlewares/logger");
 
 router.all("*", (req, res, next) => {
   if (req.app.locals.maintenance || req.app.locals.lockForum) {
@@ -17,6 +18,7 @@ router.get(
   "/:pollId",
   middleware.isAuthenticated,
   middleware.canContinue,
+  logger.general,
   controller.getAPoll
 );
 
@@ -25,6 +27,7 @@ router.get(
   middleware.isAuthenticated,
   middleware.canContinue,
   middleware.isLeader,
+  logger.general,
   controller.getAllPolls
 );
 
@@ -32,6 +35,7 @@ router.get(
   "/:pollId/results",
   middleware.isAuthenticated,
   middleware.canContinue,
+  logger.general,
   controller.generatePollResults
 );
 
@@ -39,6 +43,7 @@ router.post(
   "/:threadId/new",
   middleware.isAuthenticated,
   middleware.canContinue,
+  logger.general,
   controller.newPoll
 );
 
@@ -46,6 +51,7 @@ router.post(
   "/:pollId/:responseId/vote",
   middleware.isAuthenticated,
   middleware.canContinue,
+  logger.general,
   controller.voteOnPoll
 );
 
@@ -53,6 +59,7 @@ router.put(
   "/:pollId",
   middleware.isAuthenticated,
   middleware.canContinue,
+  logger.general,
   controller.editPoll
 );
 
@@ -61,6 +68,7 @@ router.delete(
   middleware.isAuthenticated,
   middleware.canContinue,
   middleware.isLeader,
+  logger.general,
   controller.removePoll
 );
 
