@@ -1,7 +1,5 @@
 "use strict";
 
-const nodemailer = require("../services/nodeMailer");
-
 module.exports = (sequelize, DataTypes) => {
   const Subscription = sequelize.define(
     "Subscription",
@@ -37,7 +35,6 @@ module.exports = (sequelize, DataTypes) => {
     const user = await User.findById(userId);
 
     if (user.subscriptionEmail) {
-      await nodemailer.send(req);
       return true;
     } else {
       return false;
