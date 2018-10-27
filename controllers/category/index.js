@@ -14,8 +14,7 @@ exports.getAllCategory = async (req, res, next) => {
     const categories = await Category.findAll();
 
     if (!categories) {
-      res.status(400);
-      res.json({ error: [errors.categoryError] });
+      next(errors.categoryError);
     }
 
     res.json(categories);
@@ -37,8 +36,7 @@ exports.getAllThreadsInCategory = async (req, res, next) => {
     });
 
     if (!category) {
-      res.status(400);
-      res.json({ error: [errors.categoryError] });
+      next(errors.categoryError);
     } else {
       const catReq = attributes.convert(category);
 
@@ -79,8 +77,7 @@ exports.newCategory = async (req, res, next) => {
     });
 
     if (categoryError) {
-      res.status(400);
-      res.json({ error: [errors.categoryTitleError] });
+      next(errors.categoryTitleError);
     } else {
       await Category.create({
         title: title,
@@ -100,8 +97,7 @@ exports.updateCategory = async (req, res, next) => {
     const category = await Category.findById(req.params.id);
 
     if (!category) {
-      res.status(400);
-      res.json({ error: [errors.categoryError] });
+      next(errors.categoryError);
     } else {
       const { title, description } = req.body;
 
@@ -121,8 +117,7 @@ exports.deleteCategory = async (req, res, next) => {
     const category = await Category.findById(req.params.id);
 
     if (!category) {
-      res.status(400);
-      res.json({ error: [errors.categoryError] });
+      next(errors.categoryError);
     } else {
       // so that threads aren't left without a category
       // let's create a new one and assign the thread to it..

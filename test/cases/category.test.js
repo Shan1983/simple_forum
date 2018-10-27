@@ -87,9 +87,6 @@ describe("Category", () => {
           .send({ title: "test", description: "test" });
 
         category.should.have.status(400);
-        category.body.error.should.include.something.that.deep.equals(
-          errors.categoryTitleError
-        );
       });
     });
   });
