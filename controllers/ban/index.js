@@ -6,8 +6,7 @@ exports.addBan = async (req, res, next) => {
   try {
     const user = await User.findById(req.body.userId);
     if (!user) {
-      res.status(400);
-      res.json({ error: [errors.accountNotExists] });
+      next(errors.accountNotExists);
     } else {
       const userReq = attributes.convert(user);
       if (Ban.checkIfBanned(userReq)) {
@@ -17,8 +16,7 @@ exports.addBan = async (req, res, next) => {
 
         res.json({ success: true });
       } else {
-        res.status(400);
-        res.json({ error: [errors.banError] });
+        next(errors.banError);
       }
     }
   } catch (error) {
@@ -34,8 +32,7 @@ exports.removeBan = async (req, res, next) => {
     });
 
     if (!user) {
-      res.status(400);
-      res.json({ error: [errors.accountNotExists] });
+      next(errors.accountNotExists);
     } else {
       const userReq = attributes.convert(user);
       if (Ban.checkIfBanned(userReq)) {
@@ -45,8 +42,7 @@ exports.removeBan = async (req, res, next) => {
 
         res.json({ success: true });
       } else {
-        res.status(400);
-        res.json({ error: [errors.banError] });
+        next(errors.banError);
       }
     }
   } catch (error) {
