@@ -13,8 +13,7 @@ exports.getAllUserFriends = async (req, res, next) => {
     });
 
     if (!me) {
-      res.status(400);
-      res.json({ error: [errors.accountNotExists] });
+      next(errors.accountNotExists);
     } else {
       // format what will be returned
       const userReq = attributes.convert(me);
@@ -45,8 +44,7 @@ exports.accept = async (req, res, next) => {
     const requestFromUser = await User.findById(req.params.userId);
 
     if (!requestFromUser) {
-      res.status(400);
-      res.json({ error: [errors.accountNotExists] });
+      next(errors.accountNotExists);
     } else {
       // find the pending request
       const requestUserReq = attributes.convert(requestFromUser);
@@ -59,8 +57,7 @@ exports.accept = async (req, res, next) => {
       });
 
       if (!pending) {
-        res.status(400);
-        res.json({ error: [errors.friendRequestError] });
+        next(errors.friendRequestError);
       } else {
         // update friendpending with accepted true
         await FriendPending.update(
@@ -97,8 +94,7 @@ exports.decline = async (req, res, next) => {
     const user = await User.findById(req.params.userId);
 
     if (!user) {
-      res.status(400);
-      res.json({ error: [errors.accountNotExists] });
+      next(errors.accountNotExists);
     } else {
       const userReq = attributes.convert(user);
       // find the pending request
@@ -107,8 +103,7 @@ exports.decline = async (req, res, next) => {
       });
 
       if (pending.length <= 0) {
-        res.status(400);
-        res.json({ error: [errors.friendRequestError] });
+        next(errors.friendRequestError);
       } else {
         // destroy the request
         await FriendPending.destroy({
@@ -133,8 +128,8 @@ exports.addFriend = async (req, res, next) => {
 
     if (!requestToUser) {
       // return any errors
-      res.status(400);
-      res.json({ error: [errors.accountNotExists] });
+
+      next(errors.accountNotExists);
     } else {
       const userReq = attributes.convert(requestToUser);
       // assign username the requestFrom user, and fill in the rest
@@ -168,8 +163,7 @@ exports.removeFriend = async (req, res, next) => {
     });
 
     if (!pending) {
-      res.status(400);
-      res.json({ error: [errors.friendRequestError] });
+      next(errors.friendRequestError);
     } else {
       // get pending attributes
       const pendingReq = attributes.convert(pending);
