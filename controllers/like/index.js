@@ -10,8 +10,7 @@ exports.addThreadLike = async (req, res, next) => {
       const thread = await Thread.findById(threadId);
 
       if (!thread) {
-        res.status(400);
-        res.json({ error: [errors.threadError] });
+        next(errors.threadError);
       } else {
         const threadReq = attributes.convert(thread);
 
@@ -35,12 +34,10 @@ exports.addThreadLike = async (req, res, next) => {
 
             res.json({ success: true, count: like.count + 1 });
           } else {
-            res.status(400);
-            res.json({ error: [errors.invalidLike] });
+            next(errors.invalidLike);
           }
         } else {
-          res.status(400);
-          res.json({ error: [errors.invalidLike] });
+          next(errors.invalidLike);
         }
       }
     }
@@ -49,8 +46,7 @@ exports.addThreadLike = async (req, res, next) => {
       const post = await Post.findById(postId);
 
       if (!post) {
-        res.status(400);
-        res.json({ error: [errors.postError] });
+        next(errors.postError);
       } else {
         const postReq = attributes.convert(post);
 
@@ -74,12 +70,10 @@ exports.addThreadLike = async (req, res, next) => {
 
             res.json({ success: true, count: like.count + 1 });
           } else {
-            res.status(400);
-            res.json({ error: [errors.invalidLike] });
+            next(errors.invalidLike);
           }
         } else {
-          res.status(400);
-          res.json({ error: [errors.invalidLike] });
+          next(errors.invalidLike);
         }
       }
     }
@@ -98,8 +92,7 @@ exports.removeLike = async (req, res, next) => {
       });
 
       if (like.length <= 0) {
-        res.status(400);
-        res.json({ error: [errors.likeError] });
+        next(errors.likeError);
       } else {
         await Like.destroy({
           where: { ThreadId: threadId, UserId: req.session.userId }
@@ -117,8 +110,7 @@ exports.removeLike = async (req, res, next) => {
       });
 
       if (like.length <= 0) {
-        res.status(400);
-        res.json({ error: [errors.likeError] });
+        next(errors.likeError);
       } else {
         await Like.destroy({
           where: { PostId: postId, UserId: req.session.userId }
