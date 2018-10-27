@@ -3,6 +3,7 @@ const router = express.Router();
 
 const controller = require("../controllers/like");
 const middleware = require("../services/middlewares/authMiddleware");
+const logger = require("../services/middlewares/logger");
 
 router.all("*", (req, res, next) => {
   if (req.app.locals.maintenance || req.app.locals.lockForum) {
@@ -17,6 +18,7 @@ router.post(
   "/",
   middleware.isAuthenticated,
   middleware.canContinue,
+  logger.general,
   controller.addThreadLike
 );
 
@@ -24,6 +26,7 @@ router.delete(
   "/remove",
   middleware.isAuthenticated,
   middleware.canContinue,
+  logger.general,
   controller.removeLike
 );
 
