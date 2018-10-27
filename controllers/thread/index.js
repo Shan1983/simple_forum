@@ -15,8 +15,9 @@ exports.postNewThread = async (req, res, next) => {
       });
 
       if (!category) {
-        res.status(400);
-        res.json({ error: [errors.categoryError] });
+        // res.status(400);
+        next(errors.categoryError);
+        // res.json({ error: [errors.categoryError] });
       } else {
         await Thread.create({
           title: req.body.title,
@@ -35,7 +36,7 @@ exports.postNewThread = async (req, res, next) => {
       }
     } else {
       res.status(400);
-      res.json({ error: [errors.penalyError] });
+      res.json({ error: [errors.penaltyError] });
     }
   } catch (error) {
     next(error);
