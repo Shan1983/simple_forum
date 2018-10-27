@@ -16,20 +16,17 @@ exports.getAPoll = async (req, res, next) => {
     const pollQuestion = await PollQuestion.findById(req.params.pollId);
 
     if (!pollQuestion) {
-      res.status(400);
-      res.json({ error: [errors.pollError] });
+      next(errors.pollError);
     } else {
       const pollQuestionReq = attributes.convert(pollQuestion);
 
       // check if the polls active
       if (pollQuestionReq.active === false) {
-        res.status(400);
-        res.json({ error: [errors.pollEndedError] });
+        next(errors.pollEndedError);
       } else {
         // check if the polls been open for 7 days
         const days = moment(pollQuestionReq.createdAt).fromNow();
 
-        console.log(days);
         if (days >= 7) {
           await PollQuestion.update(
             { active: true },
@@ -103,22 +100,18 @@ exports.newPoll = async (req, res, next) => {
     const thread = await Thread.findOne({ where: { id: req.params.threadId } });
 
     if (!thread) {
-      res.status(400);
-      res.json({ error: [errors.threadError] });
+      next(errors.threadError);
     } else {
       const question = req.body.question;
       const responses = req.body.responses;
 
       // response validation
       if (responses.length < 2) {
-        res.status(400);
-        res.json({ error: [errors.pollResponseError] });
+        next(errors.pollResponseError);
       } else if (responses.length !== new Set(responses).size) {
-        res.status(400);
-        res.json({ error: [errors.pollResponseDuplicates] });
+        next(errors.pollResponseDuplicates);
       } else if (validate.isEmpty(question)) {
-        res.status(400);
-        res.json({ error: [errors.pollQuestionError] });
+        next(errors.pollQuestionError);
       } else {
         // lets create a new poll
 
@@ -167,8 +160,7 @@ exports.voteOnPoll = async (req, res, next) => {
     // get the poll question
     const poll = await PollQuestion.findById(req.params.pollId);
     if (!poll) {
-      res.status(400);
-      res.json({ error: [errors.pollError] });
+      next(errors.pollError);
     } else {
       const pollReq = attributes.convert(poll);
       // check if the user has already voted
@@ -184,8 +176,7 @@ exports.voteOnPoll = async (req, res, next) => {
       });
 
       if (error) {
-        res.status(400);
-        res.json({ error: [errors.pollAlreadyVotedError] });
+        next(errors.pollAlreadyVotedError);
       } else {
         // record the users vote
         await PollVote.create({
@@ -210,22 +201,18 @@ exports.editPoll = async (req, res, next) => {
     });
 
     if (!poll) {
-      res.status(400);
-      res.json({ error: [errors.pollError] });
+      next(errors.pollError);
     } else {
       const question = req.body.question;
       const responses = req.body.responses;
 
       // response validation
       if (responses.length < 2) {
-        res.status(400);
-        res.json({ error: [errors.pollResponseError] });
+        next(errors.pollResponseError);
       } else if (responses.length !== new Set(responses).size) {
-        res.status(400);
-        res.json({ error: [errors.pollResponseDuplicates] });
+        next(errors.pollResponseDuplicates);
       } else if (validate.isEmpty(question)) {
-        res.status(400);
-        res.json({ error: [errors.pollQuestionError] });
+        next(errors.pollQuestionError);
       } else {
         // update a poll
 
