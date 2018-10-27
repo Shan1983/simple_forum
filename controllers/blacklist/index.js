@@ -10,8 +10,7 @@ exports.getBlacklist = async (req, res, next) => {
     const blacklist = await Blacklist.findAndCountAll();
 
     if (blacklist.length <= 0) {
-      res.status(400);
-      res.json({ error: [errors.blacklistError] });
+      next(errors.blacklistError);
     } else {
       res.json(blacklist);
     }
@@ -30,8 +29,7 @@ exports.addToBlacklist = async (req, res, next) => {
       validate.isEmpty(currentName) &&
       validate.isEmpty(reason)
     ) {
-      res.status(400);
-      res.json({ error: [errors.blacklistValidationError] });
+      next(errors.blacklistValidationError);
     } else {
       // add a new person to the black list
       await Blacklist.create({
@@ -58,8 +56,7 @@ exports.removeFromBlacklist = async (req, res, next) => {
     });
 
     if (!user) {
-      res.status(400);
-      res.json({ error: [errors.accountNotExists] });
+      next(errors.accountNotExists);
     } else {
       const userReq = attributes.convert(user);
       // remove them from the list - maybe discuss this with everyone first..
