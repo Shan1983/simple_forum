@@ -23,6 +23,7 @@ const jwtHelper = require("../../helpers/jwtHelper");
 const validate = require("../../helpers/validation");
 const attributes = require("../../helpers/getModelAttributes");
 const penatly = require("../../helpers/pentalybox");
+const emailer = require("../../services/emails/send");
 
 /*
 sharp(profilePicture.file)
@@ -219,6 +220,15 @@ exports.login = async (req, res, next) => {
 
           await penatly.isUserInPenaltyBox(user.id, req);
 
+          // const data = {
+          //   template: "sus",
+          //   to: params.email,
+          //   name: params.username,
+          //   token: params.emailVerificationToken
+          // };
+
+          // emailer.sendEmail(data);
+
           res.json({ success: true, username: user.username, role, token });
         } else {
           next(errors.verifyAccountError);
@@ -276,6 +286,15 @@ exports.register = async (req, res, next) => {
          */
         await IpAddress.createIpIfEmpty(req.ip, userReq.id);
 
+        const data = {
+          template: "registered",
+          to: params.email,
+          name: params.username,
+          token: params.emailVerificationToken
+        };
+
+        emailer.sendEmail(data);
+
         res.json({ success: true, redirect: "/verify" });
       }
     }
@@ -315,6 +334,14 @@ exports.updateProfile = async (req, res, next) => {
       ) {
         await user.updatePassword(req.body.password, req.body.oldPassword);
 
+        const data = {
+          template: "password",
+          to: userReq.email,
+          name: userReq.username
+        };
+
+        emailer.sendEmail(data);
+
         res.json({
           success: true,
           message: "Your password has been updated."
@@ -328,6 +355,14 @@ exports.updateProfile = async (req, res, next) => {
             emailVerificationToken: uuidv5(req.body.email, uuidv5.DNS),
             emailVerified: false
           });
+          const data = {
+            template: "email",
+            to: userReq.email,
+            name: userReq.username
+          };
+
+          emailer.sendEmail(data);
+
           return res.json({
             success: true,
             message:
@@ -347,6 +382,14 @@ exports.updateProfile = async (req, res, next) => {
           allowAdvertising: !!req.body.allowAdvertising,
           emailSubscriptions: !!req.body.emailSubscriptions
         });
+
+        const data = {
+          template: "profile",
+          to: userReq.email,
+          name: userReq.username
+        };
+
+        emailer.sendEmail(data);
 
         return res.json({
           success: true,
@@ -416,6 +459,15 @@ exports.closeAccount = async (req, res, next) => {
         res.clearCookie("username");
         res.clearCookie("UIadmin");
         res.clearCookie("token");
+
+        const data = {
+          template: "account_close",
+          to: params.email,
+          name: params.username
+        };
+
+        emailer.sendEmail(data);
+
         res.json({
           success: true,
           message:
