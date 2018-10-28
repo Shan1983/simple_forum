@@ -18,26 +18,47 @@ const sender = async (email, data) => {
 };
 
 exports.sendEmail = async data => {
-  const transport = nodeMailer.createTransport({
-    host: process.env.MAIL_HOST,
-    port: process.env.MAIL_PORT,
-    auth: {
-      user: process.env.MAIL_USER,
-      pass: process.env.MAIL_PASS
-    }
-  });
+  let transport, email;
+  if (
+    process.env.NODE_ENV !== "test" ||
+    process.env.NODE_ENV !== "production"
+  ) {
+    transport = nodeMailer.createTransport({
+      host: process.env.MAIL_HOST,
+      port: process.env.MAIL_PORT,
+      auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS
+      }
+    });
 
-  const email = new Email({
-    message: {
-      from: `Crazy Dynamic <team@${process.env.SITE_NAME.replace(
-        /\s/g,
-        ""
-      )}.com>`
-    },
-    // uncomment below to send emails in development/test env:
-    // send: true,
-    transport: transport
-  });
+    email = new Email({
+      message: {
+        from: `Crazy Dynamic <team@${process.env.SITE_NAME.replace(
+          /\s/g,
+          ""
+        )}.com>`
+      },
+      // uncomment below to send emails in development/test env:
+      send: true,
+      transport: transport
+    });
+  } else {
+    console.log("IN TEST MODE NO EMAILS");
+    email = new Email({
+      message: {
+        from: `Crazy Dynamic <team@${process.env.SITE_NAME.replace(
+          /\s/g,
+          ""
+        )}.com>`
+      },
+      // uncomment below to send emails in development/test env:
+      // send: true,
+      transport: {
+        jsonTransport: true
+      }
+    });
+  }
 
   switch (data.template) {
     case "registered":
