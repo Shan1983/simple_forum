@@ -40,6 +40,14 @@ const errors = {
   postError: ["This post does not exist.", 400],
   settingError: ["There was an error with the settings options.", 400],
   sameLikeError: ["You can not like a Thread/Post more than once.", 400],
+  subscriptionError: [
+    "Could not create the subscription, please try again.",
+    400
+  ],
+  subscriptionEmailError: [
+    "You currently have email subscriptions turned off, if you wish to recieve email alerts please go to your profile and turn them on.",
+    400
+  ],
   threadError: ["This thread does not exist.", 400],
   unknown: [
     "Whoops! something on our end screwed up :( reload and try again.",
