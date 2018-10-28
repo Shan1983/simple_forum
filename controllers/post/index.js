@@ -44,6 +44,7 @@ exports.newPost = async (req, res, next) => {
         //   const points = rewards.toJSON();
 
         await user.increment("postCount", { by: 1 });
+        await user.increment("points", { by: req.app.locals.pointsPerPost });
         //   await rewards.increment("points", { by: points.pointsPerPost });
 
         const subsObj = {
