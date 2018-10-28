@@ -12,3 +12,4 @@ require("./cases/penaltybox.test");
 require("./cases/report.test");
 require("./cases/setting.test");
 require("./cases/reward.test");
+require("./cases/subscription.test");
