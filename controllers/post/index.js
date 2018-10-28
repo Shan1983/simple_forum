@@ -10,6 +10,7 @@ const {
 const errors = require("../../helpers/mainErrors");
 const attributes = require("../../helpers/getModelAttributes");
 const penalty = require("../../helpers/pentalybox");
+const subscriber = require("../../services/subscriptions/subs");
 
 // "/:threadId",
 exports.newPost = async (req, res, next) => {
@@ -34,6 +35,7 @@ exports.newPost = async (req, res, next) => {
         });
 
         const user = await User.findById(req.session.userId);
+        const userReq = await attributes.convert(user);
         //   const rewards = await Rewards.findAll({
         //     attributes: ["pointsPerPost"]
         //   });
@@ -43,6 +45,14 @@ exports.newPost = async (req, res, next) => {
 
         await user.increment("postCount", { by: 1 });
         //   await rewards.increment("points", { by: points.pointsPerPost });
+
+        const subsObj = {
+          name: userReq.username,
+          threadId: req.params.threadId,
+          discussion: discussion
+        };
+
+        await subscriber.checkSubsAndSendNewMessage(subsObj);
 
         res.json({ success: true });
       }
