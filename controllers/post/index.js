@@ -35,25 +35,11 @@ exports.newPost = async (req, res, next) => {
         });
 
         const user = await User.findById(req.session.userId);
-        const userReq = await attributes.convert(user);
-        //   const rewards = await Rewards.findAll({
-        //     attributes: ["pointsPerPost"]
-        //   });
-
-        //   // fix this when u work on settings
-        //   const points = rewards.toJSON();
 
         await user.increment("postCount", { by: 1 });
         await user.increment("points", { by: req.app.locals.pointsPerPost });
-        //   await rewards.increment("points", { by: points.pointsPerPost });
 
-        const subsObj = {
-          name: userReq.username,
-          threadId: req.params.threadId,
-          discussion: discussion
-        };
-
-        await subscriber.checkSubsAndSendNewMessage(subsObj);
+        subscriber.checkSubsAndSendNewMessage(discussion);
 
         res.json({ success: true });
       }
