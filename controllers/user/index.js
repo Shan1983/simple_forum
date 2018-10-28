@@ -452,6 +452,7 @@ exports.closeAccount = async (req, res, next) => {
 
     if (req.session.username === username) {
       const user = await User.findById(req.session.userId);
+      const userReq = attributes.convert(user);
 
       // close their account
       await user.destroy();
@@ -462,8 +463,8 @@ exports.closeAccount = async (req, res, next) => {
 
         const data = {
           template: "account_close",
-          to: params.email,
-          name: params.username
+          to: userReq.email,
+          name: userReq.username
         };
 
         emailer.sendEmail(data);
