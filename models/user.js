@@ -85,7 +85,7 @@ module.exports = (sequelize, DataTypes) => {
       emailSubscriptions: { type: DataTypes.BOOLEAN, defaultValue: true },
       RoleId: { type: DataTypes.INTEGER }, // VillageId: { type: DataTypes.INTEGER },
       // PlayerId: { type: DataTypes.INTEGER },
-      points: { type: DataTypes.INTEGER, validation: { isInt: true } },
+      points: { type: DataTypes.INTEGER, defaultValue: 0 },
       emailVerificationToken: { type: DataTypes.STRING },
       emailVerified: { type: DataTypes.BOOLEAN, defaultValue: false }, // FriendId: { type: DataTypes.INTEGER },
       avatar: {
