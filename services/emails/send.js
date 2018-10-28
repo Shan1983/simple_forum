@@ -1,21 +1,20 @@
 const nodeMailer = require("nodemailer");
 const Email = require("email-templates");
 
-const sender = (email, data) => {
-  return email
-    .send({
-      template: data.template,
-      message: {
-        to: data.to
-      },
-      locals: {
-        name: data.name,
-        token: data.token,
-        siteName: process.env.SITE_NAME
-      }
-    })
-    .then(console.log("sent"))
-    .catch(err => console.error(err));
+const sender = async (email, data) => {
+  return await email.send({
+    template: data.template,
+    message: {
+      to: data.to
+    },
+    locals: {
+      name: data.name,
+      token: data.token,
+      siteName: process.env.SITE_NAME,
+      thread: data.threadTitle,
+      discussion: data.post
+    }
+  });
 };
 
 exports.sendEmail = async data => {
@@ -36,7 +35,7 @@ exports.sendEmail = async data => {
       )}.com>`
     },
     // uncomment below to send emails in development/test env:
-    send: true,
+    // send: true,
     transport: transport
   });
 
@@ -56,7 +55,9 @@ exports.sendEmail = async data => {
     case "account_close":
       sender(email, data);
       break;
-
+    case "subscription":
+      sender(email, data);
+      break;
     default: {
       return;
     }
