@@ -76,6 +76,7 @@ app.use("/api/v1/report", require("./routes/report"));
 app.use("/api/v1/setting", require("./routes/setting"));
 app.use("/api/v1/reward", require("./routes/reward"));
 app.use("/api/v1/subscription", require("./routes/subscription"));
+app.use("/api/v1/issues", require("./routes/issues"));
 
 // setup general error handler
 app.use(require("./helpers/generalErrors"));
