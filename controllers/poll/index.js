@@ -97,7 +97,9 @@ exports.generatePollResults = async (req, res, next) => {
 // /:threadId/new
 exports.newPoll = async (req, res, next) => {
   try {
-    const thread = await Thread.findOne({ where: { id: req.params.threadId } });
+    const thread = await Thread.findOne({
+      where: { id: req.params.threadId }
+    });
 
     if (!thread) {
       next(errors.threadError);
@@ -146,6 +148,11 @@ exports.newPoll = async (req, res, next) => {
           }
         );
 
+        const user = await User.findById(req.session.userId);
+        await user.increment("points", {
+          by: req.app.locals.pointsPerPollVote
+        });
+
         res.json({ success: true });
       }
     }
@@ -183,6 +190,11 @@ exports.voteOnPoll = async (req, res, next) => {
           UserId: req.session.userId,
           PollQuestionId: pollReq.id,
           PollResponseId: req.params.responseId
+        });
+
+        const user = await User.findById(req.session.userId);
+        await user.increment("points", {
+          by: req.app.locals.pointsPerPollVote
         });
         // return response message
         res.json({ success: true });
