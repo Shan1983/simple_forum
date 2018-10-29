@@ -54,7 +54,9 @@ exports.newPost = async (req, res, next) => {
 // can only be done by the OP
 exports.markAsBest = async (req, res, next) => {
   try {
-    const post = await Post.findById(req.params.postId);
+    const post = await Post.findOne({
+      where: { id: req.params.postId }
+    });
 
     if (!post) {
       next(errors.postError);
@@ -66,6 +68,10 @@ exports.markAsBest = async (req, res, next) => {
       } else {
         await Post.markAsBest(postReq.id);
 
+        const user = await User.findById(req.session.userId);
+        await user.increment("points", {
+          by: req.app.locals.pointsPerPollVote
+        });
         res.json({ success: true });
       }
     }
