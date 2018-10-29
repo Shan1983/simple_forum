@@ -16,6 +16,7 @@ module.exports = {
           emailVerificationToken: "123456789",
           emailVerified: true,
           RoleId: 2,
+          points: 0,
           createdAt: new Date(),
           updatedAt: new Date()
         }
