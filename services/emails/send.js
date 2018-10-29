@@ -19,10 +19,7 @@ const sender = async (email, data) => {
 
 exports.sendEmail = async data => {
   let transport, email;
-  if (
-    process.env.NODE_ENV !== "test" ||
-    process.env.NODE_ENV !== "production"
-  ) {
+  if (process.env.NODE_ENV !== "test") {
     transport = nodeMailer.createTransport({
       host: process.env.MAIL_HOST,
       port: process.env.MAIL_PORT,
