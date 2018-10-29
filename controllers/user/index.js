@@ -389,6 +389,12 @@ exports.updateProfile = async (req, res, next) => {
           name: userReq.username
         };
 
+        if (!!req.body.allowAdvertising) {
+          await user.increment("points", {
+            by: req.app.locals.pointsForAdvertising
+          });
+        }
+
         emailer.sendEmail(data);
 
         return res.json({
