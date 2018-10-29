@@ -29,6 +29,9 @@ exports.postNewThread = async (req, res, next) => {
         const user = await User.findById(req.session.userId);
 
         await user.increment("postCount", { by: 1 });
+        await user.increment("points", {
+          by: req.app.locals.pointsPerThread
+        });
 
         res.json({
           success: true
