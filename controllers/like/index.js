@@ -32,6 +32,11 @@ exports.addThreadLike = async (req, res, next) => {
               ThreadId: threadReq.id
             });
 
+            const user = await User.findById(req.session.userId);
+            await user.increment("points", {
+              by: req.app.locals.pointsPerPollVote
+            });
+
             res.json({ success: true, count: like.count + 1 });
           } else {
             next(errors.invalidLike);
