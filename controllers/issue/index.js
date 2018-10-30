@@ -7,7 +7,7 @@ exports.getAllIssues = async (req, res, next) => {
   try {
     const allIssues = await Issuetracker.findAndCountAll();
     if (allIssues.rows.length <= 0) {
-      next("not issues error");
+      next(errors.noIssuesError);
     } else {
       res.json(allIssues);
     }
@@ -23,7 +23,7 @@ exports.newIssue = async (req, res, next) => {
       validate.isEmpty(severity) ||
       validate.isEmpty(notes)
     ) {
-      next("validation error");
+      next(errors.validationError);
     } else {
       await Issuetracker.create({
         issue,
@@ -41,11 +41,11 @@ exports.editIssue = async (req, res, next) => {
   try {
     const issue = await Issuetracker.findById(req.params.issue);
     if (!issue) {
-      next("some issue error");
+      next(errors.noIssuesError);
     } else {
       const issueReq = attributes.convert(issue);
       if (issueReq.UserId !== req.session.userId) {
-        next("cant edit someone elses issue error");
+        next(errors.issueTemperError);
       } else {
         await Issuetracker.update(
           {
@@ -67,11 +67,11 @@ exports.removeIssue = async (req, res, next) => {
   try {
     const issue = await Issuetracker.findById(req.params.issue);
     if (!issue) {
-      next("some issue error");
+      next(errors.noIssuesError);
     } else {
       const issueReq = attributes.convert(issue);
       if (issueReq.UserId !== req.session.userId) {
-        next("cant delete someone elses issue error");
+        next(errors.issueTemperError);
       } else {
         await Issuetracker.destroy(
           {
