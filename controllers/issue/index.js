@@ -1,7 +1,7 @@
 const { Issuetracker } = require("../../models");
 const errors = require("../../helpers/generalErrors");
 const attributes = require("../../helpers/getModelAttributes");
-const validation = require("../../helpers/validation");
+const validate = require("../../helpers/validation");
 
 exports.getAllIssues = async (req, res, next) => {
   try {
