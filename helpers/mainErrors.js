@@ -22,11 +22,13 @@ const errors = {
   friendRequestError: ["That friend request does not exist.", 400],
   invalidLike: ["You cannot like your own thread/post.", 400],
   invalidRegister: ["You need to supply all required fields.", 400],
+  issueTemperError: ["You can not temper with someone else's issue.", 400],
   likeError: ["This like does not exist.", 400],
   lockedError: ["This thread is locked.", 400],
   loginError: ["The username or password provided was incorrect.", 401],
   notAuthorized: ["You are not authorized to continue.", 401],
   noUsers: ["Currently there are no users.", 400],
+  noIssuesError: ["There are currently no issues to report 🙌.", 400],
   penaltyError: ["You can not continue while in the penalty box.", 400],
   passwordsAreTheSame: ["You cannot use your old password.", 400],
   passwordError: ["The supplied password was incorrect.", 400],
@@ -54,6 +56,7 @@ const errors = {
     500
   ],
   userNotExist: ["Sorry this user does not exist.", 400],
+  validationError: ["All fields are required.", 400],
   verifyAccountError: [
     "Please check your registered email and follow the link to verify your account.",
     400
